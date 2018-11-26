@@ -6,12 +6,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="1219" Height="716.5">
 
-    <Grid>
-        <Image x:Name="imageDisplay" HorizontalAlignment="Left" Height="429" Margin="37,34,0,0" VerticalAlignment="Top" Width="684"/>
-        <Button x:Name="loadButton" Content="Load" HorizontalAlignment="Left" Margin="104,500,0,0" VerticalAlignment="Top" Click="loadButton_Click"/>
-        <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="192,500,0,0" VerticalAlignment="Top" Click="saveButton_Click"/>
+    <Grid HorizontalAlignment="Center" Width="1291" Margin="0,0,0,-0.333" VerticalAlignment="Stretch">
+        <Image x:Name="imageDisplay" HorizontalAlignment="Left" Height="429" Margin="750,31,185,0" VerticalAlignment="Top" Width="450"/>
+        <Image x:Name="imageSource" HorizontalAlignment="Left" Height="429" Margin="72,31,0,0" VerticalAlignment="Top" Width="450"/>
+        <Button x:Name="loadButton" Content="Load" HorizontalAlignment="Left" Margin="529,500,0,0" VerticalAlignment="Top" Click="loadButton_Click"/>
+        <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="699,500,0,0" VerticalAlignment="Top" Click="saveButton_Click"/>
 
     </Grid>
 </Page>

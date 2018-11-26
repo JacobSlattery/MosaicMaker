@@ -11,6 +11,7 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -35,6 +36,8 @@ namespace GroupEMosaicMaker
         private double dpiY;
         private WriteableBitmap modifiedImage;
 
+
+
         #endregion
 
         #region Constructors
@@ -42,6 +45,11 @@ namespace GroupEMosaicMaker
         public MainPage()
         {
             this.InitializeComponent();
+
+            var bounds = ApplicationView.GetForCurrentView().VisibleBounds;
+
+            ApplicationView.PreferredLaunchViewSize = new Size(bounds.Width, bounds.Height);
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 
             this.modifiedImage = null;
             this.dpiX = 0;
