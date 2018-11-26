@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.Xaml.Controls;
+using GroupEMosaicMaker.Model;
 using GroupEMosaicMaker.Utility;
 
 namespace GroupEMosaicMaker.ViewModel
@@ -17,6 +18,9 @@ namespace GroupEMosaicMaker.ViewModel
         private Image sourceImage;
         private Image displayImage;
         private Image resultImage;
+        private bool grid;
+        private int blockSize;
+        private ImageManipulator manipulator;
 
 
         public Image SourceImage
@@ -49,6 +53,26 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        public bool Grid
+        {
+            get => this.grid;
+            set
+            {
+                this.grid = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        public int BlockSize
+        {
+            get => this.blockSize;
+            set
+            {
+                this.blockSize = value;
+                this.OnPropertyChanged();
+            }
+        }
+
         /// <summary>
         ///     Gets or sets the save to file command.
         /// </summary>
@@ -74,6 +98,7 @@ namespace GroupEMosaicMaker.ViewModel
         {
             this.loadCommands();
             this.loadProperties();
+            this.manipulator = new ImageManipulator();
         }
 
         private void loadCommands()

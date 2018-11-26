@@ -60,6 +60,7 @@ namespace GroupEMosaicMaker
             this.dpiY = 0;
 
             this.ViewModel = new MainPageViewModel();
+            DataContext = this.ViewModel;
         }
 
         #endregion
@@ -163,6 +164,7 @@ namespace GroupEMosaicMaker
                 {
                     await writeStream.WriteAsync(sourcePixels, 0, sourcePixels.Length);
                     this.imageDisplay.Source = this.modifiedImage;
+                    this.imageSource.Source = await this.MakeACopyOfTheFileToWorkOn(sourceImageFile);
                 }
             }
         }

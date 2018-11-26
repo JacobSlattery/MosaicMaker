@@ -1,94 +1,79 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Windows.Graphics.Imaging;
+using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace GroupEMosaicMaker.Model
 {
     public class ImageManipulator
     {
-        #region Data members
-
-        private double dpiX;
-        private double dpiY;
-        private WriteableBitmap modifiedImage;
-
-        #endregion
-
-        #region Constructors
-
-        public ImageManipulator()
+        public async Task<BitmapImage> DrawGrid(StorageFile file)
         {
-            this.modifiedImage = null;
-            this.dpiX = 0;
-            this.dpiY = 0;
-        }
-
-        #endregion
-
-        #region Methods
-
-        private void createMosaic(byte[] sourcePixels, uint imageWidth, uint imageHeight, int blockSize)
-        {
-
-            var currentPixel = 0;
-            var currentPixelMax = blockSize;
-            for (var blockHeight = 0; blockHeight < imageHeight / blockSize; blockHeight++)
+            var copyBitmapImage = await this.MakeACopyOfTheFileToWorkOn(file);
+            using (var fileStream = await file.OpenAsync(FileAccessMode.Read))
             {
-                for (var blockWidth = 0; blockWidth < imageWidth / blockSize; blockWidth++)
+                var decoder = await BitmapDecoder.CreateAsync(fileStream);
+                var transform = new BitmapTransform {
+                    ScaledWidth = Convert.ToUInt32(copyBitmapImage.PixelWidth),
+                    ScaledHeight = Convert.ToUInt32(copyBitmapImage.PixelHeight)
+                };
+
+                var pixelData = await decoder.GetPixelDataAsync(
+                    BitmapPixelFormat.Bgra8,
+                    BitmapAlphaMode.Straight,
+                    transform,
+                    ExifOrientationMode.IgnoreExifOrientation,
+                    ColorManagementMode.DoNotColorManage
+                );
+
+                var sourcePixels = pixelData.DetachPixelData();
+                for (var i = 0; i < copyBitmapImage.PixelHeight; i += 30)
                 {
-                    var totalRed = 0;
-                    var totalBlue = 0;
-                    var totalGreen = 0;
-                    for (var i = currentPixel; i < currentPixelMax; i++)
+                    for (var j = 0; j < copyBitmapImage.PixelWidth; j += 30)
                     {
-                        for (var j = currentPixel; j < currentPixelMax; j++)
-                        {
-                            var pixelColor = this.getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
-                            totalRed += pixelColor.R;
-                            totalBlue += pixelColor.B;
-                            totalGreen += pixelColor.G;
-                        }
+                        var pixelColor = this.getPixelBgra8(sourcePixels, i, j, copyBitmapImage.PixelWidth, copyBitmapImage.PixelHeight);
+                        pixelColor.R = 255;
+                        pixelColor.B = 255;
+                        pixelColor.G = 255;
+                        this.setPixelBgra8(sourcePixels, i, j, pixelColor, copyBitmapImage.PixelWidth, copyBitmapImage.PixelHeight);
                     }
-
-                    for (var i = currentPixel; i < currentPixelMax; i++)
-                    {
-                        for (var j = currentPixel; j < currentPixelMax; j++)
-                        {
-                            var pixelColor = this.getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
-
-                            pixelColor.R = BitConverter.GetBytes(totalRed / blockSize)[0];
-                            pixelColor.B = BitConverter.GetBytes(totalBlue / blockSize)[0];
-                            pixelColor.G = BitConverter.GetBytes(totalGreen / blockSize)[0];
-                            //pixelColor.R = 255;
-                            this.setPixelBgra8(sourcePixels, i, j, pixelColor, imageWidth, imageHeight);
-                        }
-                    }
-
-                    currentPixel += blockSize;
-                    currentPixelMax += blockSize;
                 }
             }
 
-
+            return copyBitmapImage;
         }
 
-        private Color getPixelBgra8(byte[] pixels, int x, int y, uint width, uint height)
+        private async Task<BitmapImage> MakeACopyOfTheFileToWorkOn(StorageFile imageFile)
         {
-            var offset = (x * (int) width + y) * 4;
+            IRandomAccessStream inputStream = await imageFile.OpenReadAsync();
+            var newImage = new BitmapImage();
+            newImage.SetSource(inputStream);
+            return newImage;
+        }
+
+        private Color getPixelBgra8(byte[] pixels, int x, int y, int width, int height)
+        {
+            var offset = (x * (int)width + y) * 4;
             var r = pixels[offset + 2];
             var g = pixels[offset + 1];
             var b = pixels[offset + 0];
             return Color.FromArgb(0, r, g, b);
         }
 
-        private void setPixelBgra8(byte[] pixels, int x, int y, Color color, uint width, uint height)
+        private void setPixelBgra8(byte[] pixels, int x, int y, Color color, int width, int height)
         {
-            var offset = (x * (int) width + y) * 4;
+            var offset = (x * (int)width + y) * 4;
             pixels[offset + 2] = color.R;
             pixels[offset + 1] = color.G;
             pixels[offset + 0] = color.B;
         }
 
-        #endregion
-    }
+    
 }
