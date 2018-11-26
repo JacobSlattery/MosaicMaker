@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Imaging;
+using Windows.Media.Audio;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
@@ -112,6 +113,7 @@ namespace GroupEMosaicMaker
                 var sourcePixels = pixelData.DetachPixelData();
 
                 this.giveImageRedTint(sourcePixels, decoder.PixelWidth, decoder.PixelHeight);
+               
 
                 this.modifiedImage = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                 using (var writeStream = this.modifiedImage.PixelBuffer.AsStream())
@@ -134,6 +136,9 @@ namespace GroupEMosaicMaker
                 }
             }
         }
+
+      
+
 
         private async Task<StorageFile> selectSourceImageFile()
         {
