@@ -6,13 +6,22 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="1219" Height="716.5">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="1264.75" Height="789.713">
 
-    <Grid HorizontalAlignment="Center" Width="1291" Margin="0,0,0,-0.333" VerticalAlignment="Stretch">
-        <Image x:Name="imageDisplay" HorizontalAlignment="Left" Height="429" Margin="750,31,185,0" VerticalAlignment="Top" Width="450"/>
-        <Image x:Name="imageSource" HorizontalAlignment="Left" Height="429" Margin="72,31,0,0" VerticalAlignment="Top" Width="450"/>
-        <Button x:Name="loadButton" Content="Load" HorizontalAlignment="Left" Margin="529,500,0,0" VerticalAlignment="Top" Click="loadButton_Click"/>
-        <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="699,500,0,0" VerticalAlignment="Top" Click="saveButton_Click"/>
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Height="789" Width="1265">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <CommandBar VerticalAlignment="Top" Grid.ColumnSpan="2" Height="48" Margin="0,0,1,0">
+            <AppBarButton Icon="Save" Label="Save File" Command="{Binding SaveToFileCommand, UpdateSourceTrigger=PropertyChanged}" />
+            <AppBarButton Icon="OpenFile" Label="Load File" Command="{Binding LoadFileCommand}" />
+        </CommandBar>
+
+        <Image x:Name="imageDisplay" Source="{Binding ResultImage, Mode=OneWay}" HorizontalAlignment="Left" Height="429" Margin="686,87,0,273" Width="450" Grid.Column="1"/>
+        <Image x:Name="imageSource" Source="{Binding SourceImage, Mode=OneWay}" HorizontalAlignment="Left" Height="429" Margin="82,87,0,0" VerticalAlignment="Top" Width="450" Grid.Column="1"/>
+        <Button x:Name="loadButton" Content="Load" HorizontalAlignment="Left" Margin="480,548,0,0" VerticalAlignment="Top" Click="loadButton_Click" Height="32" Width="52" Grid.Column="1" />
+        <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="686,548,0,0" VerticalAlignment="Top" Click="saveButton_Click" Height="32" Width="51" Grid.Column="1" />
 
     </Grid>
 </Page>
