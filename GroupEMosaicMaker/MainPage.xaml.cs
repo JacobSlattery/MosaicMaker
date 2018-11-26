@@ -12,6 +12,7 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -20,6 +21,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using GroupEMosaicMaker.ViewModel;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -36,6 +38,10 @@ namespace GroupEMosaicMaker
         private double dpiY;
         private WriteableBitmap modifiedImage;
 
+        public MainPageViewModel ViewModel;
+
+
+
         #endregion
 
         #region Constructors
@@ -44,9 +50,16 @@ namespace GroupEMosaicMaker
         {
             this.InitializeComponent();
 
+            var bounds = ApplicationView.GetForCurrentView().VisibleBounds;
+
+            ApplicationView.PreferredLaunchViewSize = new Size(bounds.Width, bounds.Height);
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+
             this.modifiedImage = null;
             this.dpiX = 0;
             this.dpiY = 0;
+
+            this.ViewModel = new MainPageViewModel();
         }
 
         #endregion
@@ -84,6 +97,36 @@ namespace GroupEMosaicMaker
             }
         }
 
+
+        /// <summary>
+        ///     Picks the file to open with a file open picker.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="StorageFile"/>.
+        /// </returns>
+        public static async Task<StorageFile> PickFileWithOpenPicker()
+        {
+            var openPicker = new FileOpenPicker
+            {
+                ViewMode = PickerViewMode.Thumbnail,
+                SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+            };
+            //openPicker.FileTypeFilter.Add(".csv");
+            //openPicker.FileTypeFilter.Add(".txt");
+            //openPicker.FileTypeFilter.Add(".xml");
+
+            StorageFile file;
+            try
+            {
+                file = await openPicker.PickSingleFileAsync();
+            }
+            catch (NullReferenceException)
+            {
+                file = null;
+            }
+
+            return file;
+        }
 
         private async void loadButton_Click(object sender, RoutedEventArgs e)
         {
