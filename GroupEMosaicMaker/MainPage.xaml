@@ -31,7 +31,7 @@
         <Image Source="{Binding DisplayImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="429" Margin="82,87,0,0" VerticalAlignment="Top" Width="450" Grid.Column="1"/>
         <TextBox x:Name="blockSizeTextBox" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="167,548,0,0" Text="{Binding Path=BlockSize, Mode=TwoWay, Converter={StaticResource IntConverter}, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
         <TextBlock x:Name="blockSizeTextBlock" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="82,554,0,0" Text="Block size:" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <RadioButton x:Name="gridRadionButton" Content="Display grid" Grid.ColumnSpan="2" IsChecked="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="283,548,0,0" VerticalAlignment="Top"/>
+        <CheckBox Content="Grid" Grid.ColumnSpan="2" IsChecked="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="283,548,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Page>

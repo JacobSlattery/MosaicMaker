@@ -20,7 +20,7 @@ namespace GroupEMosaicMaker.ViewModel
     {
         #region Data members
 
-        private Image sourceImage;
+        private StorageFile sourceFile;
         private WriteableBitmap displayImage;
         private WriteableBitmap resultImage;
         private bool grid;
@@ -33,12 +33,15 @@ namespace GroupEMosaicMaker.ViewModel
 
         #region Properties
 
-        public Image SourceImage
+        private WriteableBitmap currentImage;
+        public WriteableBitmap currentImageWithGrid;
+
+        public StorageFile SourceFile
         {
-            get => this.sourceImage;
+            get => this.sourceFile;
             set
             {
-                this.sourceImage = value;
+                this.sourceFile = value;
                 this.OnPropertyChanged();
             }
         }
@@ -68,8 +71,12 @@ namespace GroupEMosaicMaker.ViewModel
             get => this.grid;
             set
             {
-                this.grid = value;
-                this.OnPropertyChanged();
+                if (this.grid != value)
+                {
+                    this.grid = value;
+                    this.updateDisplayImage();
+                    this.OnPropertyChanged();
+                }
             }
         }
 
@@ -126,11 +133,14 @@ namespace GroupEMosaicMaker.ViewModel
 
         private void loadProperties()
         {
-           // this.DisplayImage = new Image();
             this.DisplayImage = null;
+            this.currentImageWithGrid = null;
+            this.currentImage = null;
             this.ResultImage = null;
-            this.SourceImage = new Image();
+            this.SourceFile = null;
             this.BlockSize = 100;
+            this.Grid = false;
+            
         }
 
         private async void loadFile(object obj)
@@ -139,17 +149,27 @@ namespace GroupEMosaicMaker.ViewModel
 
             if (file != null)
             {
-                await this.handleNewImage(file);
+                this.SourceFile = file;
+                await this.handleNewImageFile();
             }
         }
 
-        private async Task handleNewImage(StorageFile file)
+        private void updateDisplayImage()
         {
-            var sourceImageFile = file;
-            var copyBitmapImage = await this.MakeACopyOfTheFileToWorkOn(sourceImageFile);
+            if (this.Grid)
+            {
+                this.DisplayImage = this.currentImageWithGrid;
+            }
+            else
+            {
+                this.DisplayImage = this.currentImage;
+            }
+        }
 
-
-            using (var fileStream = await sourceImageFile.OpenAsync(FileAccessMode.Read))
+        private async Task handleNewImageFile()
+        {
+            var copyBitmapImage = await this.MakeACopyOfTheFileToWorkOn(this.SourceFile);
+            using (var fileStream = await this.SourceFile.OpenAsync(FileAccessMode.Read))
             {
                 var decoder = await BitmapDecoder.CreateAsync(fileStream);
                 var transform = new BitmapTransform {
@@ -169,17 +189,21 @@ namespace GroupEMosaicMaker.ViewModel
                 );
 
                 var sourcePixels = pixelData.DetachPixelData();
-             
-                
-                ImageManipulator.DrawGrid(sourcePixels, decoder.PixelWidth, decoder.PixelHeight, this.BlockSize);
-        
 
-                this.DisplayImage = new WriteableBitmap((int) decoder.PixelWidth, (int) decoder.PixelHeight);
-                using (var writeStream = this.DisplayImage.PixelBuffer.AsStream())
+
+                this.currentImage = new WriteableBitmap((int) decoder.PixelWidth, (int) decoder.PixelHeight);
+                using (var writeStream = this.currentImage.PixelBuffer.AsStream())
                 {
                     await writeStream.WriteAsync(sourcePixels, 0, sourcePixels.Length);
-                    this.OnPropertyChanged(nameof(this.DisplayImage));
                 }
+
+                ImageManipulator.DrawGrid(sourcePixels, decoder.PixelWidth, decoder.PixelHeight, this.BlockSize);
+                this.currentImageWithGrid = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                using (var writeStream = this.currentImageWithGrid.PixelBuffer.AsStream())
+                {
+                    await writeStream.WriteAsync(sourcePixels, 0, sourcePixels.Length);
+                }
+                this.updateDisplayImage();
             }
         }
 

@@ -36,8 +36,6 @@ namespace GroupEMosaicMaker
     {
         #region Data members
 
-        private WriteableBitmap modifiedImage;
-
         public MainPageViewModel ViewModel;
 
         public static readonly string[] FileTypes = { ".jpeg", ".jpg", ".gif", ".bmp", ".png" };
@@ -55,18 +53,11 @@ namespace GroupEMosaicMaker
             ApplicationView.PreferredLaunchViewSize = new Size(bounds.Width, bounds.Height);
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 
-            this.modifiedImage = null;
-            //this.dpiX = 0;
-            //this.dpiY = 0;
-
             this.ViewModel = new MainPageViewModel();
             this.DataContext = this.ViewModel;
         }
 
         #endregion
-
-
-
 
         /// <summary>
         ///     Picks the file to open with a file open picker.
