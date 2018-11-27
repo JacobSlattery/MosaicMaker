@@ -65,38 +65,7 @@ namespace GroupEMosaicMaker
 
         #endregion
 
-        //private void saveButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    this.saveWritableBitmap();
-        //}
 
-        //private async void saveWritableBitmap()
-        //{
-        //    var fileSavePicker = new FileSavePicker
-        //    {
-        //        SuggestedStartLocation = PickerLocationId.PicturesLibrary,
-        //        SuggestedFileName = "image"
-        //    };
-        //    fileSavePicker.FileTypeChoices.Add("PNG files", new List<string> { ".png" });
-        //    var savefile = await fileSavePicker.PickSaveFileAsync();
-
-        //    if (savefile != null)
-        //    {
-        //        var stream = await savefile.OpenAsync(FileAccessMode.ReadWrite);
-        //        var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
-
-        //        var pixelStream = this.modifiedImage.PixelBuffer.AsStream();
-        //        var pixels = new byte[pixelStream.Length];
-        //        await pixelStream.ReadAsync(pixels, 0, pixels.Length);
-
-        //        encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore,
-        //            (uint)this.modifiedImage.PixelWidth,
-        //            (uint)this.modifiedImage.PixelHeight, this.dpiX, this.dpiY, pixels);
-        //        await encoder.FlushAsync();
-
-        //        stream.Dispose();
-        //    }
-        //}
 
 
         /// <summary>

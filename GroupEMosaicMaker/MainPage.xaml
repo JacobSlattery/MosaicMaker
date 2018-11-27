@@ -27,10 +27,8 @@
             <AppBarButton Icon="OpenFile" Label="Load File" Command="{Binding LoadFileCommand}" />
         </CommandBar>
 
-        <Image Source="{Binding ResultImage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="429" Margin="686,87,0,273" Width="450" Grid.Column="1"/>
-        <Image Source="{Binding DisplayImage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="429" Margin="82,87,0,0" VerticalAlignment="Top" Width="450" Grid.Column="1"/>
-        <Button x:Name="loadButton" Content="Load" HorizontalAlignment="Left" Margin="480,548,0,0" VerticalAlignment="Top" Height="32" Width="52" Grid.Column="1" />
-        <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="686,548,0,0" VerticalAlignment="Top" Height="32" Width="51" Grid.Column="1" />
+        <Image Source="{Binding ResultImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="429" Margin="686,87,0,273" Width="450" Grid.Column="1"/>
+        <Image Source="{Binding DisplayImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="429" Margin="82,87,0,0" VerticalAlignment="Top" Width="450" Grid.Column="1"/>
         <TextBox x:Name="blockSizeTextBox" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="167,548,0,0" Text="{Binding Path=BlockSize, Mode=TwoWay, Converter={StaticResource IntConverter}, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
         <TextBlock x:Name="blockSizeTextBlock" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="82,554,0,0" Text="Block size:" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <RadioButton x:Name="gridRadionButton" Content="Display grid" Grid.ColumnSpan="2" IsChecked="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="283,548,0,0" VerticalAlignment="Top"/>
