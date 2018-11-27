@@ -38,11 +38,13 @@ namespace GroupEMosaicMaker.Model
                 {
                     for (var j = 0; j < copyBitmapImage.PixelWidth; j += 30)
                     {
-                        var pixelColor = this.getPixelBgra8(sourcePixels, i, j, copyBitmapImage.PixelWidth, copyBitmapImage.PixelHeight);
+                        var pixelColor = this.getPixelBgra8(sourcePixels, i, j, copyBitmapImage.PixelWidth,
+                            copyBitmapImage.PixelHeight);
                         pixelColor.R = 255;
                         pixelColor.B = 255;
                         pixelColor.G = 255;
-                        this.setPixelBgra8(sourcePixels, i, j, pixelColor, copyBitmapImage.PixelWidth, copyBitmapImage.PixelHeight);
+                        this.setPixelBgra8(sourcePixels, i, j, pixelColor, copyBitmapImage.PixelWidth,
+                            copyBitmapImage.PixelHeight);
                     }
                 }
             }
@@ -60,7 +62,7 @@ namespace GroupEMosaicMaker.Model
 
         private Color getPixelBgra8(byte[] pixels, int x, int y, int width, int height)
         {
-            var offset = (x * (int)width + y) * 4;
+            var offset = (x * (int) width + y) * 4;
             var r = pixels[offset + 2];
             var g = pixels[offset + 1];
             var b = pixels[offset + 0];
@@ -69,11 +71,12 @@ namespace GroupEMosaicMaker.Model
 
         private void setPixelBgra8(byte[] pixels, int x, int y, Color color, int width, int height)
         {
-            var offset = (x * (int)width + y) * 4;
+            var offset = (x * (int) width + y) * 4;
             pixels[offset + 2] = color.R;
             pixels[offset + 1] = color.G;
             pixels[offset + 0] = color.B;
         }
 
-    
+
+    }
 }

@@ -6,6 +6,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Graphics.Capture;
 using Windows.Graphics.Imaging;
 using Windows.Media.Audio;
 using Windows.Storage;
@@ -60,7 +61,7 @@ namespace GroupEMosaicMaker
             this.dpiY = 0;
 
             this.ViewModel = new MainPageViewModel();
-            DataContext = this.ViewModel;
+            this.DataContext = this.ViewModel;
         }
 
         #endregion
@@ -156,15 +157,17 @@ namespace GroupEMosaicMaker
 
                 var sourcePixels = pixelData.DetachPixelData();
 
-                this.giveImageRedTint(sourcePixels, decoder.PixelWidth, decoder.PixelHeight);
-               
+                //this.giveImageRedTint(sourcePixels, decoder.PixelWidth, decoder.PixelHeight);
+                //this.DrawGrid(sourcePixels, decoder.PixelWidth, decoder.PixelHeight);
+                this.CreateMosaic(sourcePixels, decoder.PixelWidth, decoder.PixelHeight);
 
                 this.modifiedImage = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
                 using (var writeStream = this.modifiedImage.PixelBuffer.AsStream())
                 {
                     await writeStream.WriteAsync(sourcePixels, 0, sourcePixels.Length);
-                    this.imageDisplay.Source = this.modifiedImage;
-                    this.imageSource.Source = await this.MakeACopyOfTheFileToWorkOn(sourceImageFile);
+                    this.imageSource.Source = this.modifiedImage;
+                    this.imageDisplay.Source = await this.MakeACopyOfTheFileToWorkOn(sourceImageFile);
+
                 }
             }
         }
@@ -177,12 +180,90 @@ namespace GroupEMosaicMaker
                 {
                     var pixelColor = this.getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
                     pixelColor.R = 255;
+   
                     this.setPixelBgra8(sourcePixels, i, j, pixelColor, imageWidth, imageHeight);
                 }
             }
+            
         }
 
-      
+
+        public void DrawGrid(byte[] sourcePixels, uint imageWidth, uint imageHeight)
+        {
+
+            for (var i = 0; i < imageHeight; i++)
+            {
+                for (var j = 0; j < imageWidth; j += Convert.ToInt32(this.blockSizeTextBox.Text))
+                {
+                    var pixelColor = this.getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
+                    pixelColor.R = 255;
+                    pixelColor.B = 255;
+                    pixelColor.G = 255;
+                    this.setPixelBgra8(sourcePixels, i, j, pixelColor, imageWidth, imageHeight);
+                }
+            }
+
+            for (var i = 0; i < imageHeight; i += Convert.ToInt32(this.blockSizeTextBox.Text))
+            {
+                for (var j = 0; j < imageWidth; j++)
+                {
+                    var pixelColor = this.getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
+                    pixelColor.R = 255;
+                    pixelColor.B = 255;
+                    pixelColor.G = 255;
+                    this.setPixelBgra8(sourcePixels, i, j, pixelColor, imageWidth, imageHeight);
+                }
+            }
+
+        }
+
+        public void CreateMosaic(byte[] sourcePixels, uint imageWidth, uint imageHeight)
+        {
+            var currentPixel = 0;
+            var currentPixelMax = Convert.ToInt32(this.blockSizeTextBox.Text);
+            for (var blockHeight = 0; blockHeight < (Convert.ToDouble(imageHeight) / Convert.ToDouble(this.blockSizeTextBox.Text)); blockHeight ++)
+            {
+                for (var blockWidth = 0;
+                    blockWidth < (Convert.ToDouble(imageWidth) / Convert.ToDouble(this.blockSizeTextBox.Text));
+                    blockWidth++)
+                {
+                    var totalRed = 0;
+                    var totalBlue = 0;
+                    var totalGreen = 0;
+                    var pixelCounter = 0;
+
+                    for (var i = currentPixel; i < currentPixelMax; i++)
+                    {
+                        for (var j = currentPixel; j < currentPixelMax; j++)
+                        {
+                            var pixelColor = this.getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
+                            totalRed += pixelColor.R;
+                            totalBlue += pixelColor.B;
+                            totalGreen += pixelColor.G;
+                            pixelCounter++;
+                        }
+                    }
+
+                    for (var i = currentPixel; i < currentPixelMax; i++)
+                    {
+                        for (var j = currentPixel; j < currentPixelMax; j++)
+                        {
+                            var pixelColor = this.getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
+                            pixelColor.R = BitConverter.GetBytes(totalRed / pixelCounter)[0];
+                            pixelColor.B = BitConverter.GetBytes(totalBlue / pixelCounter)[0];
+                            pixelColor.G = BitConverter.GetBytes(totalGreen / pixelCounter)[0];
+                            this.setPixelBgra8(sourcePixels, i ,j, pixelColor, imageWidth, imageHeight);
+                        }
+                    }
+
+                    currentPixel += Convert.ToInt32(this.blockSizeTextBox.Text);
+                    currentPixelMax += Convert.ToInt32(this.blockSizeTextBox.Text);
+
+                }
+            }
+
+        }
+
 
 
         private async Task<StorageFile> selectSourceImageFile()
