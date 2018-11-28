@@ -40,8 +40,8 @@ namespace GroupEMosaicMaker.Model
             var currentPixelMaxHeight = blockSize;
             var currentPixelWidth = 0;
             var currentPixelMaxWidth = blockSize;
-            var maxForBlockHeight = Convert.ToInt32(Math.Round(Convert.ToDecimal(imageHeight / blockSize)));
-            var maxForBlockWidth = Convert.ToInt32(Math.Round(Convert.ToDecimal(imageWidth / blockSize)));
+            var maxForBlockHeight = Convert.ToInt32(Math.Round(Convert.ToDecimal(imageHeight / blockSize))) + 1;
+            var maxForBlockWidth = Convert.ToInt32(Math.Round(Convert.ToDecimal(imageWidth / blockSize))) + 1;
             for (var blockHeight = 0;
                 blockHeight < maxForBlockHeight;
                 blockHeight++)
