@@ -36,7 +36,7 @@ namespace GroupEMosaicMaker.Model
                 {
                     var pixelColor = Color.FromArgb(255, 255, 255, 255);
                     setPixelBgra8(this.SourcePixels, i, j, pixelColor, this.ImageWidth, this.ImageHeight);
-                    setPixelBgra8(this.SourcePixels, i, j + 1, pixelColor, this.ImageWidth, this.ImageHeight);
+                 //   setPixelBgra8(this.SourcePixels, i, j + 1, pixelColor, this.ImageWidth, this.ImageHeight);
                 }
             }
 
@@ -46,7 +46,7 @@ namespace GroupEMosaicMaker.Model
                 {
                     var pixelColor = Color.FromArgb(255, 255, 255, 255);
                     setPixelBgra8(this.SourcePixels, i, j, pixelColor, this.ImageWidth, this.ImageHeight);
-                    setPixelBgra8(this.SourcePixels, i + 1, j, pixelColor, this.ImageWidth, this.ImageHeight);
+                  //  setPixelBgra8(this.SourcePixels, i + 1, j, pixelColor, this.ImageWidth, this.ImageHeight);
                 }
             }
         }
