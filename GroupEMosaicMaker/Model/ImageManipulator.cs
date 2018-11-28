@@ -36,8 +36,10 @@ namespace GroupEMosaicMaker.Model
 
         public static void CreateMosaic(byte[] sourcePixels, uint imageWidth, uint imageHeight, int blockSize)
         {
-            var currentPixel = 0;
-            var currentPixelMax = blockSize;
+            var currentPixelHeight = 0;
+            var currentPixelMaxHeight = blockSize;
+            var currentPixelWidth = 0;
+            var currentPixelMaxWidth = blockSize;
             var maxForBlockHeight = Convert.ToInt32(Math.Round(Convert.ToDecimal(imageHeight / blockSize)));
             var maxForBlockWidth = Convert.ToInt32(Math.Round(Convert.ToDecimal(imageWidth / blockSize)));
             for (var blockHeight = 0;
@@ -53,9 +55,9 @@ namespace GroupEMosaicMaker.Model
                     var totalGreen = 0;
                     var pixelCounter = 0;
 
-                    for (var i = currentPixel; i < currentPixelMax; i++)
+                    for (var i = currentPixelHeight; i < currentPixelMaxHeight; i++)
                     {
-                        for (var j = currentPixel; j < currentPixelMax; j++)
+                        for (var j = currentPixelWidth; j < currentPixelMaxWidth; j++)
                         {
                             var pixelColor = getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
                             totalRed += pixelColor.R;
@@ -65,9 +67,9 @@ namespace GroupEMosaicMaker.Model
                         }
                     }
 
-                    for (var i = currentPixel; i < currentPixelMax; i++)
+                    for (var i = currentPixelHeight; i < currentPixelMaxHeight; i++)
                     {
-                        for (var j = currentPixel; j < currentPixelMax; j++)
+                        for (var j = currentPixelWidth; j < currentPixelMaxWidth; j++)
                         {
                             var pixelColor = getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
                             pixelColor.R = BitConverter.GetBytes(totalRed / pixelCounter)[0];
@@ -77,18 +79,28 @@ namespace GroupEMosaicMaker.Model
                         }
                     }
 
-                    currentPixel += blockSize;
-                    if (currentPixelMax + blockSize > imageWidth)
+                    currentPixelWidth += blockSize;
+                    if (currentPixelMaxWidth + blockSize > imageWidth)
                     {
-                        currentPixelMax += (Convert.ToInt32(imageWidth) - currentPixelMax);
+                        currentPixelMaxWidth += (Convert.ToInt32(imageWidth) - currentPixelMaxWidth);
                     }
                     else
                     {
-                        currentPixelMax += blockSize;
+                        currentPixelMaxWidth += blockSize;
                     }
-                    
-                }
 
+                }
+                currentPixelHeight += blockSize;
+                if (currentPixelMaxHeight + blockSize > imageHeight)
+                {
+                    currentPixelMaxHeight += (Convert.ToInt32(imageHeight) - currentPixelMaxHeight);
+                }
+                else
+                {
+                    currentPixelMaxHeight += blockSize;
+                }
+                currentPixelWidth = 0;
+                currentPixelMaxWidth = blockSize;
             }
         }
 
