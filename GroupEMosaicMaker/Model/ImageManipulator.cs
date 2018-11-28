@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Streams;
@@ -50,6 +52,7 @@ namespace GroupEMosaicMaker.Model
                     blockWidth < maxForBlockWidth;
                     blockWidth++)
                 {
+                    var byteCollection = new Collection<byte>();
                     var totalRed = 0;
                     var totalBlue = 0;
                     var totalGreen = 0;
@@ -59,25 +62,36 @@ namespace GroupEMosaicMaker.Model
                     {
                         for (var j = currentPixelWidth; j < currentPixelMaxWidth; j++)
                         {
-                            var pixelColor = getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
-                            totalRed += pixelColor.R;
-                            totalBlue += pixelColor.B;
-                            totalGreen += pixelColor.G;
-                            pixelCounter++;
+                            //var pixelColor = getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
+                            //totalRed += pixelColor.R;
+                            //totalBlue += pixelColor.B;
+                            //totalGreen += pixelColor.G;
+                            //pixelCounter++;
+                            var myPixels = getPixelAt(sourcePixels, i, j, imageWidth);
+                            foreach(var pixel in myPixels)
+                            {
+                                byteCollection.Add(pixel);
+                            }
+                            
+
                         }
                     }
 
-                    for (var i = currentPixelHeight; i < currentPixelMaxHeight; i++)
-                    {
-                        for (var j = currentPixelWidth; j < currentPixelMaxWidth; j++)
-                        {
-                            var pixelColor = getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
-                            pixelColor.R = BitConverter.GetBytes(totalRed / pixelCounter)[0];
-                            pixelColor.B = BitConverter.GetBytes(totalBlue / pixelCounter)[0];
-                            pixelColor.G = BitConverter.GetBytes(totalGreen / pixelCounter)[0];
-                            setPixelBgra8(sourcePixels, i, j, pixelColor, imageWidth, imageHeight);
-                        }
-                    }
+                    Panel.FillPanelWithAverageColor(byteCollection.ToArray());
+                    //for (var i = currentPixelHeight; i < currentPixelMaxHeight; i++)
+                    //{
+                    //    for (var j = currentPixelWidth; j < currentPixelMaxWidth; j++)
+                    //    {
+                    //        var pixelColor = getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
+                    //       // pixelColor.R = BitConverter.GetBytes(totalRed / pixelCounter)[0];
+                    //       // pixelColor.B = BitConverter.GetBytes(totalBlue / pixelCounter)[0];
+                    //       // pixelColor.G = BitConverter.GetBytes(totalGreen / pixelCounter)[0];
+                    //        pixelColor.R = (byte) (totalRed / pixelCounter);
+                    //        pixelColor.B = (byte) (totalBlue / pixelCounter);
+                    //        pixelColor.G = (byte) (totalGreen / pixelCounter);
+                    //        setPixelBgra8(sourcePixels, i, j, pixelColor, imageWidth, imageHeight);
+                    //    }
+                    //}
 
                     currentPixelWidth += blockSize;
                     if (currentPixelMaxWidth + blockSize > imageWidth)

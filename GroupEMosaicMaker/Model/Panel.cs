@@ -10,8 +10,13 @@ namespace GroupEMosaicMaker.Model
 
         public static void FillPanelWithAverageColor(byte[] pixels)
         {
-            var average = getAverageColorInPanel(pixels);
-            convertPanelTo(pixels, average);
+            if (pixels.Count() != 0)
+            {
+                var average = getAverageColorInPanel(pixels);
+                convertPanelTo(pixels, average);
+
+            }
+            
         }
 
         private static void convertPanelTo(byte[] pixels, Color color)
