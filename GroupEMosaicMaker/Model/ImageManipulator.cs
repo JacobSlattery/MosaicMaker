@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI;
-using Windows.UI.Notifications;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace GroupEMosaicMaker.Model
@@ -135,14 +131,6 @@ namespace GroupEMosaicMaker.Model
         {
             var offset = (x * (int)width + y) * 4;
             return new[] { pixels[offset], pixels[offset + 1], pixels[offset + 2], pixels[offset + 3] };
-        }
-
-        private async Task<BitmapImage> MakeACopyOfTheFileToWorkOn(StorageFile imageFile)
-        {
-            IRandomAccessStream inputStream = await imageFile.OpenReadAsync();
-            var newImage = new BitmapImage();
-            newImage.SetSource(inputStream);
-            return newImage;
         }
 
         private static Color getPixelBgra8(byte[] pixels, int x, int y, uint width, uint height)

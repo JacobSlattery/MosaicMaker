@@ -1,11 +1,10 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
-using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.UI.Xaml.Media.Imaging;
+using GroupEMosaicMaker.FileIO;
 using GroupEMosaicMaker.Model;
 using GroupEMosaicMaker.Utility;
 
@@ -20,10 +19,8 @@ namespace GroupEMosaicMaker.ViewModel
         private WriteableBitmap resultImage;
         private bool grid;
         private int blockSize;
-        private ImageManipulator manipulatorForDisplay;
-        private ImageManipulator manipulatorForResult;
-        private double dpiX;
-        private double dpiY;
+        private ImageManipulator manipulatorForGridImage;
+        private ImageManipulator manipulatorForResultImage;
         private readonly ImageStorage imageStorageForGrid;
         private readonly ImageStorage imageStorageForMosaic;
 
@@ -61,6 +58,7 @@ namespace GroupEMosaicMaker.ViewModel
             set
             {
                 this.resultImage = value;
+                this.SaveToFileCommand.OnCanExecuteChanged();
                 this.OnPropertyChanged();
             }
         }
@@ -88,13 +86,13 @@ namespace GroupEMosaicMaker.ViewModel
                 this.OnPropertyChanged();
                 if (this.SourceFile != null)
                 {
-                    this.manipulatorForDisplay = new ImageManipulator(this.imageStorageForGrid.Decoder.PixelWidth,
+                    this.manipulatorForGridImage = new ImageManipulator(this.imageStorageForGrid.Decoder.PixelWidth,
                         this.imageStorageForGrid.Decoder.PixelHeight, this.imageStorageForGrid.SourcePixels);
-                    this.manipulatorForDisplay.DrawGrid(this.BlockSize);
+                    this.manipulatorForGridImage.DrawGrid(this.BlockSize);
                     this.currentImageWithGrid = new WriteableBitmap((int) this.imageStorageForGrid.Decoder.PixelWidth,
                         (int) this.imageStorageForGrid.Decoder.PixelHeight);
                     this.writeStreamOfPixels(this.currentImageWithGrid,
-                        this.manipulatorForDisplay.RetrieveModifiedPixels());
+                        this.manipulatorForGridImage.RetrieveModifiedPixels());
                     this.updateDisplayImage();
                 }
             }
@@ -199,12 +197,12 @@ namespace GroupEMosaicMaker.ViewModel
             this.currentImage = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.currentImage, pixels);
 
-            this.manipulatorForDisplay = new ImageManipulator((uint) width,
+            this.manipulatorForGridImage = new ImageManipulator((uint) width,
                 (uint) height, pixels);
 
-            this.manipulatorForDisplay.DrawGrid(this.BlockSize);
+            this.manipulatorForGridImage.DrawGrid(this.BlockSize);
             this.currentImageWithGrid = new WriteableBitmap(width, height);
-            this.writeStreamOfPixels(this.currentImageWithGrid, this.manipulatorForDisplay.RetrieveModifiedPixels());
+            this.writeStreamOfPixels(this.currentImageWithGrid, this.manipulatorForGridImage.RetrieveModifiedPixels());
             this.updateDisplayImage();
         }
 
@@ -215,11 +213,11 @@ namespace GroupEMosaicMaker.ViewModel
             var width = (int) this.imageStorageForMosaic.Decoder.PixelWidth;
             var height = (int) this.imageStorageForMosaic.Decoder.PixelHeight;
             var pixels = this.imageStorageForMosaic.SourcePixels;
-            this.manipulatorForResult = new ImageManipulator((uint) width, (uint) height, pixels);
-            this.manipulatorForResult.CreateMosaic(this.BlockSize);
+            this.manipulatorForResultImage = new ImageManipulator((uint) width, (uint) height, pixels);
+            this.manipulatorForResultImage.CreateMosaic(this.BlockSize);
 
             this.ResultImage = new WriteableBitmap(width, height);
-            this.writeStreamOfPixels(this.ResultImage, this.manipulatorForResult.RetrieveModifiedPixels());
+            this.writeStreamOfPixels(this.ResultImage, this.manipulatorForResultImage.RetrieveModifiedPixels());
         }
 
         private async void writeStreamOfPixels(WriteableBitmap bitMap, byte[] sourcePixels)
@@ -235,19 +233,7 @@ namespace GroupEMosaicMaker.ViewModel
             var saveFile = await MainPage.SelectSaveImageFile();
             if (saveFile != null)
             {
-                var stream = await saveFile.OpenAsync(FileAccessMode.ReadWrite);
-                var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
-
-                var pixelStream = this.ResultImage.PixelBuffer.AsStream();
-                var pixels = new byte[pixelStream.Length];
-                await pixelStream.ReadAsync(pixels, 0, pixels.Length);
-
-                encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore,
-                    (uint) this.ResultImage.PixelWidth,
-                    (uint) this.ResultImage.PixelHeight, this.dpiX, this.dpiY, pixels);
-                await encoder.FlushAsync();
-
-                stream.Dispose();
+                await ImageSaver.SaveImage(saveFile, this.ResultImage, this.imageStorageForMosaic);
             }
         }
 
@@ -263,7 +249,7 @@ namespace GroupEMosaicMaker.ViewModel
 
         private bool canSaveToFile(object obj)
         {
-            return true;
+            return this.ResultImage != null;
         }
 
         #endregion
