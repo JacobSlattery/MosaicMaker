@@ -26,7 +26,8 @@ namespace GroupEMosaicMaker.ViewModel
         private WriteableBitmap resultImage;
         private bool grid;
         private int blockSize;
-        private ImageManipulator manipulator;
+        private ImageManipulator manipulatorForDisplay;
+        private ImageManipulator manipulatorForResult;
         private double dpiX;
         private double dpiY;
 
@@ -78,6 +79,8 @@ namespace GroupEMosaicMaker.ViewModel
                     this.grid = value;
                     this.updateDisplayImage();
                     this.OnPropertyChanged();
+                   // this.manipulatorForDisplay.DrawGrid(this.BlockSize);
+                   // this.updateDisplayImage();
                 }
             }
         }
@@ -89,6 +92,13 @@ namespace GroupEMosaicMaker.ViewModel
             {
                 this.blockSize = value;
                 this.OnPropertyChanged();
+                if (this.SourceFile != null)
+                {
+                    this.manipulatorForDisplay.DrawGrid(this.BlockSize);
+                    this.manipulatorForResult.CreateMosaic(this.BlockSize);
+                    this.updateDisplayImage();
+                }
+                
             }
         }
 
@@ -115,7 +125,7 @@ namespace GroupEMosaicMaker.ViewModel
         {
             this.loadCommands();
             this.loadProperties();
-            this.manipulator = new ImageManipulator();
+            //this.manipulator = new ImageManipulator();
         }
 
         #endregion
@@ -156,6 +166,7 @@ namespace GroupEMosaicMaker.ViewModel
         {
             var file = await this.MakeACopyOfTheFileToWorkOn(this.SourceFile);
             await this.handleCreatingMosaic(file);
+            await this.handleNewImageFile();
         }
 
         private async void loadFile(object obj)
@@ -173,7 +184,9 @@ namespace GroupEMosaicMaker.ViewModel
         {
             if (this.Grid)
             {
+                this.manipulatorForDisplay.DrawGrid(this.BlockSize);
                 this.DisplayImage = this.currentImageWithGrid;
+                //this.manipulatorForDisplay.DrawGrid(this.BlockSize);
             }
             else
             {
@@ -210,7 +223,9 @@ namespace GroupEMosaicMaker.ViewModel
                 await this.writeStreamOfPixels(this.currentImage, sourcePixels);
 
 
-                ImageManipulator.DrawGrid(sourcePixels, decoder.PixelWidth, decoder.PixelHeight, this.BlockSize);
+                // ImageManipulator.DrawGrid(sourcePixels, decoder.PixelWidth, decoder.PixelHeight, this.BlockSize);
+                this.manipulatorForDisplay = new ImageManipulator(decoder.PixelWidth, decoder.PixelHeight, sourcePixels);
+                this.manipulatorForDisplay.DrawGrid(this.BlockSize);
                 this.currentImageWithGrid = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
 
                 await this.writeStreamOfPixels(this.currentImageWithGrid, sourcePixels);
@@ -239,7 +254,10 @@ namespace GroupEMosaicMaker.ViewModel
 
                 var sourcePixels = pixelData.DetachPixelData();
 
-                ImageManipulator.CreateMosaic(sourcePixels, decoder.PixelWidth, decoder.PixelHeight, this.BlockSize);
+                //ImageManipulator.CreateMosaic(sourcePixels, decoder.PixelWidth, decoder.PixelHeight, this.BlockSize);
+                this.manipulatorForResult = new ImageManipulator(decoder.PixelWidth, decoder.PixelHeight, sourcePixels);
+                this.manipulatorForResult.CreateMosaic(this.BlockSize);
+
                 this.ResultImage = new WriteableBitmap((int) decoder.PixelWidth, (int) decoder.PixelHeight);
                 await this.writeStreamOfPixels(this.ResultImage, sourcePixels);
             }
