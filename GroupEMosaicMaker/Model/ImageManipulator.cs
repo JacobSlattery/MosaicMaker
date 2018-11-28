@@ -14,18 +14,23 @@ namespace GroupEMosaicMaker.Model
     public class ImageManipulator
     {
 
-        public uint ImageWidth { get; set; }
-        public uint ImageHeight { get; set; }
+        private uint ImageWidth { get; }
+        private uint ImageHeight { get; }
 
-        public byte[] SourcePixels { get; set; }
+        private byte[] SourcePixels { get; }
 
         public ImageManipulator(uint width, uint height, byte[] sourcePixels)
         {
             this.ImageWidth = width;
             this.ImageHeight = height;
-            this.SourcePixels = sourcePixels;
+            this.SourcePixels = (byte[])sourcePixels.Clone();
         }
         #region Methods
+
+        public byte[] RetrieveModifiedPixels()
+        {
+            return this.SourcePixels;
+        }
 
         public void DrawGrid(int blockSize)
         {
@@ -50,7 +55,7 @@ namespace GroupEMosaicMaker.Model
             }
         }
 
-        public void CreateMosaic( int blockSize)
+        public void CreateMosaic(int blockSize)
         {
             var currentPixelHeight = 0;
             var currentPixelMaxHeight = blockSize;
@@ -66,7 +71,7 @@ namespace GroupEMosaicMaker.Model
                     blockWidth < maxForBlockWidth;
                     blockWidth++)
                 {
-                    averagePixelColors(currentPixelHeight, currentPixelMaxHeight, currentPixelWidth, currentPixelMaxWidth);
+                    this.averagePixelColors(currentPixelHeight, currentPixelMaxHeight, currentPixelWidth, currentPixelMaxWidth);
 
                     currentPixelWidth += blockSize;
                     if (currentPixelMaxWidth + blockSize > this.ImageWidth)

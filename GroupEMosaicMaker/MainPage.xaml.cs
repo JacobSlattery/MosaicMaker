@@ -65,6 +65,12 @@ namespace GroupEMosaicMaker
         /// <returns>
         ///     A <see cref="StorageFile"/>.
         /// </returns>
+        /// <summary>
+        ///     Picks the file to open with a file open picker.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="StorageFile"/>.
+        /// </returns>
         public static async Task<StorageFile> SelectSourceImageFile()
         {
             var openPicker = new FileOpenPicker
@@ -87,6 +93,18 @@ namespace GroupEMosaicMaker
                 file = null;
             }
 
+            return file;
+        }
+
+        public static async Task<StorageFile> SelectSaveImageFile()
+        {
+            var fileSavePicker = new FileSavePicker
+            {
+                SuggestedStartLocation = PickerLocationId.PicturesLibrary,
+                SuggestedFileName = "image"
+            };
+            fileSavePicker.FileTypeChoices.Add("PNG files", new List<string> { ".png" });
+            var file = await fileSavePicker.PickSaveFileAsync();
             return file;
         }
     }

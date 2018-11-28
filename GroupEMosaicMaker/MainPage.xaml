@@ -29,7 +29,7 @@
 
         <Image Source="{Binding ResultImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="429" Margin="686,87,0,273" Width="450" Grid.Column="1"/>
         <Image Source="{Binding DisplayImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="429" Margin="82,87,0,0" VerticalAlignment="Top" Width="450" Grid.Column="1"/>
-        <TextBox x:Name="blockSizeTextBox" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="167,548,0,0" Text="{Binding Path=BlockSize, Mode=TwoWay, Converter={StaticResource IntConverter}, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"/>
+        <TextBox x:Name="blockSizeTextBox" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="167,548,0,0" Text="{Binding Path=BlockSize, Mode=TwoWay, Converter={StaticResource IntConverter}, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Top"/>
         <TextBlock x:Name="blockSizeTextBlock" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="82,554,0,0" Text="Block size:" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <CheckBox Content="Grid" Grid.ColumnSpan="2" IsChecked="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="283,548,0,0" VerticalAlignment="Top"/>
         <Button Content="Convert" Command="{Binding ConvertCommand, UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="573,286,0,0" VerticalAlignment="Top"/>
