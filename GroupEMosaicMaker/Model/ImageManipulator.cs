@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.Notifications;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace GroupEMosaicMaker.Model
@@ -36,60 +39,59 @@ namespace GroupEMosaicMaker.Model
 
         public static void CreateMosaic(byte[] sourcePixels, uint imageWidth, uint imageHeight, int blockSize)
         {
-            var currentPixel = 0;
-            var currentPixelMax = blockSize;
-            var maxForBlockHeight = Convert.ToInt32(Math.Round(Convert.ToDecimal(imageHeight / blockSize)));
-            var maxForBlockWidth = Convert.ToInt32(Math.Round(Convert.ToDecimal(imageWidth / blockSize)));
-            for (var blockHeight = 0;
-                blockHeight < maxForBlockHeight;
-                blockHeight++)
-            {
-                for (var blockWidth = 0;
-                    blockWidth < maxForBlockWidth;
-                    blockWidth++)
-                {
-                    var totalRed = 0;
-                    var totalBlue = 0;
-                    var totalGreen = 0;
-                    var pixelCounter = 0;
 
-                    for (var i = currentPixel; i < currentPixelMax; i++)
-                    {
-                        for (var j = currentPixel; j < currentPixelMax; j++)
-                        {
-                            var pixelColor = getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
-                            totalRed += pixelColor.R;
-                            totalBlue += pixelColor.B;
-                            totalGreen += pixelColor.G;
-                            pixelCounter++;
-                        }
-                    }
+            Panel.FillPanelWithAverageColor(sourcePixels);
 
-                    for (var i = currentPixel; i < currentPixelMax; i++)
-                    {
-                        for (var j = currentPixel; j < currentPixelMax; j++)
-                        {
-                            var pixelColor = getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
-                            pixelColor.R = BitConverter.GetBytes(totalRed / pixelCounter)[0];
-                            pixelColor.B = BitConverter.GetBytes(totalBlue / pixelCounter)[0];
-                            pixelColor.G = BitConverter.GetBytes(totalGreen / pixelCounter)[0];
-                            setPixelBgra8(sourcePixels, i, j, pixelColor, imageWidth, imageHeight);
-                        }
-                    }
+            //var currentPixel = 0;
+            //var currentPixelMax = blockSize;
+            //var maxForBlockHeight = Convert.ToInt32(Math.Round(Convert.ToDecimal(imageHeight / blockSize)));
+            //var maxForBlockWidth = Convert.ToInt32(Math.Round(Convert.ToDecimal(imageWidth / blockSize)));
+            //for (var blockHeight = 0; blockHeight < maxForBlockHeight; blockHeight++)
+            //{
+            //    for (var blockWidth = 0; blockWidth < maxForBlockWidth; blockWidth++)
+            //    {
+            //        var totalRed = 0;
+            //        var totalBlue = 0;
+            //        var totalGreen = 0;
+            //        var pixelCounter = 0;
 
-                    currentPixel += blockSize;
-                    if (currentPixelMax + blockSize > imageWidth)
-                    {
-                        currentPixelMax += (Convert.ToInt32(imageWidth) - currentPixelMax);
-                    }
-                    else
-                    {
-                        currentPixelMax += blockSize;
-                    }
-                    
-                }
+                //        for (var i = currentPixel; i < currentPixelMax; i++)
+                //        {
+                //            for (var j = currentPixel; j < currentPixelMax; j++)
+                //            {
+                //                var pixelColor = getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
+                //                totalRed += pixelColor.R;
+                //                totalBlue += pixelColor.B;
+                //                totalGreen += pixelColor.G;
+                //                pixelCounter++;
+                //            }
+                //        }
 
-            }
+                //        for (var i = currentPixel; i < currentPixelMax; i++)
+                //        {
+                //            for (var j = currentPixel; j < currentPixelMax; j++)
+                //            {
+                //                var pixelColor = getPixelBgra8(sourcePixels, i, j, imageWidth, imageHeight);
+                //                pixelColor.R = BitConverter.GetBytes(totalRed / pixelCounter)[0];
+                //                pixelColor.B = BitConverter.GetBytes(totalBlue / pixelCounter)[0];
+                //                pixelColor.G = BitConverter.GetBytes(totalGreen / pixelCounter)[0];
+                //                setPixelBgra8(sourcePixels, i, j, pixelColor, imageWidth, imageHeight);
+                //            }
+                //        }
+
+                //        currentPixel += blockSize;
+                //        if (currentPixelMax + blockSize > imageWidth)
+                //        {
+                //            currentPixelMax += (Convert.ToInt32(imageWidth) - currentPixelMax);
+                //        }
+                //        else
+                //        {
+                //            currentPixelMax += blockSize;
+                //        }
+
+                //    }
+
+                //}
         }
 
         private async Task<BitmapImage> MakeACopyOfTheFileToWorkOn(StorageFile imageFile)
