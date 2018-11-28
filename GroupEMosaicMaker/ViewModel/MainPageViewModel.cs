@@ -196,42 +196,54 @@ namespace GroupEMosaicMaker.ViewModel
 
         private async Task handleNewImageFile()
         {
-            var copyBitmapImage = await this.MakeACopyOfTheFileToWorkOn(this.SourceFile);
-            using (var fileStream = await this.SourceFile.OpenAsync(FileAccessMode.Read))
-            {
-                var decoder = await BitmapDecoder.CreateAsync(fileStream);
-                var transform = new BitmapTransform {
-                    ScaledWidth = Convert.ToUInt32(copyBitmapImage.PixelWidth),
-                    ScaledHeight = Convert.ToUInt32(copyBitmapImage.PixelHeight)
-                };
+            var imageStorage = new ImageStorage();
+            await imageStorage.CreateImage(this.SourceFile);
 
-                this.dpiX = decoder.DpiX;
-                this.dpiY = decoder.DpiY;
-
-                var pixelData = await decoder.GetPixelDataAsync(
-                    BitmapPixelFormat.Bgra8,
-                    BitmapAlphaMode.Straight,
-                    transform,
-                    ExifOrientationMode.IgnoreExifOrientation,
-                    ColorManagementMode.DoNotColorManage
-                );
-
-                var sourcePixels = pixelData.DetachPixelData();
-
-                
-                this.currentImage = new WriteableBitmap((int) decoder.PixelWidth, (int) decoder.PixelHeight);
-                await this.writeStreamOfPixels(this.currentImage, sourcePixels);
+            this.currentImage = new WriteableBitmap((int)imageStorage.Decoder.PixelWidth, (int)imageStorage.Decoder.PixelHeight);
+            await this.writeStreamOfPixels(this.currentImage, imageStorage.SourcePixels);
+            this.manipulatorForDisplay = new ImageManipulator(imageStorage.Decoder.PixelWidth, imageStorage.Decoder.PixelHeight, imageStorage.SourcePixels);
+            this.manipulatorForDisplay.DrawGrid(this.BlockSize);
+            this.currentImageWithGrid = new WriteableBitmap((int)imageStorage.Decoder.PixelWidth, (int)imageStorage.Decoder.PixelHeight);
+            await this.writeStreamOfPixels(this.currentImageWithGrid, imageStorage.SourcePixels);
+            this.updateDisplayImage();
 
 
-                // ImageManipulator.DrawGrid(sourcePixels, decoder.PixelWidth, decoder.PixelHeight, this.BlockSize);
-                this.manipulatorForDisplay = new ImageManipulator(decoder.PixelWidth, decoder.PixelHeight, sourcePixels);
-                this.manipulatorForDisplay.DrawGrid(this.BlockSize);
-                this.currentImageWithGrid = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+            //var copyBitmapImage = await this.MakeACopyOfTheFileToWorkOn(this.SourceFile);
+            //using (var fileStream = await this.SourceFile.OpenAsync(FileAccessMode.Read))
+            //{
+            //    var decoder = await BitmapDecoder.CreateAsync(fileStream);
+            //    var transform = new BitmapTransform {
+            //        ScaledWidth = Convert.ToUInt32(copyBitmapImage.PixelWidth),
+            //        ScaledHeight = Convert.ToUInt32(copyBitmapImage.PixelHeight)
+            //    };
 
-                await this.writeStreamOfPixels(this.currentImageWithGrid, sourcePixels);
-               
-                this.updateDisplayImage();
-            }
+            //    this.dpiX = decoder.DpiX;
+            //    this.dpiY = decoder.DpiY;
+
+            //    var pixelData = await decoder.GetPixelDataAsync(
+            //        BitmapPixelFormat.Bgra8,
+            //        BitmapAlphaMode.Straight,
+            //        transform,
+            //        ExifOrientationMode.IgnoreExifOrientation,
+            //        ColorManagementMode.DoNotColorManage
+            //    );
+
+            //    var sourcePixels = pixelData.DetachPixelData();
+
+
+            //    this.currentImage = new WriteableBitmap((int) decoder.PixelWidth, (int) decoder.PixelHeight);
+            //    await this.writeStreamOfPixels(this.currentImage, sourcePixels);
+
+
+            //    // ImageManipulator.DrawGrid(sourcePixels, decoder.PixelWidth, decoder.PixelHeight, this.BlockSize);
+            //    this.manipulatorForDisplay = new ImageManipulator(decoder.PixelWidth, decoder.PixelHeight, sourcePixels);
+            //    this.manipulatorForDisplay.DrawGrid(this.BlockSize);
+            //    this.currentImageWithGrid = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+
+            //    await this.writeStreamOfPixels(this.currentImageWithGrid, sourcePixels);
+
+            //    this.updateDisplayImage();
+            //  }
         }
 
         private async Task handleCreatingMosaic(BitmapImage copyBitmapImage2)
@@ -273,9 +285,9 @@ namespace GroupEMosaicMaker.ViewModel
 
         private async Task<BitmapImage> MakeACopyOfTheFileToWorkOn(StorageFile imageFile)
         {
-            IRandomAccessStream inputstream = await imageFile.OpenReadAsync();
+            IRandomAccessStream inputStream = await imageFile.OpenReadAsync();
             var newImage = new BitmapImage();
-            newImage.SetSource(inputstream);
+            newImage.SetSource(inputStream);
             return newImage;
         }
 

@@ -99,6 +99,7 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\ImageStorage.cs" />
     <Compile Include="Model\ImageManipulator.cs" />
     <Compile Include="Model\Panel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
