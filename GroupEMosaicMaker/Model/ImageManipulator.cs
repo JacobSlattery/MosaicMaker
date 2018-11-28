@@ -104,6 +104,12 @@ namespace GroupEMosaicMaker.Model
             }
         }
 
+        private static byte[] getPixelAt(byte[] pixels, int x, int y, uint width)
+        {
+            var offset = (x * (int)width + y) * 4;
+            return new[] { pixels[offset], pixels[offset + 1], pixels[offset + 2], pixels[offset + 3] };
+        }
+
         private async Task<BitmapImage> MakeACopyOfTheFileToWorkOn(StorageFile imageFile)
         {
             IRandomAccessStream inputStream = await imageFile.OpenReadAsync();
