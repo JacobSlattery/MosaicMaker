@@ -169,6 +169,7 @@ namespace GroupEMosaicMaker.ViewModel
         private async Task handleNewImageFile()
         {
             var copyBitmapImage = await this.MakeACopyOfTheFileToWorkOn(this.SourceFile);
+            var copyBitmapImage2 = await this.MakeACopyOfTheFileToWorkOn(this.SourceFile);
             using (var fileStream = await this.SourceFile.OpenAsync(FileAccessMode.Read))
             {
                 var decoder = await BitmapDecoder.CreateAsync(fileStream);
@@ -190,20 +191,52 @@ namespace GroupEMosaicMaker.ViewModel
 
                 var sourcePixels = pixelData.DetachPixelData();
 
-
+                
                 this.currentImage = new WriteableBitmap((int) decoder.PixelWidth, (int) decoder.PixelHeight);
-                using (var writeStream = this.currentImage.PixelBuffer.AsStream())
-                {
-                    await writeStream.WriteAsync(sourcePixels, 0, sourcePixels.Length);
-                }
+                await this.writeStreamOfPixels(this.currentImage, sourcePixels);
+
 
                 ImageManipulator.DrawGrid(sourcePixels, decoder.PixelWidth, decoder.PixelHeight, this.BlockSize);
                 this.currentImageWithGrid = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
-                using (var writeStream = this.currentImageWithGrid.PixelBuffer.AsStream())
-                {
-                    await writeStream.WriteAsync(sourcePixels, 0, sourcePixels.Length);
-                }
+
+                await this.writeStreamOfPixels(this.currentImageWithGrid, sourcePixels);
+               
                 this.updateDisplayImage();
+            }
+            await this.handleCreatingMosaic(copyBitmapImage2);
+        }
+
+        private async Task handleCreatingMosaic(BitmapImage copyBitmapImage2)
+        {
+            using (var fileStream = await this.SourceFile.OpenAsync(FileAccessMode.Read))
+            {
+                var decoder = await BitmapDecoder.CreateAsync(fileStream);
+                var transform = new BitmapTransform {
+                    ScaledWidth = Convert.ToUInt32(copyBitmapImage2.PixelWidth),
+                    ScaledHeight = Convert.ToUInt32(copyBitmapImage2.PixelHeight)
+                };
+
+                var pixelData = await decoder.GetPixelDataAsync(
+                    BitmapPixelFormat.Bgra8,
+                    BitmapAlphaMode.Straight,
+                    transform,
+                    ExifOrientationMode.IgnoreExifOrientation,
+                    ColorManagementMode.DoNotColorManage
+                );
+
+                var sourcePixels = pixelData.DetachPixelData();
+
+                ImageManipulator.CreateMosaic(sourcePixels, decoder.PixelWidth, decoder.PixelHeight, this.BlockSize);
+                this.ResultImage = new WriteableBitmap((int) decoder.PixelWidth, (int) decoder.PixelHeight);
+                await this.writeStreamOfPixels(this.ResultImage, sourcePixels);
+            }
+        }
+
+        private async Task writeStreamOfPixels(WriteableBitmap bitMap, byte[] sourcePixels)
+        {
+            using (var writeStream = bitMap.PixelBuffer.AsStream())
+            {
+                await writeStream.WriteAsync(sourcePixels, 0, sourcePixels.Length);
             }
         }
 
