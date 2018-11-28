@@ -9,6 +9,7 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 using GroupEMosaicMaker.Model;
@@ -52,6 +53,7 @@ namespace GroupEMosaicMaker.ViewModel
             set
             {
                 this.displayImage = value;
+                this.ConvertCommand.OnCanExecuteChanged();
                 this.OnPropertyChanged();
             }
         }
@@ -100,6 +102,8 @@ namespace GroupEMosaicMaker.ViewModel
         /// </summary>
         public RelayCommand LoadFileCommand { get; set; }
 
+        public RelayCommand ConvertCommand { get; set; }
+
         #endregion
 
         #region Constructors
@@ -129,6 +133,7 @@ namespace GroupEMosaicMaker.ViewModel
         {
             this.LoadFileCommand = new RelayCommand(this.loadFile, this.canLoadFile);
             this.SaveToFileCommand = new RelayCommand(this.saveToFile, this.canSaveToFile);
+            this.ConvertCommand = new RelayCommand(this.convert, this.canConvert);
         }
 
         private void loadProperties()
@@ -140,7 +145,17 @@ namespace GroupEMosaicMaker.ViewModel
             this.SourceFile = null;
             this.BlockSize = 100;
             this.Grid = false;
-            
+        }
+
+        private bool canConvert(object obj)
+        {
+            return this.DisplayImage != null;
+        }
+
+        private async void convert(object obj)
+        {
+            var file = await this.MakeACopyOfTheFileToWorkOn(this.SourceFile);
+            await this.handleCreatingMosaic(file);
         }
 
         private async void loadFile(object obj)
@@ -169,7 +184,6 @@ namespace GroupEMosaicMaker.ViewModel
         private async Task handleNewImageFile()
         {
             var copyBitmapImage = await this.MakeACopyOfTheFileToWorkOn(this.SourceFile);
-            var copyBitmapImage2 = await this.MakeACopyOfTheFileToWorkOn(this.SourceFile);
             using (var fileStream = await this.SourceFile.OpenAsync(FileAccessMode.Read))
             {
                 var decoder = await BitmapDecoder.CreateAsync(fileStream);
@@ -203,7 +217,6 @@ namespace GroupEMosaicMaker.ViewModel
                
                 this.updateDisplayImage();
             }
-            await this.handleCreatingMosaic(copyBitmapImage2);
         }
 
         private async Task handleCreatingMosaic(BitmapImage copyBitmapImage2)
