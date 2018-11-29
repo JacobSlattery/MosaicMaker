@@ -10,33 +10,37 @@ namespace GroupEMosaicMaker.Model
         /// </summary>
         /// <param name="startIndex">The index starting location</param>
         /// <param name="boxSize">The size of the output box</param>
-        /// <param name="maxWidth">The total number of elements contained in a row</param>
-        /// <param name="maxHeight">The total number of elements contained in a column</param>
+        /// <param name="imageWidth">The total number of pixels contained in a row</param>
+        /// <param name="imageHeight">The total number of pixels contained in a column</param>
         /// <returns>
-        ///     A collection of indexes.
+        ///     A collection of indexes accounting for an RGBA offset.
         /// </returns>
-        public static Collection<int> calculateIndexBox(int startIndex, int boxSize, int maxWidth, int maxHeight)
+        public static Collection<int> calculateIndexBox(int startIndex, int boxSize, int imageWidth, int imageHeight)
         {
             var indexCollection = new Collection<int>();
             var currentIndex = startIndex;
             int widthOffset;
             int heightOffset;
+            var maxWidth = imageWidth * 4;
+            var maxHeight = imageHeight * 4;
+            int startingHeight = startIndex / maxHeight;
+
 
             for (var i = 1; i <= boxSize; i++)
             {
-                widthOffset = maxWidth * (i - 1);
+                widthOffset = maxWidth * (i - 1 + startingHeight);
                 heightOffset = currentIndex / maxWidth;
-                if (heightOffset < maxHeight)
+                if (heightOffset < imageHeight)
                 {
                     for (var j = 1; j <= boxSize; j++)
                     {
-                        if ((currentIndex - widthOffset * heightOffset) < maxWidth)
+                        if (currentIndex - widthOffset < maxWidth)
                         {
                             indexCollection.Add(currentIndex);
                         }
-                        currentIndex++;
+                        currentIndex += 4;
                     }
-                    currentIndex = currentIndex - boxSize + maxWidth;
+                    currentIndex = currentIndex - (boxSize * 4) + maxWidth;
                 }
 
             }
