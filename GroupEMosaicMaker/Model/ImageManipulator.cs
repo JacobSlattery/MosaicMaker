@@ -1,9 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Windows.Storage;
-using Windows.Storage.Streams;
-using Windows.UI;
-using Windows.UI.Xaml.Media.Imaging;
+﻿using Windows.UI;
 
 namespace GroupEMosaicMaker.Model
 {
@@ -36,7 +31,6 @@ namespace GroupEMosaicMaker.Model
                 {
                     var pixelColor = Color.FromArgb(255, 255, 255, 255);
                     setPixelBgra8(this.SourcePixels, i, j, pixelColor, this.ImageWidth, this.ImageHeight);
-                 //   setPixelBgra8(this.SourcePixels, i, j + 1, pixelColor, this.ImageWidth, this.ImageHeight);
                 }
             }
 
@@ -46,55 +40,56 @@ namespace GroupEMosaicMaker.Model
                 {
                     var pixelColor = Color.FromArgb(255, 255, 255, 255);
                     setPixelBgra8(this.SourcePixels, i, j, pixelColor, this.ImageWidth, this.ImageHeight);
-                  //  setPixelBgra8(this.SourcePixels, i + 1, j, pixelColor, this.ImageWidth, this.ImageHeight);
                 }
             }
         }
 
         public void CreateMosaic(int blockSize)
         {
-            var currentPixelHeight = 0;
-            var currentPixelMaxHeight = blockSize;
-            var currentPixelWidth = 0;
-            var currentPixelMaxWidth = blockSize;
-            var maxForBlockHeight = Convert.ToInt32(Math.Round(Convert.ToDecimal(this.ImageHeight / blockSize))) + 1;
-            var maxForBlockWidth = Convert.ToInt32(Math.Round(Convert.ToDecimal(this.ImageWidth / blockSize))) + 1;
-            for (var blockHeight = 0;
-                blockHeight < maxForBlockHeight;
-                blockHeight++)
+            for (var index = 0; index < (this.ImageHeight*this.ImageWidth)/blockSize; index += blockSize)
             {
-                for (var blockWidth = 0;
-                    blockWidth < maxForBlockWidth;
-                    blockWidth++)
-                {
-                    this.averagePixelColors(currentPixelHeight, currentPixelMaxHeight, currentPixelWidth, currentPixelMaxWidth);
-
-                    currentPixelWidth += blockSize;
-                    if (currentPixelMaxWidth + blockSize > this.ImageWidth)
-                    {
-                        currentPixelMaxWidth += (Convert.ToInt32(this.ImageWidth) - currentPixelMaxWidth);
-                    }
-                    else
-                    {
-                        currentPixelMaxWidth += blockSize;
-                    }
-
-                }
-                currentPixelHeight += blockSize;
-                if (currentPixelMaxHeight + blockSize > this.ImageHeight)
-                {
-                    currentPixelMaxHeight += (Convert.ToInt32(this.ImageHeight) - currentPixelMaxHeight);
-                }
-                else
-                {
-                    currentPixelMaxHeight += blockSize;
-                }
-                currentPixelWidth = 0;
-                currentPixelMaxWidth = blockSize;
+                var indexes = ImageMapper.calculateIndexBox(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
+                Panel.FillPanelWithAverageColor(this.SourcePixels, indexes);
             }
+
+
+            //var currentPixelHeight = 0;
+            //var currentPixelMaxHeight = blockSize;
+            //var currentPixelWidth = 0;
+            //var currentPixelMaxWidth = blockSize;
+            //var maxForBlockHeight = Convert.ToInt32(Math.Round(Convert.ToDecimal(this.ImageHeight / blockSize))) + 1;
+            //var maxForBlockWidth = Convert.ToInt32(Math.Round(Convert.ToDecimal(this.ImageWidth / blockSize))) + 1;
+            //for (var blockHeight = 0; blockHeight < maxForBlockHeight; blockHeight++)
+            //{
+            //    for (var blockWidth = 0; blockWidth < maxForBlockWidth; blockWidth++)
+            //    {
+            //        //this.averagePixelColors(currentPixelHeight, currentPixelMaxHeight, currentPixelWidth, currentPixelMaxWidth);
+            //        currentPixelWidth += blockSize;
+            //        if (currentPixelMaxWidth + blockSize > this.ImageWidth)
+            //        {
+            //            currentPixelMaxWidth += (Convert.ToInt32(this.ImageWidth) - currentPixelMaxWidth);
+            //        }
+            //        else
+            //        {
+            //            currentPixelMaxWidth += blockSize;
+            //        }
+
+            //    }
+            //    currentPixelHeight += blockSize;
+            //    if (currentPixelMaxHeight + blockSize > this.ImageHeight)
+            //    {
+            //        currentPixelMaxHeight += (Convert.ToInt32(this.ImageHeight) - currentPixelMaxHeight);
+            //    }
+            //    else
+            //    {
+            //        currentPixelMaxHeight += blockSize;
+            //    }
+            //    currentPixelWidth = 0;
+            //    currentPixelMaxWidth = blockSize;
+            //}
         }
 
-        private void averagePixelColors(int currentPixelHeight, int currentPixelMaxHeight, int currentPixelWidth,
+            private void averagePixelColors(int currentPixelHeight, int currentPixelMaxHeight, int currentPixelWidth,
             int currentPixelMaxWidth)
         {
             var totalRed = 0;
