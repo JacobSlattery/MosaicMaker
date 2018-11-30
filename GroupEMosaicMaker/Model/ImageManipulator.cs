@@ -51,7 +51,11 @@ namespace GroupEMosaicMaker.Model
             }
         }
 
-        public void CreateMosaic(int blockSize)
+        public void CreatePictureMosaic(int blockSize, ImagePalette palette)
+        {
+            
+        }
+        public void CreateSolidBlockMosaic(int blockSize)
         {
             var currentPixelHeight = 0;
             var currentPixelMaxHeight = blockSize;

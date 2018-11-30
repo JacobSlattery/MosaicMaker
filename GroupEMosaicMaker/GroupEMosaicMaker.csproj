@@ -96,10 +96,14 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converter\IntConverter.cs" />
+    <Compile Include="Extension\ListExtensions.cs" />
+    <Compile Include="FileIO\ImageLoader.cs" />
     <Compile Include="FileIO\ImageSaver.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\Image.cs" />
+    <Compile Include="Model\ImagePalette.cs" />
     <Compile Include="Model\ImageStorage.cs" />
     <Compile Include="Model\ImageManipulator.cs" />
     <Compile Include="Model\Panel.cs" />

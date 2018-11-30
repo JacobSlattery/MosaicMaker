@@ -7,6 +7,9 @@ using Windows.UI.Xaml.Media.Imaging;
 using GroupEMosaicMaker.FileIO;
 using GroupEMosaicMaker.Model;
 using GroupEMosaicMaker.Utility;
+using System;
+using System.Collections.ObjectModel;
+using GroupEMosaicMaker.Extension;
 
 namespace GroupEMosaicMaker.ViewModel
 {
@@ -23,14 +26,38 @@ namespace GroupEMosaicMaker.ViewModel
         private ImageManipulator manipulatorForResultImage;
         private readonly ImageStorage imageStorageForGrid;
         private readonly ImageStorage imageStorageForMosaic;
+        private readonly ImageLoader imageLoader;
+        private Image imageWithGrid;
+        private Image imageWithMosaic;
 
         private WriteableBitmap currentImage;
         private WriteableBitmap currentImageWithGrid;
+        private ObservableCollection<Image> imagePalette;
+        private Image selectedImage;
 
         #endregion
 
         #region Properties
 
+        public Image SelectedImage
+        {
+            get => this.selectedImage;
+            set
+            {
+                this.selectedImage = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<Image> ImagePalette
+        {
+            get => this.imagePalette;
+            set
+            {
+                this.imagePalette = value;
+                this.OnPropertyChanged();
+            }
+        }
         public StorageFile SourceFile
         {
             get => this.sourceFile;
@@ -86,11 +113,19 @@ namespace GroupEMosaicMaker.ViewModel
                 this.OnPropertyChanged();
                 if (this.SourceFile != null)
                 {
-                    this.manipulatorForGridImage = new ImageManipulator(this.imageStorageForGrid.Decoder.PixelWidth,
-                        this.imageStorageForGrid.Decoder.PixelHeight, this.imageStorageForGrid.SourcePixels);
+                    //this.manipulatorForGridImage = new ImageManipulator(this.imageStorageForGrid.Decoder.PixelWidth,
+                    //    this.imageStorageForGrid.Decoder.PixelHeight, this.imageStorageForGrid.SourcePixels);
+                    //this.manipulatorForGridImage.DrawGrid(this.BlockSize);
+                    //this.currentImageWithGrid = new WriteableBitmap((int) this.imageStorageForGrid.Decoder.PixelWidth,
+                    //    (int) this.imageStorageForGrid.Decoder.PixelHeight);
+                    //this.writeStreamOfPixels(this.currentImageWithGrid,
+                    //    this.manipulatorForGridImage.RetrieveModifiedPixels());
+                    //this.updateDisplayImage();
+                    this.manipulatorForGridImage = new ImageManipulator(this.imageWithGrid.Decoder.PixelWidth,
+                        this.imageWithGrid.Decoder.PixelHeight, this.imageWithGrid.SourcePixels);
                     this.manipulatorForGridImage.DrawGrid(this.BlockSize);
-                    this.currentImageWithGrid = new WriteableBitmap((int) this.imageStorageForGrid.Decoder.PixelWidth,
-                        (int) this.imageStorageForGrid.Decoder.PixelHeight);
+                    this.currentImageWithGrid = new WriteableBitmap((int)this.imageWithGrid.Decoder.PixelWidth,
+                        (int)this.imageWithGrid.Decoder.PixelHeight);
                     this.writeStreamOfPixels(this.currentImageWithGrid,
                         this.manipulatorForGridImage.RetrieveModifiedPixels());
                     this.updateDisplayImage();
@@ -110,6 +145,8 @@ namespace GroupEMosaicMaker.ViewModel
 
         public RelayCommand ConvertCommand { get; set; }
 
+        public RelayCommand LoadImagePaletteCommand { get; set; }
+
         #endregion
 
         #region Constructors
@@ -121,8 +158,12 @@ namespace GroupEMosaicMaker.ViewModel
         {
             this.loadCommands();
             this.loadProperties();
-            this.imageStorageForGrid = new ImageStorage();
-            this.imageStorageForMosaic = new ImageStorage();
+            //this.imageStorageForGrid = new ImageStorage();
+           // this.imageStorageForMosaic = new ImageStorage();
+            this.imageLoader = new ImageLoader();
+            this.imageWithGrid = null;
+            this.imageWithMosaic = null;
+            this.imagePalette = new ObservableCollection<Image>();
         }
 
         #endregion
@@ -141,6 +182,20 @@ namespace GroupEMosaicMaker.ViewModel
             this.LoadFileCommand = new RelayCommand(this.loadFile, this.canLoadFile);
             this.SaveToFileCommand = new RelayCommand(this.saveToFile, this.canSaveToFile);
             this.ConvertCommand = new RelayCommand(this.convert, this.canConvert);
+            this.LoadImagePaletteCommand = new RelayCommand(this.loadPalette, this.canLoadPalette);
+        }
+
+        private bool canLoadPalette(object obj)
+        {
+            return this.imagePalette != null;
+        }
+
+        private async void loadPalette(object obj)
+        {
+            var folder = await MainPage.SelectImagePaletteFolder();
+            var palette = await this.imageLoader.LoadImages(folder);
+            this.ImagePalette = palette.Images.ToObservableCollection();
+
         }
 
         private void loadProperties()
@@ -189,11 +244,17 @@ namespace GroupEMosaicMaker.ViewModel
 
         private async Task handleNewImageFile()
         {
-            await this.imageStorageForGrid.CreateImage(this.SourceFile);
 
-            var width = (int) this.imageStorageForGrid.Decoder.PixelWidth;
-            var height = (int) this.imageStorageForGrid.Decoder.PixelHeight;
-            var pixels = this.imageStorageForGrid.SourcePixels;
+           // await this.imageStorageForGrid.CreateImage(this.SourceFile);
+            this.imageWithGrid = await this.imageLoader.LoadImage(this.SourceFile);
+           
+
+           // var width = (int) this.imageStorageForGrid.Decoder.PixelWidth;
+         //   var height = (int) this.imageStorageForGrid.Decoder.PixelHeight;
+           // var pixels = this.imageStorageForGrid.SourcePixels;
+            var width = (int)this.imageWithGrid.Decoder.PixelWidth;
+            var height = (int)this.imageWithGrid.Decoder.PixelHeight;
+            var pixels = this.imageWithGrid.SourcePixels;
             this.currentImage = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.currentImage, pixels);
 
@@ -208,13 +269,18 @@ namespace GroupEMosaicMaker.ViewModel
 
         private async Task handleCreatingMosaic()
         {
-            await this.imageStorageForMosaic.CreateImage(this.SourceFile);
+          //  await this.imageStorageForMosaic.CreateImage(this.SourceFile);
+            this.imageWithMosaic = await this.imageLoader.LoadImage(this.SourceFile);
 
-            var width = (int) this.imageStorageForMosaic.Decoder.PixelWidth;
-            var height = (int) this.imageStorageForMosaic.Decoder.PixelHeight;
-            var pixels = this.imageStorageForMosaic.SourcePixels;
+            //var width = (int) this.imageStorageForMosaic.Decoder.PixelWidth;
+            //var height = (int) this.imageStorageForMosaic.Decoder.PixelHeight;
+            //var pixels = this.imageStorageForMosaic.SourcePixels;
+            var width = (int)this.imageWithMosaic.Decoder.PixelWidth;
+            var height = (int)this.imageWithMosaic.Decoder.PixelHeight;
+            var pixels = this.imageWithMosaic.SourcePixels;
+
             this.manipulatorForResultImage = new ImageManipulator((uint) width, (uint) height, pixels);
-            this.manipulatorForResultImage.CreateMosaic(this.BlockSize);
+            this.manipulatorForResultImage.CreateSolidBlockMosaic(this.BlockSize);
 
             this.ResultImage = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.ResultImage, this.manipulatorForResultImage.RetrieveModifiedPixels());
@@ -233,7 +299,7 @@ namespace GroupEMosaicMaker.ViewModel
             var saveFile = await MainPage.SelectSaveImageFile();
             if (saveFile != null)
             {
-                await ImageSaver.SaveImage(saveFile, this.ResultImage, this.imageStorageForMosaic);
+                await ImageSaver.SaveImage(saveFile, this.ResultImage, this.imageWithMosaic);
             }
         }
 

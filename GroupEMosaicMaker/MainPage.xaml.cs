@@ -96,6 +96,43 @@ namespace GroupEMosaicMaker
             return file;
         }
 
+        /// <summary>
+        ///     Picks the folder to open with a file open picker.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="StorageFile"/>.
+        /// </returns>
+        /// <summary>
+        ///     Picks the file to open with a file open picker.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="StorageFile"/>.
+        /// </returns>
+        public static async Task<StorageFolder> SelectImagePaletteFolder()
+        {
+            var openPicker = new FolderPicker()
+            {
+                ViewMode = PickerViewMode.Thumbnail,
+                SuggestedStartLocation = PickerLocationId.Desktop
+            };
+            foreach (var fileType in FileTypes)
+            {
+                openPicker.FileTypeFilter.Add(fileType);
+            }
+
+          //  StorageFolder folder;
+          //  try
+          //  {
+               var folder = await openPicker.PickSingleFolderAsync();
+          //  }
+          //  catch (NullReferenceException)
+          //  {
+          //      folder = null;
+          //  }
+
+            return folder;
+        }
+
         public static async Task<StorageFile> SelectSaveImageFile()
         {
             var fileSavePicker = new FileSavePicker

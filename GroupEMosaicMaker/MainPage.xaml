@@ -35,6 +35,19 @@
                   IsChecked="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="283,548,0,0" VerticalAlignment="Top"/>
         <Button Content="Convert" Command="{Binding ConvertCommand, UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="2"
                 Grid.Column="0" HorizontalAlignment="Left" Margin="573,286,0,0" VerticalAlignment="Top"/>
+        <GridView BorderBrush="Black" BorderThickness="5"  Grid.ColumnSpan="2" ItemsSource="{Binding ImagePalette, Mode=TwoWay}" SelectedItem="{Binding SelectedImage, Mode=TwoWay}" HorizontalAlignment="Left" Margin="687,540,0,0" VerticalAlignment="Top" Width="450" Height="173">
+            <GridView.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <Grid>
+                            <Image Source="{Binding Path=Thumbnail}" Width="50" Height="50"/>
+                            <TextBlock HorizontalAlignment="Stretch" Grid.Row="0"  />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+        </GridView>
+        <Button x:Name="loadImagePaletteButton" Command="{Binding LoadImagePaletteCommand}"  Content="Load Image Palette" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="838,732,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Page>

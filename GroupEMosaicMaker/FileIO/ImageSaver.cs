@@ -13,7 +13,7 @@ namespace GroupEMosaicMaker.FileIO
 {
     public class ImageSaver
     {
-        public static async Task SaveImage(StorageFile saveFile, WriteableBitmap bitMapToSave, ImageStorage imageData)
+        public static async Task SaveImage(StorageFile saveFile, WriteableBitmap bitMapToSave, Image imageData)
         {
             var stream = await saveFile.OpenAsync(FileAccessMode.ReadWrite);
             var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
