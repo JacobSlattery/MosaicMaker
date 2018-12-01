@@ -12,15 +12,8 @@ namespace GroupEMosaicMaker.Model
 
         public static void FillPanelWithAverageColor(byte[] sourceBytes, ICollection<int> indexes)
         {
-            try
-            {
-                var average = getPanelAverageColor(sourceBytes, indexes);
-                fillPanelWithColor(sourceBytes, indexes, average);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.StackTrace);
-            }
+            var average = getPanelAverageColor(sourceBytes, indexes);
+            fillPanelWithColor(sourceBytes, indexes, average);
 
         }
 
@@ -35,10 +28,11 @@ namespace GroupEMosaicMaker.Model
             foreach (var index in indexes)
             {
                 pixels.Add(sourceBytes[index]);
-                pixels.Add(sourceBytes[index+1]);
-                pixels.Add(sourceBytes[index+2]);
-                pixels.Add(sourceBytes[index+3]);
+                pixels.Add(sourceBytes[index + 1]);
+                pixels.Add(sourceBytes[index + 2]);
+                pixels.Add(sourceBytes[index + 3]);
             }
+
             var colorCollection = getColorForEachPixel(pixels);
             foreach (var currentColor in colorCollection)
             {

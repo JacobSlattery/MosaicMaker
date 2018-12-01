@@ -9,42 +9,74 @@ namespace GroupEMosaicMaker.Model
         ///     Finds the indexes for a box within a larger box. Uses bounds to ensure that indexes do not go outside the bounds of the larger box.
         /// </summary>
         /// <param name="startIndex">The index starting location</param>
-        /// <param name="boxSize">The size of the output box</param>
-        /// <param name="imageWidth">The total number of pixels contained in a row</param>
-        /// <param name="imageHeight">The total number of pixels contained in a column</param>
+        /// <param name="boxWidth">The width of the index box</param>
+        /// <param name="boxHeight">The height of the index box</param>
+        /// <param name="maxWidth">The total number of pixels contained in a row</param>
+        /// <param name="maxHeight">The total number of pixels contained in a column</param>
         /// <returns>
-        ///     A collection of indexes accounting for an RGBA offset.
+        ///     A collection of the predicted indexes.
         /// </returns>
-        public static Collection<int> calculateIndexBox(int startIndex, int boxSize, int imageWidth, int imageHeight)
+        public static Collection<int> CalculateIndexBox(int startIndex, int boxWidth, int boxHeight, int maxWidth, int maxHeight)
         {
             var indexCollection = new Collection<int>();
             var currentIndex = startIndex;
-            int widthOffset;
-            int heightOffset;
-            var maxWidth = imageWidth * 4;
-            var maxHeight = imageHeight * 4;
-            int startingHeight = startIndex / maxHeight;
+            var startingHeight = startIndex / maxWidth;
 
 
-            for (var i = 1; i <= boxSize; i++)
+            for (var row = 0; row < boxHeight; row++)
             {
-                widthOffset = maxWidth * (i - 1 + startingHeight);
-                heightOffset = currentIndex / maxWidth;
-                if (heightOffset < imageHeight)
+                var actualRow = (row + startingHeight);
+                var rowOffset = maxWidth * (row + startingHeight);
+                if (actualRow < maxHeight)
                 {
-                    for (var j = 1; j <= boxSize; j++)
+                    for (var j = 1; j <= boxWidth; j++)
                     {
-                        if (currentIndex - widthOffset < maxWidth)
+                        if (currentIndex - rowOffset < maxWidth)
                         {
                             indexCollection.Add(currentIndex);
                         }
-                        currentIndex += 4;
+                        currentIndex++;
                     }
-                    currentIndex = currentIndex - (boxSize * 4) + maxWidth;
+                    currentIndex = currentIndex - boxWidth + maxWidth;
                 }
 
             }
             return indexCollection;
+        }
+        //{
+        //    var indexCollection = new Collection<int>();
+        //    var currentIndex = startIndex;
+        //    var startingHeight = startIndex / maxHeight;
+
+
+        //    for (var i = 1; i <= boxHeight; i++)
+        //    {
+        //        var widthOffset = maxWidth * (i - 1 + startingHeight);
+        //        var heightOffset = currentIndex / maxWidth;
+        //        if (heightOffset < maxHeight)
+        //        {
+        //            for (var j = 1; j <= boxWidth; j++)
+        //            {
+        //                if (currentIndex - widthOffset < maxWidth)
+        //                {
+        //                    indexCollection.Add(currentIndex);
+        //                }
+        //                currentIndex++;
+        //            }
+        //            currentIndex = currentIndex - (boxWidth) + maxWidth;
+        //        }
+
+        //    }
+        //    return indexCollection;
+        //}
+
+        public static void ConvertEachIndexToMatchOffset(Collection<int> indexes, int offset)
+        {
+            for (var i = 0; i < indexes.Count; i++)
+            {
+                indexes[i] = indexes[i] * offset;
+            }
+
         }
 
     }
