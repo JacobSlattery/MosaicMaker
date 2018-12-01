@@ -11,43 +11,58 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="1264.75" Height="789.713">
 
     <Page.Resources>
-        <converter:IntConverter x:Key="IntConverter"/>
+        <converter:IntConverter x:Key="IntConverter" />
     </Page.Resources>
     <Page.DataContext>
-        <vm:MainPageViewModel/>
+        <vm:MainPageViewModel />
     </Page.DataContext>
     <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Height="789" Width="1265">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0*"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="0*" />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
         <CommandBar VerticalAlignment="Top" Grid.ColumnSpan="2" Height="48" Margin="0,0,1,0">
-            <AppBarButton Icon="Save" Label="Save File" Command="{Binding SaveToFileCommand, UpdateSourceTrigger=PropertyChanged}" />
+            <AppBarButton Icon="Save" Label="Save File"
+                          Command="{Binding SaveToFileCommand, UpdateSourceTrigger=PropertyChanged}" />
             <AppBarButton Icon="OpenFile" Label="Load File" Command="{Binding LoadFileCommand}" />
         </CommandBar>
 
-        <Image Source="{Binding ResultImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="429" Margin="686,87,0,273" VerticalAlignment="Center" Width="450" Grid.Column="1"/>
-        <Image Source="{Binding DisplayImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="429" Margin="82,87,0,273" VerticalAlignment="Center" Width="450" Grid.Column="1"/>
-        <TextBox x:Name="blockSizeTextBox" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left" Margin="167,548,0,0" Text="{Binding Path=BlockSize, Mode=TwoWay, Converter={StaticResource IntConverter}, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Top"/>
-        <TextBlock x:Name="blockSizeTextBlock" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left" Margin="82,554,0,0" Text="Block size:" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <Image Source="{Binding ResultImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+               HorizontalAlignment="Left" Height="429" Margin="686,87,0,273" VerticalAlignment="Center" Width="450"
+               Grid.Column="1" />
+        <Image Source="{Binding DisplayImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+               HorizontalAlignment="Left" Height="429" Margin="82,87,0,273" VerticalAlignment="Center" Width="450"
+               Grid.Column="1" />
+        <TextBox x:Name="blockSizeTextBox" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left"
+                 Margin="167,548,0,0"
+                 Text="{Binding Path=BlockSize, Mode=TwoWay, Converter={StaticResource IntConverter}, UpdateSourceTrigger=LostFocus}"
+                 VerticalAlignment="Top" />
+        <TextBlock x:Name="blockSizeTextBlock" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left"
+                   Margin="82,554,0,0" Text="Block size:" TextWrapping="Wrap" VerticalAlignment="Top" />
         <CheckBox Content="Grid" Grid.ColumnSpan="2" Grid.Column="0"
-                  IsChecked="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="283,548,0,0" VerticalAlignment="Top"/>
-        <Button Content="Convert" Command="{Binding ConvertCommand, UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="2"
-                Grid.Column="0" HorizontalAlignment="Left" Margin="573,286,0,0" VerticalAlignment="Top"/>
-        <GridView BorderBrush="Black" BorderThickness="5"  Grid.ColumnSpan="2" ItemsSource="{Binding ImagePalette, Mode=TwoWay}" SelectedItem="{Binding SelectedImage, Mode=TwoWay}" HorizontalAlignment="Left" Margin="687,540,0,0" VerticalAlignment="Top" Width="450" Height="173">
+                  IsChecked="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  HorizontalAlignment="Left" Margin="283,548,0,0" VerticalAlignment="Top" />
+        <Button Content="Convert" Command="{Binding ConvertCommand, UpdateSourceTrigger=PropertyChanged}"
+                Grid.ColumnSpan="2"
+                Grid.Column="0" HorizontalAlignment="Left" Margin="573,286,0,0" VerticalAlignment="Top" />
+        <GridView BorderBrush="Black" BorderThickness="5" Grid.ColumnSpan="2"
+                  ItemsSource="{Binding ImagePalette, Mode=TwoWay}" SelectedItem="{Binding SelectedImage, Mode=TwoWay}"
+                  HorizontalAlignment="Left" Margin="687,540,0,0" VerticalAlignment="Top" Width="450" Height="173">
             <GridView.ItemTemplate>
                 <DataTemplate>
                     <Border BorderBrush="Black" BorderThickness="1">
                         <Grid>
-                            <Image Source="{Binding Path=Thumbnail}" Width="50" Height="50"/>
-                            <TextBlock HorizontalAlignment="Stretch" Grid.Row="0"  />
+                            <Image Source="{Binding Path=Thumbnail}" Width="50" Height="50" />
+                            <TextBlock HorizontalAlignment="Stretch" Grid.Row="0" />
                         </Grid>
                     </Border>
                 </DataTemplate>
             </GridView.ItemTemplate>
         </GridView>
-        <Button x:Name="loadImagePaletteButton" Command="{Binding LoadImagePaletteCommand}"  Content="Load Image Palette" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="838,732,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="loadImagePaletteButton" Command="{Binding LoadImagePaletteCommand}"
+                Content="Load Image Palette" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="838,732,0,0"
+                VerticalAlignment="Top" />
 
     </Grid>
 </Page>

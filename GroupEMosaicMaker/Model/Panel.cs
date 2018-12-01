@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using Windows.UI;
 
@@ -9,14 +7,13 @@ namespace GroupEMosaicMaker.Model
 {
     public class Panel
     {
+        #region Methods
 
         public static void FillPanelWithAverageColor(byte[] sourceBytes, ICollection<int> indexes)
         {
             var average = getPanelAverageColor(sourceBytes, indexes);
             fillPanelWithColor(sourceBytes, indexes, average);
-
         }
-
 
         private static Color getPanelAverageColor(byte[] sourceBytes, ICollection<int> indexes)
         {
@@ -41,6 +38,7 @@ namespace GroupEMosaicMaker.Model
                 totalG += currentColor.G;
                 totalB += currentColor.B;
             }
+
             var newA = (byte) (totalA / colorCollection.Count);
             var newR = (byte) (totalR / colorCollection.Count);
             var newG = (byte) (totalG / colorCollection.Count);
@@ -74,5 +72,6 @@ namespace GroupEMosaicMaker.Model
             return colorCollection;
         }
 
+        #endregion
     }
 }

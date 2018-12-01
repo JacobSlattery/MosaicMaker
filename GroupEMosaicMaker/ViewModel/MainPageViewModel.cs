@@ -1,15 +1,14 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.Xaml.Media.Imaging;
+using GroupEMosaicMaker.Extension;
 using GroupEMosaicMaker.FileIO;
 using GroupEMosaicMaker.Model;
 using GroupEMosaicMaker.Utility;
-using System;
-using System.Collections.ObjectModel;
-using GroupEMosaicMaker.Extension;
 
 namespace GroupEMosaicMaker.ViewModel
 {
@@ -58,6 +57,7 @@ namespace GroupEMosaicMaker.ViewModel
                 this.OnPropertyChanged();
             }
         }
+
         public StorageFile SourceFile
         {
             get => this.sourceFile;
@@ -124,8 +124,8 @@ namespace GroupEMosaicMaker.ViewModel
                     this.manipulatorForGridImage = new ImageManipulator(this.imageWithGrid.Decoder.PixelWidth,
                         this.imageWithGrid.Decoder.PixelHeight, this.imageWithGrid.SourcePixels);
                     this.manipulatorForGridImage.DrawGrid(this.BlockSize);
-                    this.currentImageWithGrid = new WriteableBitmap((int)this.imageWithGrid.Decoder.PixelWidth,
-                        (int)this.imageWithGrid.Decoder.PixelHeight);
+                    this.currentImageWithGrid = new WriteableBitmap((int) this.imageWithGrid.Decoder.PixelWidth,
+                        (int) this.imageWithGrid.Decoder.PixelHeight);
                     this.writeStreamOfPixels(this.currentImageWithGrid,
                         this.manipulatorForGridImage.RetrieveModifiedPixels());
                     this.updateDisplayImage();
@@ -159,7 +159,7 @@ namespace GroupEMosaicMaker.ViewModel
             this.loadCommands();
             this.loadProperties();
             //this.imageStorageForGrid = new ImageStorage();
-           // this.imageStorageForMosaic = new ImageStorage();
+            // this.imageStorageForMosaic = new ImageStorage();
             this.imageLoader = new ImageLoader();
             this.imageWithGrid = null;
             this.imageWithMosaic = null;
@@ -195,7 +195,6 @@ namespace GroupEMosaicMaker.ViewModel
             var folder = await MainPage.SelectImagePaletteFolder();
             var palette = await this.imageLoader.LoadImages(folder);
             this.ImagePalette = palette.Images.ToObservableCollection();
-
         }
 
         private void loadProperties()
@@ -244,16 +243,14 @@ namespace GroupEMosaicMaker.ViewModel
 
         private async Task handleNewImageFile()
         {
-
-           // await this.imageStorageForGrid.CreateImage(this.SourceFile);
+            // await this.imageStorageForGrid.CreateImage(this.SourceFile);
             this.imageWithGrid = await this.imageLoader.LoadImage(this.SourceFile);
-           
 
-           // var width = (int) this.imageStorageForGrid.Decoder.PixelWidth;
-         //   var height = (int) this.imageStorageForGrid.Decoder.PixelHeight;
-           // var pixels = this.imageStorageForGrid.SourcePixels;
-            var width = (int)this.imageWithGrid.Decoder.PixelWidth;
-            var height = (int)this.imageWithGrid.Decoder.PixelHeight;
+            // var width = (int) this.imageStorageForGrid.Decoder.PixelWidth;
+            //   var height = (int) this.imageStorageForGrid.Decoder.PixelHeight;
+            // var pixels = this.imageStorageForGrid.SourcePixels;
+            var width = (int) this.imageWithGrid.Decoder.PixelWidth;
+            var height = (int) this.imageWithGrid.Decoder.PixelHeight;
             var pixels = this.imageWithGrid.SourcePixels;
             this.currentImage = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.currentImage, pixels);
@@ -269,14 +266,14 @@ namespace GroupEMosaicMaker.ViewModel
 
         private async Task handleCreatingMosaic()
         {
-          //  await this.imageStorageForMosaic.CreateImage(this.SourceFile);
+            //  await this.imageStorageForMosaic.CreateImage(this.SourceFile);
             this.imageWithMosaic = await this.imageLoader.LoadImage(this.SourceFile);
 
             //var width = (int) this.imageStorageForMosaic.Decoder.PixelWidth;
             //var height = (int) this.imageStorageForMosaic.Decoder.PixelHeight;
             //var pixels = this.imageStorageForMosaic.SourcePixels;
-            var width = (int)this.imageWithMosaic.Decoder.PixelWidth;
-            var height = (int)this.imageWithMosaic.Decoder.PixelHeight;
+            var width = (int) this.imageWithMosaic.Decoder.PixelWidth;
+            var height = (int) this.imageWithMosaic.Decoder.PixelHeight;
             var pixels = this.imageWithMosaic.SourcePixels;
 
             this.manipulatorForResultImage = new ImageManipulator((uint) width, (uint) height, pixels);

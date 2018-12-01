@@ -1,23 +1,30 @@
 ﻿using System;
-using System.Diagnostics;
 using Windows.UI;
 
 namespace GroupEMosaicMaker.Model
 {
     public class ImageManipulator
     {
+        #region Properties
 
         private uint ImageWidth { get; }
         private uint ImageHeight { get; }
 
         private byte[] SourcePixels { get; }
 
+        #endregion
+
+        #region Constructors
+
         public ImageManipulator(uint width, uint height, byte[] sourcePixels)
         {
             this.ImageWidth = width;
             this.ImageHeight = height;
-            this.SourcePixels = (byte[])sourcePixels.Clone();
+            this.SourcePixels = (byte[]) sourcePixels.Clone();
         }
+
+        #endregion
+
         #region Methods
 
         public byte[] RetrieveModifiedPixels()
@@ -48,8 +55,8 @@ namespace GroupEMosaicMaker.Model
 
         public void CreatePictureMosaic(int blockSize, ImagePalette palette)
         {
-            
         }
+
         public void CreateSolidBlockMosaic(int blockSize)
         {
             var currentIndex = 0;
@@ -57,36 +64,20 @@ namespace GroupEMosaicMaker.Model
             var maxHorizontalBlocks = (int) Math.Ceiling(decimal.Divide(this.ImageWidth, blockSize));
             var maxVerticalBlocks = (int) Math.Ceiling(decimal.Divide(this.ImageHeight, blockSize));
 
-
-
             for (var i = 1; i <= maxVerticalBlocks; i++)
             {
-                var heightOffset = (int)(i * verticalJumpSize);
+                var heightOffset = (int) (i * verticalJumpSize);
                 for (var j = 1; j <= maxHorizontalBlocks; j++)
                 {
-                    Debug.WriteLine(currentIndex);
-                    var indexes = ImageMapper.CalculateIndexBox(currentIndex, blockSize, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
-                    ImageMapper.ConvertEachIndexToMatchOffset(indexes, 4);
+                    var indexes = IndexMapper.CalculateIndexBox(currentIndex, blockSize, blockSize,
+                        (int) this.ImageWidth, (int) this.ImageHeight);
+                    IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
                     Panel.FillPanelWithAverageColor(this.SourcePixels, indexes);
                     currentIndex += blockSize;
                 }
+
                 currentIndex = heightOffset;
             }
-        }
-
-        private static byte[] getPixelAt(byte[] pixels, int x, int y, uint width)
-        {
-            var offset = (x * (int)width + y) * 4;
-            return new[] { pixels[offset], pixels[offset + 1], pixels[offset + 2], pixels[offset + 3] };
-        }
-
-        private static Color getPixelBgra8(byte[] pixels, int x, int y, uint width, uint height)
-        {
-            var offset = (x * (int) width + y) * 4;
-            var r = pixels[offset + 2];
-            var g = pixels[offset + 1];
-            var b = pixels[offset + 0];
-            return Color.FromArgb(0, r, g, b);
         }
 
         private static void setPixelBgra8(byte[] pixels, int x, int y, Color color, uint width, uint height)

@@ -9,11 +9,21 @@ namespace GroupEMosaicMaker.Model
 {
     public class ImageStorage
     {
-        public BitmapDecoder Decoder { get; set; }
-        public byte[] SourcePixels { get; set; }
+        #region Data members
 
         private double dpiX;
         private double dpiY;
+
+        #endregion
+
+        #region Properties
+
+        public BitmapDecoder Decoder { get; set; }
+        public byte[] SourcePixels { get; set; }
+
+        #endregion
+
+        #region Methods
 
         public async Task CreateImage(StorageFile file)
         {
@@ -21,8 +31,7 @@ namespace GroupEMosaicMaker.Model
             using (var fileStream = await file.OpenAsync(FileAccessMode.Read))
             {
                 this.Decoder = await BitmapDecoder.CreateAsync(fileStream);
-                var transform = new BitmapTransform
-                {
+                var transform = new BitmapTransform {
                     ScaledWidth = Convert.ToUInt32(copyBitmapImage.PixelWidth),
                     ScaledHeight = Convert.ToUInt32(copyBitmapImage.PixelHeight)
                 };
@@ -49,5 +58,7 @@ namespace GroupEMosaicMaker.Model
             newImage.SetSource(inputStream);
             return newImage;
         }
+
+        #endregion
     }
 }

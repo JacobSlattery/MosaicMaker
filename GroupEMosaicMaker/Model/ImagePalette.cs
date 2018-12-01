@@ -1,24 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace GroupEMosaicMaker.Model
 {
     public class ImagePalette
     {
+        #region Data members
+
         public ICollection<Image> Images;
+
+        #endregion
+
+        #region Constructors
 
         public ImagePalette()
         {
             this.Images = new Collection<Image>();
         }
+
+        #endregion
+
+        #region Methods
+
         public void AddImage(Image image)
         {
             this.Images.Add(image);
         }
+
+        #endregion
     }
 }

@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using GroupEMosaicMaker.Model;
 
@@ -16,24 +11,35 @@ namespace GroupEMosaicMaker.FileIO
 {
     public class ImageLoader
     {
+        #region Data members
+
         public ImagePalette Palette;
+
+        #endregion
+
+        #region Constructors
 
         public ImageLoader()
         {
             this.Palette = new ImagePalette();
         }
 
+        #endregion
+
+        #region Methods
+
         public async Task<Image> LoadImage(StorageFile image)
         {
             return await this.createWorkableImage(image);
         }
+
         public async Task<ImagePalette> LoadImages(StorageFolder folder)
         {
             var images = await folder.GetFilesAsync();
             foreach (var image in images)
             {
-               var myImage = await this.createWorkableImage(image);
-               this.Palette.AddImage(myImage);
+                var myImage = await this.createWorkableImage(image);
+                this.Palette.AddImage(myImage);
             }
 
             return this.Palette;
@@ -60,9 +66,9 @@ namespace GroupEMosaicMaker.FileIO
 
                 var sourcePixels = pixelData.DetachPixelData();
 
-               // var bitMap = new WriteableBitmap((int) decoder.PixelWidth, (int) decoder.PixelHeight);
+                // var bitMap = new WriteableBitmap((int) decoder.PixelWidth, (int) decoder.PixelHeight);
 
-               // this.writeStreamOfPixels(bitMap, sourcePixels);
+                // this.writeStreamOfPixels(bitMap, sourcePixels);
                 var thumbnail = await this.makeACopyOfTheFileToWorkOn(image);
                 return new Image(sourcePixels, decoder, thumbnail);
             }
@@ -83,5 +89,7 @@ namespace GroupEMosaicMaker.FileIO
                 await writeStream.WriteAsync(sourcePixels, 0, sourcePixels.Length);
             }
         }
+
+        #endregion
     }
 }
