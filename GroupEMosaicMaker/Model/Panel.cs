@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using Windows.UI;
 
@@ -8,34 +10,29 @@ namespace GroupEMosaicMaker.Model
     public class Panel
     {
 
-        public static void FillPanelWithAverageColor(byte[] pixels)
+        public static void FillPanelWithAverageColor(byte[] sourceBytes, ICollection<int> indexes)
         {
-            if (pixels.Count() != 0)
-            {
-                var average = getAverageColorInPanel(pixels);
-                convertPanelTo(pixels, average);
+            var average = getPanelAverageColor(sourceBytes, indexes);
+            fillPanelWithColor(sourceBytes, indexes, average);
 
-            }
-            
         }
 
-        private static void convertPanelTo(byte[] pixels, Color color)
-        {
-            for (var index=0; index < pixels.Count(); index+=4)
-            {
-                pixels[index + 3] = color.A;
-                pixels[index + 2] = color.R;
-                pixels[index + 1] = color.G;
-                pixels[index + 0] = color.B;
-            }
-        }
 
-        private static Color getAverageColorInPanel(byte[] pixels)
+        private static Color getPanelAverageColor(byte[] sourceBytes, ICollection<int> indexes)
         {
             var totalA = 0;
             var totalR = 0;
             var totalG = 0;
             var totalB = 0;
+            var pixels = new Collection<byte>();
+            foreach (var index in indexes)
+            {
+                pixels.Add(sourceBytes[index]);
+                pixels.Add(sourceBytes[index + 1]);
+                pixels.Add(sourceBytes[index + 2]);
+                pixels.Add(sourceBytes[index + 3]);
+            }
+
             var colorCollection = getColorForEachPixel(pixels);
             foreach (var currentColor in colorCollection)
             {
@@ -44,22 +41,33 @@ namespace GroupEMosaicMaker.Model
                 totalG += currentColor.G;
                 totalB += currentColor.B;
             }
-            var newA = Convert.ToInt32(Math.Round(Convert.ToDecimal(totalA / colorCollection.Count)));
-            var newR = Convert.ToInt32(Math.Round(Convert.ToDecimal(totalR / colorCollection.Count)));
-            var newG = Convert.ToInt32(Math.Round(Convert.ToDecimal(totalG / colorCollection.Count)));
-            var newB = Convert.ToInt32(Math.Round(Convert.ToDecimal(totalB / colorCollection.Count)));
-            return Color.FromArgb(BitConverter.GetBytes(newA)[0], BitConverter.GetBytes(newR)[0], BitConverter.GetBytes(newG)[0], BitConverter.GetBytes(newB)[0]);
+            var newA = (byte) (totalA / colorCollection.Count);
+            var newR = (byte) (totalR / colorCollection.Count);
+            var newG = (byte) (totalG / colorCollection.Count);
+            var newB = (byte) (totalB / colorCollection.Count);
+            return Color.FromArgb(newA, newR, newG, newB);
         }
 
-        private static Collection<Color> getColorForEachPixel(byte[] pixels)
+        private static void fillPanelWithColor(byte[] sourceBytes, ICollection<int> indexes, Color color)
+        {
+            foreach (var index in indexes)
+            {
+                sourceBytes[index + 3] = color.A;
+                sourceBytes[index + 2] = color.R;
+                sourceBytes[index + 1] = color.G;
+                sourceBytes[index + 0] = color.B;
+            }
+        }
+
+        private static Collection<Color> getColorForEachPixel(Collection<byte> pixelBytes)
         {
             var colorCollection = new Collection<Color>();
-            for (var index = 0; index < pixels.Count(); index += 4)
+            for (var index = 0; index < pixelBytes.Count(); index += 4)
             {
-                var valueA = pixels[index + 3];
-                var valueR = pixels[index + 2];
-                var valueG = pixels[index + 1];
-                var valueB = pixels[index + 0];
+                var valueA = pixelBytes[index + 3];
+                var valueR = pixelBytes[index + 2];
+                var valueG = pixelBytes[index + 1];
+                var valueB = pixelBytes[index + 0];
                 colorCollection.Add(Color.FromArgb(valueA, valueR, valueG, valueB));
             }
 

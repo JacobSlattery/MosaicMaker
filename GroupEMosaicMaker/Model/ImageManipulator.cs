@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Windows.Storage;
-using Windows.Storage.Streams;
+using System.Diagnostics;
 using Windows.UI;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace GroupEMosaicMaker.Model
 {
@@ -36,7 +33,6 @@ namespace GroupEMosaicMaker.Model
                 {
                     var pixelColor = Color.FromArgb(255, 255, 255, 255);
                     setPixelBgra8(this.SourcePixels, i, j, pixelColor, this.ImageWidth, this.ImageHeight);
-                 //   setPixelBgra8(this.SourcePixels, i, j + 1, pixelColor, this.ImageWidth, this.ImageHeight);
                 }
             }
 
@@ -46,7 +42,6 @@ namespace GroupEMosaicMaker.Model
                 {
                     var pixelColor = Color.FromArgb(255, 255, 255, 255);
                     setPixelBgra8(this.SourcePixels, i, j, pixelColor, this.ImageWidth, this.ImageHeight);
-                  //  setPixelBgra8(this.SourcePixels, i + 1, j, pixelColor, this.ImageWidth, this.ImageHeight);
                 }
             }
         }
@@ -57,77 +52,25 @@ namespace GroupEMosaicMaker.Model
         }
         public void CreateSolidBlockMosaic(int blockSize)
         {
-            var currentPixelHeight = 0;
-            var currentPixelMaxHeight = blockSize;
-            var currentPixelWidth = 0;
-            var currentPixelMaxWidth = blockSize;
-            var maxForBlockHeight = Convert.ToInt32(Math.Round(Convert.ToDecimal(this.ImageHeight / blockSize))) + 1;
-            var maxForBlockWidth = Convert.ToInt32(Math.Round(Convert.ToDecimal(this.ImageWidth / blockSize))) + 1;
-            for (var blockHeight = 0;
-                blockHeight < maxForBlockHeight;
-                blockHeight++)
+            var currentIndex = 0;
+            var verticalJumpSize = blockSize * this.ImageWidth;
+            var maxHorizontalBlocks = (int) Math.Ceiling(decimal.Divide(this.ImageWidth, blockSize));
+            var maxVerticalBlocks = (int) Math.Ceiling(decimal.Divide(this.ImageHeight, blockSize));
+
+
+
+            for (var i = 1; i <= maxVerticalBlocks; i++)
             {
-                for (var blockWidth = 0;
-                    blockWidth < maxForBlockWidth;
-                    blockWidth++)
+                var heightOffset = (int)(i * verticalJumpSize);
+                for (var j = 1; j <= maxHorizontalBlocks; j++)
                 {
-                    this.averagePixelColors(currentPixelHeight, currentPixelMaxHeight, currentPixelWidth, currentPixelMaxWidth);
-
-                    currentPixelWidth += blockSize;
-                    if (currentPixelMaxWidth + blockSize > this.ImageWidth)
-                    {
-                        currentPixelMaxWidth += (Convert.ToInt32(this.ImageWidth) - currentPixelMaxWidth);
-                    }
-                    else
-                    {
-                        currentPixelMaxWidth += blockSize;
-                    }
-
+                    Debug.WriteLine(currentIndex);
+                    var indexes = ImageMapper.CalculateIndexBox(currentIndex, blockSize, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
+                    ImageMapper.ConvertEachIndexToMatchOffset(indexes, 4);
+                    Panel.FillPanelWithAverageColor(this.SourcePixels, indexes);
+                    currentIndex += blockSize;
                 }
-                currentPixelHeight += blockSize;
-                if (currentPixelMaxHeight + blockSize > this.ImageHeight)
-                {
-                    currentPixelMaxHeight += (Convert.ToInt32(this.ImageHeight) - currentPixelMaxHeight);
-                }
-                else
-                {
-                    currentPixelMaxHeight += blockSize;
-                }
-                currentPixelWidth = 0;
-                currentPixelMaxWidth = blockSize;
-            }
-        }
-
-        private void averagePixelColors(int currentPixelHeight, int currentPixelMaxHeight, int currentPixelWidth,
-            int currentPixelMaxWidth)
-        {
-            var totalRed = 0;
-            var totalBlue = 0;
-            var totalGreen = 0;
-            var pixelCounter = 0;
-
-            for (var i = currentPixelHeight; i < currentPixelMaxHeight; i++)
-            {
-                for (var j = currentPixelWidth; j < currentPixelMaxWidth; j++)
-                {
-                    var pixelColor = getPixelBgra8(this.SourcePixels, i, j, this.ImageWidth, this.ImageHeight);
-                    totalRed += pixelColor.R;
-                    totalBlue += pixelColor.B;
-                    totalGreen += pixelColor.G;
-                    pixelCounter++;
-                }
-            }
-
-            for (var i = currentPixelHeight; i < currentPixelMaxHeight; i++)
-            {
-                for (var j = currentPixelWidth; j < currentPixelMaxWidth; j++)
-                {
-                    var pixelColor = getPixelBgra8(this.SourcePixels, i, j, this.ImageWidth, this.ImageHeight);
-                    pixelColor.R = (byte) (totalRed / pixelCounter);
-                    pixelColor.B = (byte) (totalBlue / pixelCounter);
-                    pixelColor.G = (byte) (totalGreen / pixelCounter);
-                    setPixelBgra8(this.SourcePixels, i, j, pixelColor, this.ImageWidth, this.ImageHeight);
-                }
+                currentIndex = heightOffset;
             }
         }
 
