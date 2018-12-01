@@ -4,6 +4,32 @@ namespace GroupEMosaicMaker.Model
 {
     internal class IndexMapper
     {
+
+
+        public static Collection<int> Grid(int blockSize, int maxWidth, int maxHeight)
+        {
+            var indexCollection = new Collection<int>();
+            for (var i = 0; i < maxHeight; i++)
+            {
+                for (var j = 0; j < maxWidth; j += blockSize)
+                {
+                    var index = i * maxWidth + j;
+                    indexCollection.Add(index);
+                }
+            }
+
+            for (var i = 0; i < maxHeight; i += blockSize)
+            {
+                for (var j = 0; j < maxWidth; j++)
+                {
+                    var index = i * maxWidth + j;
+                    indexCollection.Add(index);
+                }
+            }
+
+            return indexCollection;
+        }
+
         #region Methods
 
         /// <summary>
@@ -18,7 +44,7 @@ namespace GroupEMosaicMaker.Model
         /// <returns>
         ///     A collection of the predicted indexes.
         /// </returns>
-        public static Collection<int> CalculateIndexBox(int startIndex, int boxWidth, int boxHeight, int maxWidth,
+        public static Collection<int> Box(int startIndex, int boxWidth, int boxHeight, int maxWidth,
             int maxHeight)
         {
             var indexCollection = new Collection<int>();

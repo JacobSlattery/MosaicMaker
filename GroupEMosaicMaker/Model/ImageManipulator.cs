@@ -34,23 +34,9 @@ namespace GroupEMosaicMaker.Model
 
         public void DrawGrid(int blockSize)
         {
-            for (var i = 0; i < this.ImageHeight; i++)
-            {
-                for (var j = 0; j < this.ImageWidth; j += blockSize)
-                {
-                    var pixelColor = Color.FromArgb(255, 255, 255, 255);
-                    setPixelBgra8(this.SourcePixels, i, j, pixelColor, this.ImageWidth, this.ImageHeight);
-                }
-            }
-
-            for (var i = 0; i < this.ImageHeight; i += blockSize)
-            {
-                for (var j = 0; j < this.ImageWidth; j++)
-                {
-                    var pixelColor = Color.FromArgb(255, 255, 255, 255);
-                    setPixelBgra8(this.SourcePixels, i, j, pixelColor, this.ImageWidth, this.ImageHeight);
-                }
-            }
+            var indexes = IndexMapper.Grid(blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
+            IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
+            Painter.FillWithColor(this.SourcePixels, indexes, Color.FromArgb(255, 255, 255, 255));
         }
 
         public void CreatePictureMosaic(int blockSize, ImagePalette palette)
@@ -69,23 +55,15 @@ namespace GroupEMosaicMaker.Model
                 var heightOffset = (int) (i * verticalJumpSize);
                 for (var j = 1; j <= maxHorizontalBlocks; j++)
                 {
-                    var indexes = IndexMapper.CalculateIndexBox(currentIndex, blockSize, blockSize,
+                    var indexes = IndexMapper.Box(currentIndex, blockSize, blockSize,
                         (int) this.ImageWidth, (int) this.ImageHeight);
                     IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
-                    Panel.FillPanelWithAverageColor(this.SourcePixels, indexes);
+                    Painter.FillWithAverageColor(this.SourcePixels, indexes);
                     currentIndex += blockSize;
                 }
 
                 currentIndex = heightOffset;
             }
-        }
-
-        private static void setPixelBgra8(byte[] pixels, int x, int y, Color color, uint width, uint height)
-        {
-            var offset = (x * (int) width + y) * 4;
-            pixels[offset + 2] = color.R;
-            pixels[offset + 1] = color.G;
-            pixels[offset + 0] = color.B;
         }
 
         #endregion
