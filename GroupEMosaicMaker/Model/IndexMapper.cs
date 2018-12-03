@@ -47,10 +47,6 @@ namespace GroupEMosaicMaker.Model
                             {
                                 indexes.Add(currentIndex);
                             }
-                            else if ((relativeRowIndex - row) == (startIndex)) //Triangle Line
-                            {
-                                indexes.Add(currentIndex);
-                            }
                         }
 
                         currentIndex++;
