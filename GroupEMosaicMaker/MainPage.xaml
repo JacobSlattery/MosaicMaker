@@ -63,6 +63,7 @@
         <Button x:Name="loadImagePaletteButton" Command="{Binding LoadImagePaletteCommand}"
                 Content="Load Image Palette" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="838,732,0,0"
                 VerticalAlignment="Top" />
+        <Button x:Name="pictureMosaicButton" Command="{Binding PictureMosaicCommand}" Content="Mosaic" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="573,363,0,0" VerticalAlignment="Top" Width="72"/>
 
     </Grid>
 </Page>

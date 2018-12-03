@@ -9,6 +9,7 @@ using GroupEMosaicMaker.Extension;
 using GroupEMosaicMaker.FileIO;
 using GroupEMosaicMaker.Model;
 using GroupEMosaicMaker.Utility;
+using System;
 
 namespace GroupEMosaicMaker.ViewModel
 {
@@ -23,8 +24,8 @@ namespace GroupEMosaicMaker.ViewModel
         private int blockSize;
         private ImageManipulator manipulatorForGridImage;
         private ImageManipulator manipulatorForResultImage;
-        private readonly ImageStorage imageStorageForGrid;
-        private readonly ImageStorage imageStorageForMosaic;
+        //private readonly ImageStorage imageStorageForGrid;
+        //private readonly ImageStorage imageStorageForMosaic;
         private readonly ImageLoader imageLoader;
         private Image imageWithGrid;
         private Image imageWithMosaic;
@@ -33,6 +34,7 @@ namespace GroupEMosaicMaker.ViewModel
         private WriteableBitmap currentImageWithGrid;
         private ObservableCollection<Image> imagePalette;
         private Image selectedImage;
+        private ImagePalette palette;
 
         #endregion
 
@@ -138,6 +140,8 @@ namespace GroupEMosaicMaker.ViewModel
 
         public RelayCommand LoadImagePaletteCommand { get; set; }
 
+        public RelayCommand PictureMosaicCommand { get; set; }
+
         #endregion
 
         #region Constructors
@@ -155,6 +159,7 @@ namespace GroupEMosaicMaker.ViewModel
             this.imageWithGrid = null;
             this.imageWithMosaic = null;
             this.imagePalette = new ObservableCollection<Image>();
+            this.palette = new ImagePalette();
         }
 
         #endregion
@@ -174,6 +179,17 @@ namespace GroupEMosaicMaker.ViewModel
             this.SaveToFileCommand = new RelayCommand(this.saveToFile, this.canSaveToFile);
             this.ConvertCommand = new RelayCommand(this.convert, this.canConvert);
             this.LoadImagePaletteCommand = new RelayCommand(this.loadPalette, this.canLoadPalette);
+            this.PictureMosaicCommand = new RelayCommand(this.createPictureMosaic, this.canCreatePictureMosaic);
+        }
+
+        private bool canCreatePictureMosaic(object obj)
+        {
+            return true;
+        }
+
+        private void createPictureMosaic(object obj)
+        {
+            this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette);
         }
 
         private bool canLoadPalette(object obj)
@@ -185,6 +201,7 @@ namespace GroupEMosaicMaker.ViewModel
         {
             var folder = await MainPage.SelectImagePaletteFolder();
             var palette = await this.imageLoader.LoadImages(folder);
+            this.palette = palette;
             this.ImagePalette = palette.Images.ToObservableCollection();
         }
 
@@ -248,6 +265,7 @@ namespace GroupEMosaicMaker.ViewModel
 
             this.manipulatorForGridImage = new ImageManipulator((uint) width,
                 (uint) height, pixels);
+            this.manipulatorForResultImage = new ImageManipulator((uint)width, (uint)height, pixels);
 
             this.manipulatorForGridImage.DrawGrid(this.BlockSize);
             this.currentImageWithGrid = new WriteableBitmap(width, height);
@@ -265,9 +283,9 @@ namespace GroupEMosaicMaker.ViewModel
             //var pixels = this.imageStorageForMosaic.SourcePixels;
             var width = (int) this.imageWithMosaic.Decoder.PixelWidth;
             var height = (int) this.imageWithMosaic.Decoder.PixelHeight;
-            var pixels = this.imageWithMosaic.SourcePixels;
+           // var pixels = this.imageWithMosaic.SourcePixels;
 
-            this.manipulatorForResultImage = new ImageManipulator((uint) width, (uint) height, pixels);
+           // this.manipulatorForResultImage = new ImageManipulator((uint) width, (uint) height, pixels);
             this.manipulatorForResultImage.CreateSolidBlockMosaic(this.BlockSize);
 
             this.ResultImage = new WriteableBitmap(width, height);
