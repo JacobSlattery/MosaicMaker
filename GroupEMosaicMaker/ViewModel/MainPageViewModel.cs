@@ -195,8 +195,8 @@ namespace GroupEMosaicMaker.ViewModel
             var pixels = this.imageWithMosaic.SourcePixels;
 
             this.manipulatorForResultImage = new ImageManipulator((uint)width, (uint)height, pixels);
-            // this.manipulatorForResultImage.CreateSolidBlockMosaic(this.BlockSize);
-            this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette);
+            
+            await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette);
             this.ResultImage = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.ResultImage, this.manipulatorForResultImage.RetrieveModifiedPixels());
 
@@ -216,7 +216,7 @@ namespace GroupEMosaicMaker.ViewModel
             var folder = await MainPage.SelectImagePaletteFolder();
             var palette = await this.imageLoader.LoadImages(folder);
             this.palette = palette;
-            this.ImagePalette = palette.Images.ToObservableCollection();
+            this.ImagePalette = palette.OriginalImages.ToObservableCollection();
         }
 
         private void loadProperties()

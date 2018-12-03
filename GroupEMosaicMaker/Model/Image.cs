@@ -14,6 +14,8 @@ namespace GroupEMosaicMaker.Model
 
         public BitmapImage Thumbnail { get; set; }
 
+        public byte[] modifiedPixels { get; }
+
         #endregion
 
         #region Constructors
@@ -25,6 +27,7 @@ namespace GroupEMosaicMaker.Model
             this.Thumbnail = thumbnail;
         }
 
+        
         #endregion
 
         public async Task ResizeImage(int size)

@@ -8,7 +8,10 @@ namespace GroupEMosaicMaker.Model
     {
         #region Data members
 
-        public ICollection<Image> Images;
+        public ICollection<Image> OriginalImages;
+        public ICollection<Image> AlteredImages;
+
+
 
         #endregion
 
@@ -16,7 +19,8 @@ namespace GroupEMosaicMaker.Model
 
         public ImagePalette()
         {
-            this.Images = new Collection<Image>();
+            this.OriginalImages = new Collection<Image>();
+            this.AlteredImages = new Collection<Image>();
         }
 
         #endregion
@@ -25,14 +29,20 @@ namespace GroupEMosaicMaker.Model
 
         public void AddImage(Image image)
         {
-            this.Images.Add(image);
+            this.OriginalImages.Add(image);
+        }
+
+        public void ClearPalette()
+        {
+            this.OriginalImages.Clear();
         }
 
         public Dictionary<Color, Image> FindAverageColorsForImagesInPalette()
         {
+            this.AlteredImages = this.OriginalImages;
             var averageColorsInPalette = new Dictionary<Color, Image>();
 
-            foreach (var image in this.Images)
+            foreach (var image in this.AlteredImages)
             {
                 var indexes = IndexMapper.Box(0, 50, 50, 50);
                 IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Windows.UI;
 
 namespace GroupEMosaicMaker.Model
@@ -49,43 +50,34 @@ namespace GroupEMosaicMaker.Model
         /// </summary>
         /// <param name="blockSize"> the block size </param>
         /// <param name="palette"> the palette to use</param>
-        public void CreatePictureMosaic(int blockSize, ImagePalette palette)
+        public async Task CreatePictureMosaic(int blockSize, ImagePalette palette)
         {
             var colors = palette.FindAverageColorsForImagesInPalette();
 
-            var currentIndex = 0;
-            var verticalJumpSize = blockSize * this.ImageWidth;
-            var maxHorizontalBlocks = (int)Math.Ceiling(decimal.Divide(this.ImageWidth, blockSize));
-            var maxVerticalBlocks = (int)Math.Ceiling(decimal.Divide(this.ImageHeight, blockSize));
-
-            for (var i = 1; i <= maxVerticalBlocks; i++)
+            foreach (var index in this.getBlockStartingPoints(blockSize))
             {
-                var heightOffset = (int)(i * verticalJumpSize);
-                for (var j = 1; j <= maxHorizontalBlocks; j++)
+                var indexes = IndexMapper.Box(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
+                IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
+                var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
+
+                Image imageToUse = null;
+                var difference = 1000000.0;
+                foreach (var color in colors.Keys)
                 {
-                    var indexes = IndexMapper.Box(currentIndex, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
-                    IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
-                    var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
-
-                    Image imageToUse;
-                    var difference = 5000.0;
-                    foreach (var color in colors.Keys)
+                    var currentDifference = Math.Pow(((color.R - averageColor.R) * .3), 2) +
+                                            Math.Pow(((color.G - averageColor.G) * .59), 2) +
+                                            Math.Pow(((color.B - averageColor.B) * .11), 2);
+                    if (currentDifference <= difference)
                     {
-                        var currentDifference = Math.Pow(((color.R - averageColor.R) * .3), 2) + 
-                                                Math.Pow(((color.G - averageColor.G) * .59), 2) +  
-                                                Math.Pow(((color.B - averageColor.B) * .11), 2);
-                        if (currentDifference <= difference)
-                        {
-                            difference = currentDifference;
-                            imageToUse = colors[color];
-                        }
+                        difference = currentDifference;
+                        imageToUse = colors[color];
                     }
-
-                    currentIndex += blockSize;
                 }
 
-                currentIndex = heightOffset;
+                await imageToUse.ResizeImage(blockSize);
+                Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.SourcePixels, indexes);
             }
+           
         }
 
 
