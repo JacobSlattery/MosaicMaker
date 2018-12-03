@@ -63,10 +63,9 @@ namespace GroupEMosaicMaker.Model
                 var heightOffset = (int)(i * verticalJumpSize);
                 for (var j = 1; j <= maxHorizontalBlocks; j++)
                 {
-                    var indexes = IndexMapper.CalculateIndexBox(currentIndex, blockSize, blockSize,
-                        (int)this.ImageWidth, (int)this.ImageHeight);
+                    var indexes = IndexMapper.Box(currentIndex, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
                     IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
-                    var averageColor = Panel.getPanelAverageColor(this.SourcePixels, indexes);
+                    var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
 
                     Image imageToUse;
                     var difference = 5000.0;

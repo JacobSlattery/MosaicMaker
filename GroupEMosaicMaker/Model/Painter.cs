@@ -11,7 +11,7 @@ namespace GroupEMosaicMaker.Model
 
         public static void FillWithAverageColor(byte[] sourceBytes, ICollection<int> indexes)
         {
-            var average = getAverageColor(sourceBytes, indexes);
+            var average = GetAverageColor(sourceBytes, indexes);
             FillWithColor(sourceBytes, indexes, average);
         }
 
@@ -26,7 +26,7 @@ namespace GroupEMosaicMaker.Model
             }
         }
 
-        private static Color getAverageColor(byte[] sourceBytes, ICollection<int> indexes)
+        public static Color GetAverageColor(byte[] sourceBytes, ICollection<int> indexes)
         {
             var totalA = 0;
             var totalR = 0;
