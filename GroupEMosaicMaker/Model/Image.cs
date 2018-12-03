@@ -14,7 +14,7 @@ namespace GroupEMosaicMaker.Model
 
         public BitmapImage Thumbnail { get; set; }
 
-        public byte[] modifiedPixels { get; }
+        public byte[] modifiedPixels { get; set; }
 
         #endregion
 
@@ -45,7 +45,7 @@ namespace GroupEMosaicMaker.Model
                 ColorManagementMode.DoNotColorManage
             );
 
-            this.SourcePixels = pixelData.DetachPixelData();
+            this.modifiedPixels = pixelData.DetachPixelData();
 
         }
     }

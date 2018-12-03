@@ -75,7 +75,7 @@ namespace GroupEMosaicMaker.Model
                 }
 
                 await imageToUse.ResizeImage(blockSize);
-                Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.SourcePixels, indexes);
+                Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.modifiedPixels, indexes);
             }
            
         }
