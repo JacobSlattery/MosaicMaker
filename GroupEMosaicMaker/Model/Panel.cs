@@ -15,7 +15,7 @@ namespace GroupEMosaicMaker.Model
             fillPanelWithColor(sourceBytes, indexes, average);
         }
 
-        private static Color getPanelAverageColor(byte[] sourceBytes, ICollection<int> indexes)
+        public static Color getPanelAverageColor(byte[] sourceBytes, ICollection<int> indexes)
         {
             var totalA = 0;
             var totalR = 0;
