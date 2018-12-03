@@ -115,21 +115,12 @@ namespace GroupEMosaicMaker.ViewModel
                 this.OnPropertyChanged();
                 if (this.SourceFile != null)
                 {
-                    //this.manipulatorForGridImage = new ImageManipulator(this.imageStorageForGrid.Decoder.PixelWidth,
-                    //    this.imageStorageForGrid.Decoder.PixelHeight, this.imageStorageForGrid.SourcePixels);
-                    //this.manipulatorForGridImage.DrawGrid(this.BlockSize);
-                    //this.currentImageWithGrid = new WriteableBitmap((int) this.imageStorageForGrid.Decoder.PixelWidth,
-                    //    (int) this.imageStorageForGrid.Decoder.PixelHeight);
-                    //this.writeStreamOfPixels(this.currentImageWithGrid,
-                    //    this.manipulatorForGridImage.RetrieveModifiedPixels());
-                    //this.updateDisplayImage();
                     this.manipulatorForGridImage = new ImageManipulator(this.imageWithGrid.Decoder.PixelWidth,
-                        this.imageWithGrid.Decoder.PixelHeight, this.imageWithGrid.SourcePixels);
+                    this.imageWithGrid.Decoder.PixelHeight, this.imageWithGrid.SourcePixels);
                     this.manipulatorForGridImage.DrawGrid(this.BlockSize);
-                    this.currentImageWithGrid = new WriteableBitmap((int) this.imageWithGrid.Decoder.PixelWidth,
-                        (int) this.imageWithGrid.Decoder.PixelHeight);
+                    this.currentImageWithGrid = new WriteableBitmap((int) this.imageWithGrid.Decoder.PixelWidth, (int) this.imageWithGrid.Decoder.PixelHeight);
                     this.writeStreamOfPixels(this.currentImageWithGrid,
-                        this.manipulatorForGridImage.RetrieveModifiedPixels());
+                    this.manipulatorForGridImage.RetrieveModifiedPixels());
                     this.updateDisplayImage();
                 }
             }

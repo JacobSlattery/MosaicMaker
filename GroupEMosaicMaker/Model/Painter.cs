@@ -5,17 +5,28 @@ using Windows.UI;
 
 namespace GroupEMosaicMaker.Model
 {
-    public class Panel
+    public class Painter
     {
         #region Methods
 
-        public static void FillPanelWithAverageColor(byte[] sourceBytes, ICollection<int> indexes)
+        public static void FillWithAverageColor(byte[] sourceBytes, ICollection<int> indexes)
         {
-            var average = getPanelAverageColor(sourceBytes, indexes);
-            fillPanelWithColor(sourceBytes, indexes, average);
+            var average = getAverageColor(sourceBytes, indexes);
+            FillWithColor(sourceBytes, indexes, average);
         }
 
-        public static Color getPanelAverageColor(byte[] sourceBytes, ICollection<int> indexes)
+        public static void FillWithColor(byte[] sourceBytes, ICollection<int> indexes, Color color)
+        {
+            foreach (var index in indexes)
+            {
+                sourceBytes[index + 3] = color.A;
+                sourceBytes[index + 2] = color.R;
+                sourceBytes[index + 1] = color.G;
+                sourceBytes[index + 0] = color.B;
+            }
+        }
+
+        private static Color getAverageColor(byte[] sourceBytes, ICollection<int> indexes)
         {
             var totalA = 0;
             var totalR = 0;
@@ -44,17 +55,6 @@ namespace GroupEMosaicMaker.Model
             var newG = (byte) (totalG / colorCollection.Count);
             var newB = (byte) (totalB / colorCollection.Count);
             return Color.FromArgb(newA, newR, newG, newB);
-        }
-
-        private static void fillPanelWithColor(byte[] sourceBytes, ICollection<int> indexes, Color color)
-        {
-            foreach (var index in indexes)
-            {
-                sourceBytes[index + 3] = color.A;
-                sourceBytes[index + 2] = color.R;
-                sourceBytes[index + 1] = color.G;
-                sourceBytes[index + 0] = color.B;
-            }
         }
 
         private static Collection<Color> getColorForEachPixel(Collection<byte> pixelBytes)
