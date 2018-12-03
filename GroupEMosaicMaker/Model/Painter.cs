@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.UI;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace GroupEMosaicMaker.Model
 {
@@ -15,6 +18,23 @@ namespace GroupEMosaicMaker.Model
             FillWithColor(sourceBytes, indexes, average);
         }
 
+        public static void FillBlockWithPicture(byte[] sourceBytes, byte[] modifiedBytes, ICollection<int> indexes)
+        {
+            var counter = 0;
+            foreach (var index in indexes)
+            {
+                //var test = modifiedBytes[counter];
+                // sourceBytes[index] = modifiedBytes[counter];
+                sourceBytes[index + 3] = modifiedBytes[counter + 3];
+                sourceBytes[index + 2] = modifiedBytes[counter + 2];
+                sourceBytes[index + 1] = modifiedBytes[counter + 1];
+                sourceBytes[index + 0] = modifiedBytes[counter];
+                counter +=4;
+            }
+
+        }
+
+
         public static void FillWithColor(byte[] sourceBytes, ICollection<int> indexes, Color color)
         {
             foreach (var index in indexes)
@@ -26,7 +46,7 @@ namespace GroupEMosaicMaker.Model
             }
         }
 
-        private static Color getAverageColor(byte[] sourceBytes, ICollection<int> indexes)
+        public static Color getAverageColor(byte[] sourceBytes, ICollection<int> indexes)
         {
             var totalA = 0;
             var totalR = 0;

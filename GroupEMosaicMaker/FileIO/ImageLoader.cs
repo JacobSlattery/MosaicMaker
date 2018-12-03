@@ -66,9 +66,6 @@ namespace GroupEMosaicMaker.FileIO
 
                 var sourcePixels = pixelData.DetachPixelData();
 
-                // var bitMap = new WriteableBitmap((int) decoder.PixelWidth, (int) decoder.PixelHeight);
-
-                // this.writeStreamOfPixels(bitMap, sourcePixels);
                 var thumbnail = await this.makeACopyOfTheFileToWorkOn(image);
                 return new Image(sourcePixels, decoder, thumbnail);
             }

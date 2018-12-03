@@ -1,4 +1,6 @@
-﻿using Windows.Graphics.Imaging;
+﻿using System;
+using System.Threading.Tasks;
+using Windows.Graphics.Imaging;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace GroupEMosaicMaker.Model
@@ -24,5 +26,24 @@ namespace GroupEMosaicMaker.Model
         }
 
         #endregion
+
+        public async Task ResizeImage(int size)
+        {
+            var transform = new BitmapTransform {
+                ScaledWidth = Convert.ToUInt32(size),
+                ScaledHeight = Convert.ToUInt32(size) 
+            };
+
+            var pixelData = await this.Decoder.GetPixelDataAsync(
+                BitmapPixelFormat.Bgra8,
+                BitmapAlphaMode.Straight,
+                transform,
+                ExifOrientationMode.IgnoreExifOrientation,
+                ColorManagementMode.DoNotColorManage
+            );
+
+            this.SourcePixels = pixelData.DetachPixelData();
+
+        }
     }
 }

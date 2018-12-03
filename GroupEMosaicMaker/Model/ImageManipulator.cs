@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Windows.Foundation;
+using Windows.Graphics.Imaging;
 using Windows.UI;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace GroupEMosaicMaker.Model
 {
@@ -11,6 +15,7 @@ namespace GroupEMosaicMaker.Model
         private uint ImageHeight { get; }
 
         private byte[] SourcePixels { get; }
+
 
         #endregion
 
@@ -44,7 +49,7 @@ namespace GroupEMosaicMaker.Model
         /// </summary>
         /// <param name="blockSize"> the block size </param>
         /// <param name="palette"> the palette to use</param>
-        public void CreatePictureMosaic(int blockSize, ImagePalette palette)
+        public async void CreatePictureMosaic(int blockSize, ImagePalette palette)
         {
             var colors = palette.FindAverageColorsForImagesInPalette();
 
@@ -58,13 +63,13 @@ namespace GroupEMosaicMaker.Model
                 var heightOffset = (int)(i * verticalJumpSize);
                 for (var j = 1; j <= maxHorizontalBlocks; j++)
                 {
-                    var indexes = IndexMapper.CalculateIndexBox(currentIndex, blockSize, blockSize,
+                    var indexes = IndexMapper.Box(currentIndex, blockSize, blockSize,
                         (int)this.ImageWidth, (int)this.ImageHeight);
                     IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
-                    var averageColor = Panel.getPanelAverageColor(this.SourcePixels, indexes);
+                    var averageColor = Painter.getAverageColor(this.SourcePixels, indexes);
 
-                    Image imageToUse;
-                    var difference = 5000.0;
+                    Image imageToUse = null;
+                    var difference = 100000000.0;
                     foreach (var color in colors.Keys)
                     {
                         var currentDifference = Math.Pow(((color.R - averageColor.R) * .3), 2) + 
@@ -77,12 +82,17 @@ namespace GroupEMosaicMaker.Model
                         }
                     }
 
+                    await imageToUse.ResizeImage(blockSize);
+
+                    Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.SourcePixels, indexes);
+
                     currentIndex += blockSize;
                 }
 
                 currentIndex = heightOffset;
             }
         }
+
 
 
         /// <summary>

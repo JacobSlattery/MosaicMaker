@@ -28,15 +28,20 @@ namespace GroupEMosaicMaker.Model
             this.Images.Add(image);
         }
 
+        public void ClearPalette()
+        {
+            this.Images.Clear();
+        }
+
         public Dictionary<Color, Image> FindAverageColorsForImagesInPalette()
         {
             var averageColorsInPalette = new Dictionary<Color, Image>();
 
             foreach (var image in this.Images)
             {
-                var indexes = IndexMapper.CalculateIndexBox(0, 50, 50, 50, 50);
+                var indexes = IndexMapper.Box(0, 50, 50, 50, 50);
                 IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
-                var color = Panel.getPanelAverageColor(image.SourcePixels, indexes);
+                var color = Painter.getAverageColor(image.SourcePixels, indexes);
                 averageColorsInPalette.Add(color, image);
             }
 
