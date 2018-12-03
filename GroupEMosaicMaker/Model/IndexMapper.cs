@@ -1,4 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace GroupEMosaicMaker.Model
 {
@@ -6,28 +9,104 @@ namespace GroupEMosaicMaker.Model
     {
 
 
-        public static Collection<int> Grid(int blockSize, int maxWidth, int maxHeight)
+
+        public static Collection<int> TriangleGrid(int startIndex, int boxSize, int maxWidth, int maxHeight)
         {
-            var indexCollection = new Collection<int>();
-            for (var i = 0; i < maxHeight; i++)
+            var indexes = new Collection<int>();
+            var currentIndex = startIndex;
+            var startingHeight = startIndex / maxWidth;
+
+            for (var row = 0; row < boxSize; row++)
             {
-                for (var j = 0; j < maxWidth; j += blockSize)
+                var actualRow = row + startingHeight;
+                var rowOffset = maxWidth * actualRow;
+                if (actualRow < maxHeight)
                 {
-                    var index = i * maxWidth + j;
-                    indexCollection.Add(index);
+                    for (var j = 0; j < boxSize; j++)
+                    {
+                        var relativeRowIndex = currentIndex - startIndex - (row*maxWidth);
+                        if (currentIndex - rowOffset < maxWidth)
+                        {
+                            if (row == 0) //Top Wall
+                            {
+                                indexes.Add(currentIndex);
+                            }
+                            else if (relativeRowIndex % boxSize == 0) //Left Wall
+                            {
+                                indexes.Add(currentIndex);
+                            }
+                            else if (row == boxSize - 1) //Bottom Wall
+                            {
+                                indexes.Add(currentIndex);
+                            }
+                            else if ((relativeRowIndex + 1) % boxSize == 0) // Right Wall
+                            {
+                                indexes.Add(currentIndex);
+                            }
+                            else if ((relativeRowIndex - row) == (0)) //Triangle Line
+                            {
+                                indexes.Add(currentIndex);
+                            }
+                        }
+
+                        currentIndex++;
+                    }
                 }
+
+                currentIndex = currentIndex - boxSize + maxWidth;
             }
 
-            for (var i = 0; i < maxHeight; i += blockSize)
-            {
-                for (var j = 0; j < maxWidth; j++)
-                {
-                    var index = i * maxWidth + j;
-                    indexCollection.Add(index);
-                }
-            }
 
-            return indexCollection;
+            return indexes;
+        }
+
+
+        public static Collection<int> Grid(int startIndex, int boxSize, int maxWidth, int maxHeight)
+        {
+            {
+                var indexes = new Collection<int>();
+                var currentIndex = startIndex;
+                var startingHeight = startIndex / maxWidth;
+
+                for (var row = 0; row < boxSize; row++)
+                {
+                    var actualRow = row + startingHeight;
+                    var rowOffset = maxWidth * actualRow;
+                    if (actualRow < maxHeight)
+                    {
+                        for (var j = 0; j < boxSize; j++)
+                        {
+                            var relativeRowIndex = currentIndex - startIndex - (row * maxWidth);
+                            if (currentIndex - rowOffset < maxWidth)
+                            {
+                                if (row == 0) //Top Wall
+                                {
+                                    indexes.Add(currentIndex);
+                                }
+                                else if (relativeRowIndex % boxSize == 0) //Left Wall
+                                {
+                                    indexes.Add(currentIndex);
+                                }
+                                else if (row == boxSize - 1) //Bottom Wall
+                                {
+                                    indexes.Add(currentIndex);
+                                }
+                                else if ((relativeRowIndex + 1) % boxSize == 0) // Right Wall
+                                {
+                                    indexes.Add(currentIndex);
+                                }
+                            }
+
+                            currentIndex++;
+                        }
+                    }
+
+                    currentIndex = currentIndex - boxSize + maxWidth;
+                }
+
+
+                return indexes;
+            }
         }
 
         #region Methods
@@ -37,27 +116,25 @@ namespace GroupEMosaicMaker.Model
         ///     the larger box.
         /// </summary>
         /// <param name="startIndex">The index starting location</param>
-        /// <param name="boxWidth">The width of the index box</param>
-        /// <param name="boxHeight">The height of the index box</param>
+        /// <param name="boxSize">The height and width of the index box</param>
         /// <param name="maxWidth">The total number of pixels contained in a row</param>
         /// <param name="maxHeight">The total number of pixels contained in a column</param>
         /// <returns>
         ///     A collection of the predicted indexes.
         /// </returns>
-        public static Collection<int> Box(int startIndex, int boxWidth, int boxHeight, int maxWidth,
-            int maxHeight)
+        public static Collection<int> Box(int startIndex, int boxSize, int maxWidth, int maxHeight)
         {
             var indexCollection = new Collection<int>();
             var currentIndex = startIndex;
             var startingHeight = startIndex / maxWidth;
 
-            for (var row = 0; row < boxHeight; row++)
+            for (var row = 0; row < boxSize; row++)
             {
                 var actualRow = row + startingHeight;
                 var rowOffset = maxWidth * (row + startingHeight);
                 if (actualRow < maxHeight)
                 {
-                    for (var j = 1; j <= boxWidth; j++)
+                    for (var j = 1; j <= boxSize; j++)
                     {
                         if (currentIndex - rowOffset < maxWidth)
                         {
@@ -67,11 +144,14 @@ namespace GroupEMosaicMaker.Model
                         currentIndex++;
                     }
 
-                    currentIndex = currentIndex - boxWidth + maxWidth;
+                    currentIndex = currentIndex - boxSize + maxWidth;
                 }
             }
 
             return indexCollection;
+
+
+
         }
 
         public static void ConvertEachIndexToMatchOffset(Collection<int> indexes, int offset)

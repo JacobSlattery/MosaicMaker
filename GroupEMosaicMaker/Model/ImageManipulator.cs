@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Graphics.Imaging;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Windows.UI;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace GroupEMosaicMaker.Model
 {
@@ -15,7 +13,6 @@ namespace GroupEMosaicMaker.Model
         private uint ImageHeight { get; }
 
         private byte[] SourcePixels { get; }
-
 
         #endregion
 
@@ -39,9 +36,12 @@ namespace GroupEMosaicMaker.Model
 
         public void DrawGrid(int blockSize)
         {
-            var indexes = IndexMapper.Grid(blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
-            IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
-            Painter.FillWithColor(this.SourcePixels, indexes, Color.FromArgb(255, 255, 255, 255));
+            foreach (var index in this.getGridStartingPoints(blockSize))
+            {
+                var indexes = IndexMapper.Grid(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
+                IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
+                Painter.FillWithColor(this.SourcePixels, indexes, Color.FromArgb(255, 255, 255, 255));
+            }
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace GroupEMosaicMaker.Model
         /// </summary>
         /// <param name="blockSize"> the block size </param>
         /// <param name="palette"> the palette to use</param>
-        public async void CreatePictureMosaic(int blockSize, ImagePalette palette)
+        public void CreatePictureMosaic(int blockSize, ImagePalette palette)
         {
             var colors = palette.FindAverageColorsForImagesInPalette();
 
@@ -63,13 +63,12 @@ namespace GroupEMosaicMaker.Model
                 var heightOffset = (int)(i * verticalJumpSize);
                 for (var j = 1; j <= maxHorizontalBlocks; j++)
                 {
-                    var indexes = IndexMapper.Box(currentIndex, blockSize, blockSize,
-                        (int)this.ImageWidth, (int)this.ImageHeight);
+                    var indexes = IndexMapper.Box(currentIndex, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
                     IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
-                    var averageColor = Painter.getAverageColor(this.SourcePixels, indexes);
+                    var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
 
-                    Image imageToUse = null;
-                    var difference = 100000000.0;
+                    Image imageToUse;
+                    var difference = 5000.0;
                     foreach (var color in colors.Keys)
                     {
                         var currentDifference = Math.Pow(((color.R - averageColor.R) * .3), 2) + 
@@ -82,10 +81,6 @@ namespace GroupEMosaicMaker.Model
                         }
                     }
 
-                    await imageToUse.ResizeImage(blockSize);
-
-                    Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.SourcePixels, indexes);
-
                     currentIndex += blockSize;
                 }
 
@@ -94,32 +89,67 @@ namespace GroupEMosaicMaker.Model
         }
 
 
-
         /// <summary>
         /// Creates the solid block mosaic with the specified block sizes
         /// </summary>
         /// <param name="blockSize"> the block size to use</param>
         public void CreateSolidBlockMosaic(int blockSize)
         {
+
+            foreach (var index in this.getBlockStartingPoints(blockSize))
+            {
+                var indexes = IndexMapper.Box(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
+                IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
+                Painter.FillWithAverageColor(this.SourcePixels, indexes);
+            }
+        }
+
+
+        private IEnumerable<int> getBlockStartingPoints(int blockSize)
+        {
+            var startingIndexes = new Collection<int>();
             var currentIndex = 0;
             var verticalJumpSize = blockSize * this.ImageWidth;
-            var maxHorizontalBlocks = (int) Math.Ceiling(decimal.Divide(this.ImageWidth, blockSize));
-            var maxVerticalBlocks = (int) Math.Ceiling(decimal.Divide(this.ImageHeight, blockSize));
+            var maxHorizontalBlocks = (int)Math.Ceiling(decimal.Divide(this.ImageWidth, blockSize));
+            var maxVerticalBlocks = (int)Math.Ceiling(decimal.Divide(this.ImageHeight, blockSize));
 
             for (var i = 1; i <= maxVerticalBlocks; i++)
             {
-                var heightOffset = (int) (i * verticalJumpSize);
+                var heightOffset = (int)(i * verticalJumpSize);
                 for (var j = 1; j <= maxHorizontalBlocks; j++)
                 {
-                    var indexes = IndexMapper.Box(currentIndex, blockSize, blockSize,
-                        (int) this.ImageWidth, (int) this.ImageHeight);
-                    IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
-                    Painter.FillWithAverageColor(this.SourcePixels, indexes);
+                    startingIndexes.Add(currentIndex);
                     currentIndex += blockSize;
                 }
 
                 currentIndex = heightOffset;
             }
+
+            return startingIndexes;
+        }
+
+
+        private IEnumerable<int> getGridStartingPoints(int blockSize)
+        {
+            var gridBlockSize = blockSize - 1;
+            var startingIndexes = new Collection<int>();
+            var currentIndex = 0;
+            var verticalJumpSize = blockSize * this.ImageWidth;
+            var maxHorizontalBlocks = (int)Math.Ceiling(decimal.Divide(this.ImageWidth, gridBlockSize));
+            var maxVerticalBlocks = (int)Math.Ceiling(decimal.Divide(this.ImageHeight, gridBlockSize));
+
+            for (var i = 1; i <= maxVerticalBlocks; i++)
+            {
+                for (var j = 0; j < maxHorizontalBlocks; j++)
+                {
+                    startingIndexes.Add(currentIndex);
+                    currentIndex += gridBlockSize;
+                }
+                var heightOffset = (int)(i * verticalJumpSize);
+                currentIndex = heightOffset - (i * (int)this.ImageWidth);
+            }
+
+            return startingIndexes;
         }
 
         #endregion
