@@ -13,8 +13,8 @@ namespace GroupEMosaicMaker.Model
 
         public static Collection<int[]> Triangle(int startIndex, int boxSize, int maxWidth, int maxHeight)
         {
-            var left = new Collection<int>();
-            var right = new Collection<int>();
+            var leftTriangle = new Collection<int>();
+            var rightTriangle = new Collection<int>();
             var currentIndex = startIndex;
             var startingHeight = startIndex / maxWidth;
             for (var row = 0; row < boxSize; row++)
@@ -30,26 +30,23 @@ namespace GroupEMosaicMaker.Model
                         {
                             if (relativeRowIndex - row <= 0)
                             {
-                                left.Add(currentIndex);
+                                leftTriangle.Add(currentIndex);
                             }
                             else
                             {
-                                right.Add(currentIndex);
+                                rightTriangle.Add(currentIndex);
                             }
                         }
-
                         currentIndex++;
                     }
                 }
-
                 currentIndex = currentIndex - boxSize + maxWidth;
             }
-
-            return new Collection<int[]>() {left.ToArray(), right.ToArray()};
+            return new Collection<int[]>() {leftTriangle.ToArray(), rightTriangle.ToArray()};
         }
 
 
-        public static int[] Grid(int startIndex, int boxSize, int maxWidth, int maxHeight)
+        public static int[] Grid(int startIndex, int boxSize, int maxWidth, int maxHeight, bool includeDiagonalLine=false)
         {
             {
                 var indexes = new Collection<int>();
@@ -65,24 +62,11 @@ namespace GroupEMosaicMaker.Model
                         for (var j = 0; j < boxSize; j++)
                         {
                             var relativeRowIndex = currentIndex - startIndex - (row * maxWidth);
-                            if (currentIndex - rowOffset < maxWidth)
+                            var isInBoxRange = (currentIndex - rowOffset < maxWidth);
+
+                            if (isInBoxRange && isValidGridIndex(boxSize, row, relativeRowIndex, includeDiagonalLine))
                             {
-                                if (row == 0) //Top Wall
-                                {
-                                    indexes.Add(currentIndex);
-                                }
-                                else if (relativeRowIndex % boxSize == 0) //Left Wall
-                                {
-                                    indexes.Add(currentIndex);
-                                }
-                                else if (row == boxSize - 1) //Bottom Wall
-                                {
-                                    indexes.Add(currentIndex);
-                                }
-                                else if ((relativeRowIndex + 1) % boxSize == 0) // Right Wall
-                                {
-                                    indexes.Add(currentIndex);
-                                }
+                                indexes.Add(currentIndex);
                             }
 
                             currentIndex++;
@@ -95,6 +79,23 @@ namespace GroupEMosaicMaker.Model
 
                 return indexes.Distinct().ToArray();
             }
+        }
+
+        private static bool isValidGridIndex(int boxSize, int row, int relativeRowIndex, bool includeDiagonalLine=false)
+        {
+            var topWall = (row == 0);
+            var leftWall = (relativeRowIndex % boxSize == 0);
+            var bottomWall = (row == boxSize - 1);
+            var rightWall = ((relativeRowIndex + 1) % boxSize == 0);
+
+            var isValid = topWall || leftWall || bottomWall || rightWall;
+
+            if (includeDiagonalLine)
+            {
+                isValid = isValid || relativeRowIndex - row == 0;
+            }
+
+            return isValid;
         }
 
         #region Methods

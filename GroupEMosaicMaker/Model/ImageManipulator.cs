@@ -37,11 +37,11 @@ namespace GroupEMosaicMaker.Model
         }
 
 
-        public void DrawGrid(int blockSize)
+        public void DrawGrid(int blockSize, bool includeDiagonalLine)
         {
-            foreach (var index in this.getGridStartingPoints(blockSize))
+            foreach (var index in this.getBlockStartingPoints(blockSize))
             {
-                var indexes = IndexMapper.Grid(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
+                var indexes = IndexMapper.Grid(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight, includeDiagonalLine);
                 IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
                 Painter.FillWithColor(this.SourcePixels, indexes, Color.FromArgb(255, 255, 255, 255));
             }

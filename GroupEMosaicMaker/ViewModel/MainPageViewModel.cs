@@ -103,7 +103,11 @@ namespace GroupEMosaicMaker.ViewModel
             set
             {
                 this.grid = value;
-                this.updateDisplayImage();
+                if (this.SourceFile != null)
+                {
+                    this.UpdateGrid();
+                    this.updateDisplayImage();
+                }
                 this.OnPropertyChanged();
             }
         }
@@ -114,7 +118,11 @@ namespace GroupEMosaicMaker.ViewModel
             set
             {
                 this.squareMosaic = value;
-                this.updateDisplayImage();
+                if (this.SourceFile != null)
+                {
+                    this.UpdateGrid();
+                    this.updateDisplayImage();
+                }
                 this.OnPropertyChanged();
             }
         }
@@ -125,7 +133,11 @@ namespace GroupEMosaicMaker.ViewModel
             set
             {
                 this.triangleMosaic = value;
-                this.updateDisplayImage();
+                if (this.SourceFile != null)
+                {
+                    this.UpdateGrid();
+                    this.updateDisplayImage();
+                }
                 this.OnPropertyChanged();
             }
         }
@@ -136,7 +148,11 @@ namespace GroupEMosaicMaker.ViewModel
             set
             {
                 this.pictureMosaic = value;
-                this.updateDisplayImage();
+                if (this.SourceFile != null)
+                {
+                    this.UpdateGrid();
+                    this.updateDisplayImage();
+                }
                 this.OnPropertyChanged();
             }
         }
@@ -149,16 +165,22 @@ namespace GroupEMosaicMaker.ViewModel
                 this.blockSize = value;
                 if (this.SourceFile != null)
                 {
-                    this.manipulatorForGridImage = new ImageManipulator(this.imageWithGrid.Decoder.PixelWidth,
-                    this.imageWithGrid.Decoder.PixelHeight, this.imageWithGrid.SourcePixels);
-                    this.manipulatorForGridImage.DrawGrid(this.BlockSize);
-                    this.currentImageWithGrid = new WriteableBitmap((int) this.imageWithGrid.Decoder.PixelWidth, (int) this.imageWithGrid.Decoder.PixelHeight);
-                    this.writeStreamOfPixels(this.currentImageWithGrid,
-                    this.manipulatorForGridImage.RetrieveModifiedPixels());
+                    this.UpdateGrid();
                     this.updateDisplayImage();
-                    this.OnPropertyChanged();
                 }
+                this.OnPropertyChanged();
             }
+        }
+
+        private void UpdateGrid()
+        {
+            this.manipulatorForGridImage = new ImageManipulator(this.imageWithGrid.Decoder.PixelWidth,
+                this.imageWithGrid.Decoder.PixelHeight, this.imageWithGrid.SourcePixels);
+            this.manipulatorForGridImage.DrawGrid(this.BlockSize, this.TriangleMosaic);
+            this.currentImageWithGrid = new WriteableBitmap((int) this.imageWithGrid.Decoder.PixelWidth,
+                (int) this.imageWithGrid.Decoder.PixelHeight);
+            this.writeStreamOfPixels(this.currentImageWithGrid,
+                this.manipulatorForGridImage.RetrieveModifiedPixels());
         }
 
         /// <summary>
@@ -311,7 +333,7 @@ namespace GroupEMosaicMaker.ViewModel
                 (uint) height, pixels);
             this.manipulatorForResultImage = new ImageManipulator((uint)width, (uint)height, pixels);
 
-            this.manipulatorForGridImage.DrawGrid(this.BlockSize);
+            this.manipulatorForGridImage.DrawGrid(this.BlockSize, this.TriangleMosaic);
             this.currentImageWithGrid = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.currentImageWithGrid, this.manipulatorForGridImage.RetrieveModifiedPixels());
             this.updateDisplayImage();
