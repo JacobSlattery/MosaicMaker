@@ -178,5 +178,12 @@ namespace GroupEMosaicMaker
         }
 
         #endregion
+
+        private void scaleToFitRadioButton_Checked(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            this.displayScrollView.ChangeView(0, this.displayScrollView.VerticalOffset, 1.0f);
+            this.resultScrollView.ChangeView(0, this.resultScrollView.VerticalOffset, 1.0f);
+        }
+
     }
 }

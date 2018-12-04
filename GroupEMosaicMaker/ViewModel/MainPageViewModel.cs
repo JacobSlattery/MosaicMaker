@@ -391,6 +391,8 @@ namespace GroupEMosaicMaker.ViewModel
             this.SquareMosaic = true;
             this.TriangleMosaic = false;
             this.SliderMaximum = 100;
+
+            this.ScaleImage = true;
         }
 
         private bool canCreatePictureMosaic(object obj)
