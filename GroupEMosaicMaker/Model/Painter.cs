@@ -18,7 +18,7 @@ namespace GroupEMosaicMaker.Model
             FillWithColor(sourceBytes, indexes, average);
         }
 
-        public static void FillBlockWithPicture(byte[] sourceBytes, byte[] modifiedBytes, ICollection<int> indexes)
+        public static void FillBlockWithPicture(byte[] sourceBytes, byte[] modifiedBytes, IEnumerable<int> indexes)
         {
             var counter = 0;
             foreach (var index in indexes)
@@ -33,7 +33,7 @@ namespace GroupEMosaicMaker.Model
         }
 
 
-        public static void FillWithColor(byte[] sourceBytes, ICollection<int> indexes, Color color)
+        public static void FillWithColor(byte[] sourceBytes, IEnumerable<int> indexes, Color color)
         {
             foreach (var index in indexes)
             {
@@ -43,7 +43,7 @@ namespace GroupEMosaicMaker.Model
                 sourceBytes[index + 0] = color.B;
             }
         }
-        public static Color GetAverageColor(byte[] sourceBytes, ICollection<int> indexes)
+        public static Color GetAverageColor(byte[] sourceBytes, IEnumerable<int> indexes)
 
         {
             var totalA = 0;

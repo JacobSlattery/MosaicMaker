@@ -38,8 +38,19 @@
                  Margin="167,548,0,0"
                  Text="{Binding Path=BlockSize, Mode=TwoWay, Converter={StaticResource IntConverter}, UpdateSourceTrigger=LostFocus}"
                  VerticalAlignment="Top" />
+
+        <Grid Grid.ColumnSpan="2" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="135" Margin="280,602,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <RadioButton Content="Square Mosaic" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding SquareMosaic, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <RadioButton Content="Picture Mosaic" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding PictureMosaic, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <RadioButton Content="Triangle Mosaic" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding TriangleMosaic, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
         <TextBlock x:Name="blockSizeTextBlock" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left"
-                   Margin="82,554,0,0" Text="Block size:" TextWrapping="Wrap" VerticalAlignment="Top" />
+              Margin="82,554,0,0" Text="Block size:" TextWrapping="Wrap" VerticalAlignment="Top" />
         <CheckBox Content="Grid" Grid.ColumnSpan="2" Grid.Column="0"
                   IsChecked="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   HorizontalAlignment="Left" Margin="283,548,0,0" VerticalAlignment="Top" />

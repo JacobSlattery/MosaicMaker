@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace GroupEMosaicMaker.Model
 {
@@ -10,12 +11,12 @@ namespace GroupEMosaicMaker.Model
 
 
 
-        public static Collection<int> TriangleGrid(int startIndex, int boxSize, int maxWidth, int maxHeight)
+        public static Collection<int[]> Triangle(int startIndex, int boxSize, int maxWidth, int maxHeight)
         {
-            var indexes = new Collection<int>();
+            var left = new Collection<int>();
+            var right = new Collection<int>();
             var currentIndex = startIndex;
             var startingHeight = startIndex / maxWidth;
-
             for (var row = 0; row < boxSize; row++)
             {
                 var actualRow = row + startingHeight;
@@ -27,25 +28,13 @@ namespace GroupEMosaicMaker.Model
                         var relativeRowIndex = currentIndex - startIndex - (row*maxWidth);
                         if (currentIndex - rowOffset < maxWidth)
                         {
-                            if (row == 0) //Top Wall
+                            if (relativeRowIndex - row <= 0)
                             {
-                                indexes.Add(currentIndex);
+                                left.Add(currentIndex);
                             }
-                            else if (relativeRowIndex % boxSize == 0) //Left Wall
+                            else
                             {
-                                indexes.Add(currentIndex);
-                            }
-                            else if (row == boxSize - 1) //Bottom Wall
-                            {
-                                indexes.Add(currentIndex);
-                            }
-                            else if ((relativeRowIndex + 1) % boxSize == 0) // Right Wall
-                            {
-                                indexes.Add(currentIndex);
-                            }
-                            else if ((relativeRowIndex - row) == (0)) //Triangle Line
-                            {
-                                indexes.Add(currentIndex);
+                                right.Add(currentIndex);
                             }
                         }
 
@@ -56,12 +45,11 @@ namespace GroupEMosaicMaker.Model
                 currentIndex = currentIndex - boxSize + maxWidth;
             }
 
-
-            return indexes;
+            return new Collection<int[]>() {left.ToArray(), right.ToArray()};
         }
 
 
-        public static Collection<int> Grid(int startIndex, int boxSize, int maxWidth, int maxHeight)
+        public static int[] Grid(int startIndex, int boxSize, int maxWidth, int maxHeight)
         {
             {
                 var indexes = new Collection<int>();
@@ -105,7 +93,7 @@ namespace GroupEMosaicMaker.Model
                 }
 
 
-                return indexes;
+                return indexes.Distinct().ToArray();
             }
         }
 
@@ -122,7 +110,7 @@ namespace GroupEMosaicMaker.Model
         /// <returns>
         ///     A collection of the predicted indexes.
         /// </returns>
-        public static Collection<int> Box(int startIndex, int boxSize, int maxWidth, int maxHeight)
+        public static int[] Box(int startIndex, int boxSize, int maxWidth, int maxHeight)
         {
             var indexCollection = new Collection<int>();
             var currentIndex = startIndex;
@@ -148,15 +136,15 @@ namespace GroupEMosaicMaker.Model
                 }
             }
 
-            return indexCollection;
+            return indexCollection.ToArray();
 
 
 
         }
 
-        public static void ConvertEachIndexToMatchOffset(Collection<int> indexes, int offset)
+        public static void ConvertEachIndexToMatchOffset(int[] indexes, int offset)
         {
-            for (var i = 0; i < indexes.Count; i++)
+            for (var i = 0; i < indexes.Length; i++)
             {
                 indexes[i] = indexes[i] * offset;
             }

@@ -35,6 +35,7 @@ namespace GroupEMosaicMaker.Model
             return this.SourcePixels;
         }
 
+
         public void DrawGrid(int blockSize)
         {
             foreach (var index in this.getGridStartingPoints(blockSize))
@@ -74,10 +75,44 @@ namespace GroupEMosaicMaker.Model
                     }
                 }
 
-                await imageToUse.ResizeImage(blockSize);
-                Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.modifiedPixels, indexes);
+                if (imageToUse == null)
+                {
+                    //TODO
+                    // Alert user
+                }
+                else
+                {
+                    await imageToUse.ResizeImage(blockSize);
+                    Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.modifiedPixels, indexes);
+                }
+                
             }
            
+        }
+
+        public void CreateTriangleMosaic(int blockSize)
+        {
+            foreach (var index in this.getBlockStartingPoints(blockSize))
+            {
+                var indexMapperData = IndexMapper.Triangle(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
+                for (var collectionIndex = 0; collectionIndex < indexMapperData.Count; collectionIndex++)
+                {
+                    IndexMapper.ConvertEachIndexToMatchOffset(indexMapperData[collectionIndex], 4);
+                }
+                var left = indexMapperData[0];
+                var right = indexMapperData[1];
+
+                if (left.Length > 0)
+                {
+                    Painter.FillWithAverageColor(this.SourcePixels, left);
+                }
+                if (right.Length > 0)
+                {
+                    Painter.FillWithAverageColor(this.SourcePixels, right);
+                }
+                
+                
+            }
         }
 
 
@@ -85,9 +120,8 @@ namespace GroupEMosaicMaker.Model
         /// Creates the solid block mosaic with the specified block sizes
         /// </summary>
         /// <param name="blockSize"> the block size to use</param>
-        public void CreateSolidBlockMosaic(int blockSize)
+        public void CreateSquareMosaic(int blockSize)
         {
-
             foreach (var index in this.getBlockStartingPoints(blockSize))
             {
                 var indexes = IndexMapper.Box(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);

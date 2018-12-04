@@ -22,6 +22,9 @@ namespace GroupEMosaicMaker.ViewModel
         private WriteableBitmap displayImage;
         private WriteableBitmap resultImage;
         private bool grid;
+        private bool squareMosaic;
+        private bool triangleMosaic;
+        private bool pictureMosaic;
         private int blockSize;
         private ImageManipulator manipulatorForGridImage;
         private ImageManipulator manipulatorForResultImage;
@@ -92,17 +95,48 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+
         public bool Grid
         {
             get => this.grid;
             set
             {
-                if (this.grid != value)
-                {
-                    this.grid = value;
-                    this.updateDisplayImage();
-                    this.OnPropertyChanged();
-                }
+                this.grid = value;
+                this.updateDisplayImage();
+                this.OnPropertyChanged();
+            }
+        }
+
+        public bool SquareMosaic
+        {
+            get => this.squareMosaic;
+            set
+            {
+                this.squareMosaic = value;
+                this.updateDisplayImage();
+                this.OnPropertyChanged();
+            }
+        }
+
+        public bool TriangleMosaic
+        {
+            get => this.triangleMosaic;
+            set
+            {
+                this.triangleMosaic = value;
+                this.updateDisplayImage();
+                this.OnPropertyChanged();
+            }
+        }
+
+        public bool PictureMosaic
+        {
+            get => this.pictureMosaic;
+            set
+            {
+                this.pictureMosaic = value;
+                this.updateDisplayImage();
+                this.OnPropertyChanged();
             }
         }
 
@@ -112,7 +146,6 @@ namespace GroupEMosaicMaker.ViewModel
             set
             {
                 this.blockSize = value;
-                this.OnPropertyChanged();
                 if (this.SourceFile != null)
                 {
                     this.manipulatorForGridImage = new ImageManipulator(this.imageWithGrid.Decoder.PixelWidth,
@@ -122,6 +155,7 @@ namespace GroupEMosaicMaker.ViewModel
                     this.writeStreamOfPixels(this.currentImageWithGrid,
                     this.manipulatorForGridImage.RetrieveModifiedPixels());
                     this.updateDisplayImage();
+                    this.OnPropertyChanged();
                 }
             }
         }
@@ -180,6 +214,19 @@ namespace GroupEMosaicMaker.ViewModel
             this.PictureMosaicCommand = new RelayCommand(this.createPictureMosaic, this.canCreatePictureMosaic);
         }
 
+        private void loadProperties()
+        {
+            this.DisplayImage = null;
+            this.currentImageWithGrid = null;
+            this.currentImage = null;
+            this.ResultImage = null;
+            this.SourceFile = null;
+            this.BlockSize = 25;
+            this.Grid = false;
+            this.SquareMosaic = true;
+            this.TriangleMosaic = false;
+        }
+
         private bool canCreatePictureMosaic(object obj)
         {
             return this.DisplayImage != null;
@@ -199,9 +246,6 @@ namespace GroupEMosaicMaker.ViewModel
             await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette);
             this.ResultImage = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.ResultImage, this.manipulatorForResultImage.RetrieveModifiedPixels());
-
-
-
         }
 
         private bool canLoadPalette(object obj)
@@ -217,17 +261,6 @@ namespace GroupEMosaicMaker.ViewModel
             var palette = await this.imageLoader.LoadImages(folder);
             this.palette = palette;
             this.ImagePalette = palette.OriginalImages.ToObservableCollection();
-        }
-
-        private void loadProperties()
-        {
-            this.DisplayImage = null;
-            this.currentImageWithGrid = null;
-            this.currentImage = null;
-            this.ResultImage = null;
-            this.SourceFile = null;
-            this.BlockSize = 5;
-            this.Grid = false;
         }
 
         private bool canConvert(object obj)
@@ -292,7 +325,19 @@ namespace GroupEMosaicMaker.ViewModel
             var pixels = this.imageWithMosaic.SourcePixels;
 
             this.manipulatorForResultImage = new ImageManipulator((uint) width, (uint) height, pixels);
-            this.manipulatorForResultImage.CreateSolidBlockMosaic(this.BlockSize);
+            if (this.SquareMosaic)
+            {
+                this.manipulatorForResultImage.CreateSquareMosaic(this.BlockSize);
+            }
+            else if (this.PictureMosaic)
+            {
+                await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette);
+            }
+            else
+            {
+                this.manipulatorForResultImage.CreateTriangleMosaic(this.BlockSize);
+            }
+            
 
             this.ResultImage = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.ResultImage, this.manipulatorForResultImage.RetrieveModifiedPixels());
