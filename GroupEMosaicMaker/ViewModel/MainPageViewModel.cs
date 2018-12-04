@@ -26,6 +26,7 @@ namespace GroupEMosaicMaker.ViewModel
         private bool triangleMosaic;
         private bool pictureMosaic;
         private int blockSize;
+        private int sliderMaximum;
         private ImageManipulator manipulatorForGridImage;
         private ImageManipulator manipulatorForResultImage;
         private readonly ImageLoader imageLoader;
@@ -105,7 +106,7 @@ namespace GroupEMosaicMaker.ViewModel
                 this.grid = value;
                 if (this.SourceFile != null)
                 {
-                    this.UpdateGrid();
+                    this.updateGrid();
                     this.updateDisplayImage();
                 }
                 this.OnPropertyChanged();
@@ -120,7 +121,7 @@ namespace GroupEMosaicMaker.ViewModel
                 this.squareMosaic = value;
                 if (this.SourceFile != null)
                 {
-                    this.UpdateGrid();
+                    this.updateGrid();
                     this.updateDisplayImage();
                 }
                 this.OnPropertyChanged();
@@ -135,7 +136,7 @@ namespace GroupEMosaicMaker.ViewModel
                 this.triangleMosaic = value;
                 if (this.SourceFile != null)
                 {
-                    this.UpdateGrid();
+                    this.updateGrid();
                     this.updateDisplayImage();
                 }
                 this.OnPropertyChanged();
@@ -150,7 +151,7 @@ namespace GroupEMosaicMaker.ViewModel
                 this.pictureMosaic = value;
                 if (this.SourceFile != null)
                 {
-                    this.UpdateGrid();
+                    this.updateGrid();
                     this.updateDisplayImage();
                 }
                 this.OnPropertyChanged();
@@ -165,14 +166,25 @@ namespace GroupEMosaicMaker.ViewModel
                 this.blockSize = value;
                 if (this.SourceFile != null)
                 {
-                    this.UpdateGrid();
+                    this.updateGrid();
                     this.updateDisplayImage();
                 }
+
                 this.OnPropertyChanged();
             }
         }
 
-        private void UpdateGrid()
+        public int SliderMaximum
+        {
+            get => this.sliderMaximum;
+            set
+            {
+                this.sliderMaximum = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        private void updateGrid()
         {
             this.manipulatorForGridImage = new ImageManipulator(this.imageWithGrid.Decoder.PixelWidth,
                 this.imageWithGrid.Decoder.PixelHeight, this.imageWithGrid.SourcePixels);
@@ -248,6 +260,7 @@ namespace GroupEMosaicMaker.ViewModel
             this.Grid = false;
             this.SquareMosaic = true;
             this.TriangleMosaic = false;
+            this.SliderMaximum = 100;
         }
 
         private bool canCreatePictureMosaic(object obj)
@@ -336,6 +349,16 @@ namespace GroupEMosaicMaker.ViewModel
             this.manipulatorForGridImage.DrawGrid(this.BlockSize, this.TriangleMosaic);
             this.currentImageWithGrid = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.currentImageWithGrid, this.manipulatorForGridImage.RetrieveModifiedPixels());
+
+            if (width > height)
+            {
+                this.SliderMaximum = width;
+            }
+            else
+            {
+                this.SliderMaximum = height;
+            }
+            this.OnPropertyChanged();
             this.updateDisplayImage();
         }
 
