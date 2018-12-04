@@ -9,16 +9,25 @@ using GroupEMosaicMaker.Model;
 
 namespace GroupEMosaicMaker.FileIO
 {
+    /// <summary>
+    /// The class that handles loading images
+    /// </summary>
     public class ImageLoader
     {
         #region Data members
 
+        /// <summary>
+        /// The palette
+        /// </summary>
         public ImagePalette Palette;
 
         #endregion
 
-        #region Constructors
-
+        #region Constructors  
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageLoader"/> class.
+        /// </summary>
         public ImageLoader()
         {
             this.Palette = new ImagePalette();
@@ -26,13 +35,22 @@ namespace GroupEMosaicMaker.FileIO
 
         #endregion
 
-        #region Methods
-
+        #region Methods        
+        /// <summary>
+        /// Loads a single image.
+        /// </summary>
+        /// <param name="image">The image.</param>
+        /// <returns> the workable image</returns>
         public async Task<Image> LoadImage(StorageFile image)
         {
             return await this.createWorkableImage(image);
         }
 
+        /// <summary>
+        /// Loads a folder of images.
+        /// </summary>
+        /// <param name="folder">The folder.</param>
+        /// <returns> the palette created from the folder</returns>
         public async Task<ImagePalette> LoadImages(StorageFolder folder)
         {
             var images = await folder.GetFilesAsync();
@@ -77,14 +95,6 @@ namespace GroupEMosaicMaker.FileIO
             var newImage = new BitmapImage();
             newImage.SetSource(inputStream);
             return newImage;
-        }
-
-        private async void writeStreamOfPixels(WriteableBitmap bitMap, byte[] sourcePixels)
-        {
-            using (var writeStream = bitMap.PixelBuffer.AsStream())
-            {
-                await writeStream.WriteAsync(sourcePixels, 0, sourcePixels.Length);
-            }
         }
 
         #endregion

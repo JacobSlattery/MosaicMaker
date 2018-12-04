@@ -3,6 +3,9 @@ using System.Collections.ObjectModel;
 
 namespace GroupEMosaicMaker.Extension
 {
+    /// <summary>
+    /// A class that extends the list class to add functionality 
+    /// </summary>
     public static class ListExtensions
     {
         #region Methods

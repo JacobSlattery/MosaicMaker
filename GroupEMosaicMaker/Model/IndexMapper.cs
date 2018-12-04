@@ -6,11 +6,21 @@ using System.Linq;
 
 namespace GroupEMosaicMaker.Model
 {
+    /// <summary>
+    /// The index mapper class used to determine the indexes
+    /// </summary>
     internal class IndexMapper
     {
 
 
-
+        /// <summary>
+        /// Gets the indexes for the triangle at the specified start index.
+        /// </summary>
+        /// <param name="startIndex">The start index.</param>
+        /// <param name="boxSize">Size of the box.</param>
+        /// <param name="maxWidth">The maximum width.</param>
+        /// <param name="maxHeight">The maximum height.</param>
+        /// <returns> the collection of indexes for the triangle mosaic</returns>
         public static Collection<int[]> Triangle(int startIndex, int boxSize, int maxWidth, int maxHeight)
         {
             var leftTriangle = new Collection<int>();
@@ -45,7 +55,15 @@ namespace GroupEMosaicMaker.Model
             return new Collection<int[]>() {leftTriangle.ToArray(), rightTriangle.ToArray()};
         }
 
-
+        /// <summary>
+        /// Gets the indexes for the grid at the specified start index.
+        /// </summary>
+        /// <param name="startIndex">The start index.</param>
+        /// <param name="boxSize">Size of the box.</param>
+        /// <param name="maxWidth">The maximum width.</param>
+        /// <param name="maxHeight">The maximum height.</param>
+        /// <param name="includeDiagonalLine">if set to <c>true</c> [include diagonal line].</param>
+        /// <returns> the indexes for the grid</returns>
         public static int[] Grid(int startIndex, int boxSize, int maxWidth, int maxHeight, bool includeDiagonalLine=false)
         {
             {
@@ -143,6 +161,11 @@ namespace GroupEMosaicMaker.Model
 
         }
 
+        /// <summary>
+        /// Converts each index to match offset.
+        /// </summary>
+        /// <param name="indexes">The indexes.</param>
+        /// <param name="offset">The offset.</param>
         public static void ConvertEachIndexToMatchOffset(int[] indexes, int offset)
         {
             for (var i = 0; i < indexes.Length; i++)

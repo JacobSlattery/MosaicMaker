@@ -8,16 +8,30 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace GroupEMosaicMaker.Model
 {
+    /// <summary>
+    /// The class in charge of painting pixels
+    /// </summary>
     public class Painter
     {
         #region Methods
 
+        /// <summary>
+        /// Fills the indexes that map to the specified source bytes with the average color.
+        /// </summary>
+        /// <param name="sourceBytes">The source bytes.</param>
+        /// <param name="indexes">The indexes.</param>
         public static void FillWithAverageColor(byte[] sourceBytes, ICollection<int> indexes)
         {
             var average = GetAverageColor(sourceBytes, indexes);
             FillWithColor(sourceBytes, indexes, average);
         }
 
+        /// <summary>
+        /// Fills the block with the specified picture picture.
+        /// </summary>
+        /// <param name="sourceBytes">The source bytes.</param>
+        /// <param name="modifiedBytes">The modified bytes of the picture to be used.</param>
+        /// <param name="indexes">The indexes.</param>
         public static void FillBlockWithPicture(byte[] sourceBytes, byte[] modifiedBytes, IEnumerable<int> indexes)
         {
             var counter = 0;
@@ -32,7 +46,12 @@ namespace GroupEMosaicMaker.Model
 
         }
 
-
+        /// <summary>
+        /// Fills the source bytes with the specified color.
+        /// </summary>
+        /// <param name="sourceBytes">The source bytes.</param>
+        /// <param name="indexes">The indexes.</param>
+        /// <param name="color">The color.</param>
         public static void FillWithColor(byte[] sourceBytes, IEnumerable<int> indexes, Color color)
         {
             foreach (var index in indexes)
@@ -43,6 +62,13 @@ namespace GroupEMosaicMaker.Model
                 sourceBytes[index + 0] = color.B;
             }
         }
+
+        /// <summary>
+        /// Gets the average color.
+        /// </summary>
+        /// <param name="sourceBytes">The source bytes.</param>
+        /// <param name="indexes">The indexes.</param>
+        /// <returns></returns>
         public static Color GetAverageColor(byte[] sourceBytes, IEnumerable<int> indexes)
 
         {

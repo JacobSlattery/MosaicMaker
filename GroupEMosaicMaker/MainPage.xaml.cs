@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using Windows.UI.Notifications;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml.Controls;
 using GroupEMosaicMaker.ViewModel;
@@ -19,8 +20,11 @@ namespace GroupEMosaicMaker
     {
         #region Data members
 
-        public static readonly string[] FileTypes = {".jpeg", ".jpg", ".gif", ".bmp", ".png"};
+        public static readonly string[] FileTypes = { ".jpg", ".jpeg", ".gif", ".bmp", ".png"};
 
+        public static List<string> FileTypesForSaving;
+
+        private static StorageFile sourcefile;
         public MainPageViewModel ViewModel;
 
         #endregion
@@ -35,6 +39,9 @@ namespace GroupEMosaicMaker
 
             ApplicationView.PreferredLaunchViewSize = new Size(bounds.Width, bounds.Height);
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+
+            sourcefile = null;
+            FileTypesForSaving = new List<string>();
 
             this.ViewModel = new MainPageViewModel();
             DataContext = this.ViewModel;
@@ -58,6 +65,7 @@ namespace GroupEMosaicMaker
         /// </returns>
         public static async Task<StorageFile> SelectSourceImageFile()
         {
+            FileTypesForSaving.Clear();
             var openPicker = new FileOpenPicker {
                 ViewMode = PickerViewMode.Thumbnail,
                 SuggestedStartLocation = PickerLocationId.PicturesLibrary
@@ -67,17 +75,17 @@ namespace GroupEMosaicMaker
                 openPicker.FileTypeFilter.Add(fileType);
             }
 
-            StorageFile file;
             try
             {
-                file = await openPicker.PickSingleFileAsync();
+                sourcefile = await openPicker.PickSingleFileAsync();
+                FileTypesForSaving.Add(sourcefile.FileType);
             }
             catch (NullReferenceException)
             {
-                file = null;
+                sourcefile = null;
             }
 
-            return file;
+            return sourcefile;
         }
 
         /// <summary>
@@ -103,31 +111,53 @@ namespace GroupEMosaicMaker
                 openPicker.FileTypeFilter.Add(fileType);
             }
 
-            //  StorageFolder folder;
-            //  try
-            //  {
-            var folder = await openPicker.PickSingleFolderAsync();
-            //  }
-            //  catch (NullReferenceException)
-            //  {
-            //      folder = null;
-            //  }
+              StorageFolder folder;
+              try
+              {
+               folder = await openPicker.PickSingleFolderAsync();
+              }
+              catch (NullReferenceException)
+              {
+                  folder = null;
+              }
 
             return folder;
         }
 
         public static async Task<StorageFile> SelectSaveImageFile()
         {
-            var fileSavePicker = new FileSavePicker {
+            createSaveFileTypes();
+
+            var fileSavePicker = new FileSavePicker
+            {
                 SuggestedStartLocation = PickerLocationId.PicturesLibrary,
                 SuggestedFileName = "image"
             };
-            foreach (var fileType in FileTypes)
+            addFileTypesForSaving(fileSavePicker);
+
+
+            var file = await fileSavePicker.PickSaveFileAsync();
+            
+            return file;
+        }
+
+        private static void addFileTypesForSaving(FileSavePicker fileSavePicker)
+        {
+            foreach (var fileType in FileTypesForSaving)
             {
                 fileSavePicker.FileTypeChoices.Add(fileType + " file", new List<string> {fileType});
             }
-            var file = await fileSavePicker.PickSaveFileAsync();
-            return file;
+        }
+
+        private static void createSaveFileTypes()
+        {
+            foreach (var fileType in FileTypes)
+            {
+                if (!FileTypesForSaving.Contains(fileType))
+                {
+                    FileTypesForSaving.Add(fileType);
+                }
+            }
         }
 
         #endregion

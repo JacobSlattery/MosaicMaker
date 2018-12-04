@@ -7,6 +7,9 @@ using Windows.UI;
 
 namespace GroupEMosaicMaker.Model
 {
+    /// <summary>
+    /// The class in charge of manipulating an image
+    /// </summary>
     public class ImageManipulator
     {
         #region Properties
@@ -20,6 +23,12 @@ namespace GroupEMosaicMaker.Model
 
         #region Constructors
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageManipulator"/> class.
+        /// </summary>
+        /// <param name="width">The width.</param>
+        /// <param name="height">The height.</param>
+        /// <param name="sourcePixels">The source pixels.</param>
         public ImageManipulator(uint width, uint height, byte[] sourcePixels)
         {
             this.ImageWidth = width;
@@ -31,12 +40,20 @@ namespace GroupEMosaicMaker.Model
 
         #region Methods
 
+        /// <summary>
+        /// Retrieves the modified pixels.
+        /// </summary>
+        /// <returns>the modified pixels.</returns>
         public byte[] RetrieveModifiedPixels()
         {
             return this.SourcePixels;
         }
 
-
+        /// <summary>
+        /// Draws the grid.
+        /// </summary>
+        /// <param name="blockSize">Size of the block.</param>
+        /// <param name="includeDiagonalLine">if set to <c>true</c> [include diagonal line].</param>
         public void DrawGrid(int blockSize, bool includeDiagonalLine)
         {
             foreach (var index in this.getBlockStartingPoints(blockSize))
@@ -54,7 +71,6 @@ namespace GroupEMosaicMaker.Model
         /// <param name="palette"> the palette to use</param>
         public async Task CreatePictureMosaic(int blockSize, ImagePalette palette)
         {
-            // var colors = palette.FindAverageColorsForImagesInPalette();
             var colors = palette.AverageColorDictionary;
 
             foreach (var index in this.getBlockStartingPoints(blockSize))
@@ -85,13 +101,17 @@ namespace GroupEMosaicMaker.Model
                 else
                 {
                     await imageToUse.ResizeImage(blockSize);
-                    Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.modifiedPixels, indexes);
+                    Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.ModifiedPixels, indexes);
                 }
                 
             }
            
         }
 
+        /// <summary>
+        /// Creates the triangle mosaic.
+        /// </summary>
+        /// <param name="blockSize">Size of the block.</param>
         public void CreateTriangleMosaic(int blockSize)
         {
             foreach (var index in this.getBlockStartingPoints(blockSize))

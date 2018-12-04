@@ -9,11 +9,13 @@ using GroupEMosaicMaker.Extension;
 using GroupEMosaicMaker.FileIO;
 using GroupEMosaicMaker.Model;
 using GroupEMosaicMaker.Utility;
-using System;
-using Windows.Graphics.Imaging;
 
 namespace GroupEMosaicMaker.ViewModel
 {
+    /// <summary>
+    /// The main paige view model
+    /// </summary>
+    /// <seealso cref="System.ComponentModel.INotifyPropertyChanged" />
     public class MainPageViewModel : INotifyPropertyChanged
     {
         #region Data members
@@ -43,6 +45,12 @@ namespace GroupEMosaicMaker.ViewModel
 
         #region Properties
 
+        /// <summary>
+        /// Gets or sets the selected image.
+        /// </summary>
+        /// <value>
+        /// The selected image.
+        /// </value>
         public Image SelectedImage
         {
             get => this.selectedImage;
@@ -53,6 +61,12 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Gets or sets the image palette.
+        /// </summary>
+        /// <value>
+        /// The image palette.
+        /// </value>
         public ObservableCollection<Image> ImagePalette
         {
             get => this.imagePalette;
@@ -64,6 +78,12 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Gets or sets the source file.
+        /// </summary>
+        /// <value>
+        /// The source file.
+        /// </value>
         public StorageFile SourceFile
         {
             get => this.sourceFile;
@@ -74,6 +94,12 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Gets or sets the display image.
+        /// </summary>
+        /// <value>
+        /// The display image.
+        /// </value>
         public WriteableBitmap DisplayImage
         {
             get => this.displayImage;
@@ -86,6 +112,12 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Gets or sets the result image.
+        /// </summary>
+        /// <value>
+        /// The result image.
+        /// </value>
         public WriteableBitmap ResultImage
         {
             get => this.resultImage;
@@ -97,7 +129,12 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
-
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="MainPageViewModel"/> is grid.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if grid; otherwise, <c>false</c>.
+        /// </value>
         public bool Grid
         {
             get => this.grid;
@@ -113,6 +150,12 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [square mosaic].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [square mosaic]; otherwise, <c>false</c>.
+        /// </value>
         public bool SquareMosaic
         {
             get => this.squareMosaic;
@@ -128,6 +171,12 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [triangle mosaic].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [triangle mosaic]; otherwise, <c>false</c>.
+        /// </value>
         public bool TriangleMosaic
         {
             get => this.triangleMosaic;
@@ -143,6 +192,12 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether [picture mosaic].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [picture mosaic]; otherwise, <c>false</c>.
+        /// </value>
         public bool PictureMosaic
         {
             get => this.pictureMosaic;
@@ -158,6 +213,12 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Gets or sets the size of the block.
+        /// </summary>
+        /// <value>
+        /// The size of the block.
+        /// </value>
         public int BlockSize
         {
             get => this.blockSize;
@@ -174,6 +235,12 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Gets or sets the slider maximum.
+        /// </summary>
+        /// <value>
+        /// The slider maximum.
+        /// </value>
         public int SliderMaximum
         {
             get => this.sliderMaximum;
@@ -184,6 +251,9 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Updates the grid.
+        /// </summary>
         private void updateGrid()
         {
             this.manipulatorForGridImage = new ImageManipulator(this.imageWithGrid.Decoder.PixelWidth,
@@ -205,10 +275,28 @@ namespace GroupEMosaicMaker.ViewModel
         /// </summary>
         public RelayCommand LoadFileCommand { get; set; }
 
+        /// <summary>
+        /// Gets or sets the convert command.
+        /// </summary>
+        /// <value>
+        /// The convert command.
+        /// </value>
         public RelayCommand ConvertCommand { get; set; }
 
+        /// <summary>
+        /// Gets or sets the load image palette command.
+        /// </summary>
+        /// <value>
+        /// The load image palette command.
+        /// </value>
         public RelayCommand LoadImagePaletteCommand { get; set; }
 
+        /// <summary>
+        /// Gets or sets the picture mosaic command.
+        /// </summary>
+        /// <value>
+        /// The picture mosaic command.
+        /// </value>
         public RelayCommand PictureMosaicCommand { get; set; }
 
         #endregion
@@ -231,10 +319,17 @@ namespace GroupEMosaicMaker.ViewModel
 
         #endregion
 
-        #region Methods
+        #region Methods        
 
+        /// <summary>
+        /// Occurs when a property value changes.
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Called when [property changed].
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -294,9 +389,12 @@ namespace GroupEMosaicMaker.ViewModel
             this.ImagePalette.Clear();
             this.palette.ClearPalette();
             var folder = await MainPage.SelectImagePaletteFolder();
-            var palette = await this.imageLoader.LoadImages(folder);
-            this.palette = palette;
-            this.ImagePalette = palette.OriginalImages.ToObservableCollection();
+            if (folder != null)
+            {
+                this.palette = await this.imageLoader.LoadImages(folder); ;
+                this.ImagePalette = this.palette.OriginalImages.ToObservableCollection();
+            }
+            
         }
 
         private bool canConvert(object obj)
