@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:converter="using:GroupEMosaicMaker.Converter"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="1264.75" Height="789.713">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="1980" Height="1080">
 
     <Page.Resources>
         <converter:IntConverter x:Key="IntConverter" />
@@ -16,7 +16,7 @@
     <Page.DataContext>
         <vm:MainPageViewModel />
     </Page.DataContext>
-    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Height="789" Width="1265">
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Height="1082" Width="1980" Margin="0,0,0,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*" />
             <ColumnDefinition />
@@ -29,17 +29,25 @@
         </CommandBar>
 
         <Image Source="{Binding ResultImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-               HorizontalAlignment="Left" Height="429" Margin="686,87,0,273" VerticalAlignment="Center" Width="450"
+               HorizontalAlignment="Left" Height="540" Margin="1010,79,0,0" VerticalAlignment="Top" Width="960"
                Grid.Column="1" />
         <Image Source="{Binding DisplayImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-               HorizontalAlignment="Left" Height="429" Margin="82,87,0,273" VerticalAlignment="Center" Width="450"
+               HorizontalAlignment="Left" Height="540" Margin="10,79,0,0" VerticalAlignment="Top" Width="960"
                Grid.Column="1" />
-        <TextBox x:Name="blockSizeTextBox" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left"
-                 Margin="167,548,0,0"
+        <TextBlock x:Name="blockSizeTextBlock" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left"
+                   Margin="82,680,0,0" Text="Block size:" TextWrapping="Wrap" VerticalAlignment="Top" />
+        <!--<TextBox x:Name="blockSizeTextBox" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left"
+                 Margin="131,795,0,0"
                  Text="{Binding Path=BlockSize, Mode=TwoWay, Converter={StaticResource IntConverter}, UpdateSourceTrigger=LostFocus}"
-                 VerticalAlignment="Top" />
+                 VerticalAlignment="Top" extensions:TextBoxRegex.Regex="^(\d{0,4})$"
+                 extensions:TextBoxRegex.ValidationMode="Dynamic"/>-->
+        <CheckBox Content="Grid" Grid.ColumnSpan="2" Grid.Column="0"
+                  IsChecked="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  HorizontalAlignment="Left" Margin="283,674,0,0" VerticalAlignment="Top" />
 
-        <Grid Grid.ColumnSpan="2" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="135" Margin="280,602,0,0">
+        <Slider Grid.ColumnSpan="2" HorizontalAlignment="Left" Value="{Binding BlockSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="5" Maximum="50" VerticalAlignment="Top" Width="200" Margin="31,732,0,0"/>
+
+        <Grid Grid.ColumnSpan="2" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="135" Margin="280,728,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -49,17 +57,11 @@
             <RadioButton Content="Picture Mosaic" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding PictureMosaic, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <RadioButton Content="Triangle Mosaic" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding TriangleMosaic, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
-        <TextBlock x:Name="blockSizeTextBlock" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left"
-              Margin="82,554,0,0" Text="Block size:" TextWrapping="Wrap" VerticalAlignment="Top" />
-        <CheckBox Content="Grid" Grid.ColumnSpan="2" Grid.Column="0"
-                  IsChecked="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  HorizontalAlignment="Left" Margin="283,548,0,0" VerticalAlignment="Top" />
         <Button Content="Convert" Command="{Binding ConvertCommand, UpdateSourceTrigger=PropertyChanged}"
-                Grid.ColumnSpan="2"
-                Grid.Column="0" HorizontalAlignment="Left" Margin="573,286,0,0" VerticalAlignment="Top" />
+                Grid.Column="1" HorizontalAlignment="Left" Margin="525,722,0,0" VerticalAlignment="Top" />
         <GridView BorderBrush="Black" BorderThickness="5" Grid.ColumnSpan="2"
                   ItemsSource="{Binding ImagePalette, Mode=TwoWay}" SelectedItem="{Binding SelectedImage, Mode=TwoWay}"
-                  HorizontalAlignment="Left" Margin="687,540,0,0" VerticalAlignment="Top" Width="450" Height="173">
+                  HorizontalAlignment="Left" Margin="687,619,0,0" VerticalAlignment="Top" Width="450" Height="173">
             <GridView.ItemTemplate>
                 <DataTemplate>
                     <Border BorderBrush="Black" BorderThickness="1">
@@ -72,9 +74,8 @@
             </GridView.ItemTemplate>
         </GridView>
         <Button x:Name="loadImagePaletteButton" Command="{Binding LoadImagePaletteCommand}"
-                Content="Load Image Palette" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="838,732,0,0"
+                Content="Load Image Palette" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="838,811,0,0"
                 VerticalAlignment="Top" />
-        <Button x:Name="pictureMosaicButton" Command="{Binding PictureMosaicCommand}" Content="Mosaic" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="573,363,0,0" VerticalAlignment="Top" Width="72"/>
 
     </Grid>
 </Page>
