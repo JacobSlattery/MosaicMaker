@@ -122,7 +122,10 @@ namespace GroupEMosaicMaker
                 SuggestedStartLocation = PickerLocationId.PicturesLibrary,
                 SuggestedFileName = "image"
             };
-            fileSavePicker.FileTypeChoices.Add("PNG files", new List<string> {".png"});
+            foreach (var fileType in FileTypes)
+            {
+                fileSavePicker.FileTypeChoices.Add(fileType + " file", new List<string> {fileType});
+            }
             var file = await fileSavePicker.PickSaveFileAsync();
             return file;
         }
