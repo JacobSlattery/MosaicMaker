@@ -105,7 +105,6 @@
     <Compile Include="Model\IndexMapper.cs" />
     <Compile Include="Model\Image.cs" />
     <Compile Include="Model\ImagePalette.cs" />
-    <Compile Include="Model\ImageStorage.cs" />
     <Compile Include="Model\ImageManipulator.cs" />
     <Compile Include="Model\Painter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

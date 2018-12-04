@@ -55,6 +55,7 @@ namespace GroupEMosaicMaker.ViewModel
             set
             {
                 this.imagePalette = value;
+                this.PictureMosaicCommand.OnCanExecuteChanged();
                 this.OnPropertyChanged();
             }
         }
@@ -182,7 +183,7 @@ namespace GroupEMosaicMaker.ViewModel
 
         private bool canCreatePictureMosaic(object obj)
         {
-            return this.DisplayImage != null;
+            return this.DisplayImage != null && this.ImagePalette.Count != 0;
         }
 
         private async void createPictureMosaic(object obj)
