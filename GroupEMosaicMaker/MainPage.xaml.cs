@@ -20,17 +20,30 @@ namespace GroupEMosaicMaker
     {
         #region Data members
 
+        /// <summary>
+        /// The file types
+        /// </summary>
         public static readonly string[] FileTypes = { ".jpg", ".jpeg", ".gif", ".bmp", ".png"};
 
+        /// <summary>
+        /// The file types for saving
+        /// </summary>
         public static List<string> FileTypesForSaving;
 
-        private static StorageFile sourcefile;
+        /// <summary>
+        /// The view model/
+        /// </summary>
         public MainPageViewModel ViewModel;
+
+        private static StorageFile sourceFile;
 
         #endregion
 
         #region Constructors
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainPage"/> class.
+        /// </summary>
         public MainPage()
         {
             this.InitializeComponent();
@@ -40,7 +53,7 @@ namespace GroupEMosaicMaker
             ApplicationView.PreferredLaunchViewSize = new Size(bounds.Width, bounds.Height);
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 
-            sourcefile = null;
+            sourceFile = null;
             FileTypesForSaving = new List<string>();
 
             this.ViewModel = new MainPageViewModel();
@@ -77,15 +90,15 @@ namespace GroupEMosaicMaker
 
             try
             {
-                sourcefile = await openPicker.PickSingleFileAsync();
-                FileTypesForSaving.Add(sourcefile.FileType);
+                sourceFile = await openPicker.PickSingleFileAsync();
+                FileTypesForSaving.Add(sourceFile.FileType);
             }
             catch (NullReferenceException)
             {
-                sourcefile = null;
+                sourceFile = null;
             }
 
-            return sourcefile;
+            return sourceFile;
         }
 
         /// <summary>
@@ -124,6 +137,10 @@ namespace GroupEMosaicMaker
             return folder;
         }
 
+        /// <summary>
+        /// Selects the save image file.
+        /// </summary>
+        /// <returns> the save file</returns>
         public static async Task<StorageFile> SelectSaveImageFile()
         {
             createSaveFileTypes();

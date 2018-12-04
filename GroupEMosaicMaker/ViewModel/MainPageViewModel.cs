@@ -41,9 +41,44 @@ namespace GroupEMosaicMaker.ViewModel
         private Image selectedImage;
         private ImagePalette palette;
 
+        private bool zoomImage;
+        private bool scaleImage;
+
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Gets or sets a value indicating whether [zoom image].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [zoom image]; otherwise, <c>false</c>.
+        /// </value>
+        public bool ZoomImage
+        {
+            get => this.zoomImage;
+            set
+            {
+                this.zoomImage = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether [scale image].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [scale image]; otherwise, <c>false</c>.
+        /// </value>
+        public bool ScaleImage
+        {
+            get => this.scaleImage;
+            set
+            {
+                this.scaleImage = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the selected image.
@@ -391,7 +426,7 @@ namespace GroupEMosaicMaker.ViewModel
             var folder = await MainPage.SelectImagePaletteFolder();
             if (folder != null)
             {
-                this.palette = await this.imageLoader.LoadImages(folder); ;
+                this.palette = await this.imageLoader.LoadImages(folder);
                 this.ImagePalette = this.palette.OriginalImages.ToObservableCollection();
             }
             

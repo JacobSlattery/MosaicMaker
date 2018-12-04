@@ -27,13 +27,18 @@
                           Command="{Binding SaveToFileCommand, UpdateSourceTrigger=PropertyChanged}" />
             <AppBarButton Icon="OpenFile" Label="Load File" Command="{Binding LoadFileCommand}" />
         </CommandBar>
-
-        <Image Source="{Binding ResultImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+        
+ 
+           <Image x:Name="resultImage" Source="{Binding ResultImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                HorizontalAlignment="Left" Height="540" Margin="1010,79,0,0" VerticalAlignment="Top" Width="960"
                Grid.Column="1" />
-        <Image Source="{Binding DisplayImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+      
+
+  
+            <Image x:Name="displayImage" Source="{Binding DisplayImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                HorizontalAlignment="Left" Height="540" Margin="10,79,0,0" VerticalAlignment="Top" Width="960"
                Grid.Column="1" />
+            
         <TextBlock x:Name="blockSizeTextBlock" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left"
                    Margin="82,680,0,0" Text="Block size:" TextWrapping="Wrap" VerticalAlignment="Top" />
         <!--<TextBox x:Name="blockSizeTextBox" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left"
@@ -76,6 +81,17 @@
         <Button x:Name="loadImagePaletteButton" Command="{Binding LoadImagePaletteCommand}"
                 Content="Load Image Palette" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="838,811,0,0"
                 VerticalAlignment="Top" />
+
+        <Grid Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="135" Margin="280, 870,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <RadioButton x:Name="scaleToFitRadioButton" Grid.Row="0" IsChecked="{Binding ScaleImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Content="Scale to fit" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <RadioButton x:Name="zoomRadioButton" Grid.Row="1" IsChecked="{Binding ZoomImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="Zoom image" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        </Grid>
+        
+      
 
     </Grid>
 </Page>
