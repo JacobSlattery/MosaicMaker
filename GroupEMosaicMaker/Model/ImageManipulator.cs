@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI;
 
@@ -53,7 +54,8 @@ namespace GroupEMosaicMaker.Model
         /// <param name="palette"> the palette to use</param>
         public async Task CreatePictureMosaic(int blockSize, ImagePalette palette)
         {
-            var colors = palette.FindAverageColorsForImagesInPalette();
+            // var colors = palette.FindAverageColorsForImagesInPalette();
+            var colors = palette.AverageColorDictionary;
 
             foreach (var index in this.getBlockStartingPoints(blockSize))
             {

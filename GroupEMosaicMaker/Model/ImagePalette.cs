@@ -9,7 +9,8 @@ namespace GroupEMosaicMaker.Model
         #region Data members
 
         public ICollection<Image> OriginalImages;
-        public ICollection<Image> AlteredImages;
+
+        public IDictionary<Color, Image> AverageColorDictionary;
 
 
 
@@ -20,7 +21,7 @@ namespace GroupEMosaicMaker.Model
         public ImagePalette()
         {
             this.OriginalImages = new Collection<Image>();
-            this.AlteredImages = new Collection<Image>();
+            this.AverageColorDictionary = new Dictionary<Color, Image>();
         }
 
         #endregion
@@ -30,6 +31,7 @@ namespace GroupEMosaicMaker.Model
         public void AddImage(Image image)
         {
             this.OriginalImages.Add(image);
+            this.FindAverageColorsForImagesInPalette(image);
         }
 
         public void ClearPalette()
@@ -37,20 +39,20 @@ namespace GroupEMosaicMaker.Model
             this.OriginalImages.Clear();
         }
 
-        public Dictionary<Color, Image> FindAverageColorsForImagesInPalette()
+        public void FindAverageColorsForImagesInPalette(Image image)
         {
-            this.AlteredImages = this.OriginalImages;
-            var averageColorsInPalette = new Dictionary<Color, Image>();
+           // var averageColorsInPalette = new Dictionary<Color, Image>();
 
-            foreach (var image in this.AlteredImages)
-            {
+         //   foreach (var image in this.OriginalImages)
+           // {
                 var indexes = IndexMapper.Box(0, 50, 50, 50);
                 IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
                 var color = Painter.GetAverageColor(image.SourcePixels, indexes);
-                averageColorsInPalette.Add(color, image);
-            }
+               // averageColorsInPalette.Add(color, image);
+            this.AverageColorDictionary.Add(color, image);
+          //  }
 
-            return averageColorsInPalette;
+           // return averageColorsInPalette;
         }
 
         #endregion
