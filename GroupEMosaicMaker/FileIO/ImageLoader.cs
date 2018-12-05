@@ -16,6 +16,10 @@ namespace GroupEMosaicMaker.FileIO
     {
         #region Data members
 
+        private const string JpgFileType = ".jpg";
+        private const string BmpFileType = ".bmp";
+        private const string PngFileType = ".png";
+
         /// <summary>
         /// The palette
         /// </summary>
@@ -56,8 +60,12 @@ namespace GroupEMosaicMaker.FileIO
             var images = await folder.GetFilesAsync();
             foreach (var image in images)
             {
-                var myImage = await this.createWorkableImage(image);
-                this.Palette.AddImage(myImage);
+                if (this.determineIfFileIsValid(image))
+                {
+                    var myImage = await this.createWorkableImage(image);
+                    this.Palette.AddImage(myImage);
+                }
+                
             }
 
             return this.Palette;
@@ -95,6 +103,11 @@ namespace GroupEMosaicMaker.FileIO
             var newImage = new BitmapImage();
             newImage.SetSource(inputStream);
             return newImage;
+        }
+
+        private bool determineIfFileIsValid(StorageFile file)
+        {
+            return file.FileType.Equals(BmpFileType) || file.FileType.Equals(JpgFileType) || file.FileType.Equals(PngFileType);
         }
 
         #endregion

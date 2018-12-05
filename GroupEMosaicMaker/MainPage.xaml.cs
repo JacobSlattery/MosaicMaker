@@ -23,7 +23,7 @@ namespace GroupEMosaicMaker
         /// <summary>
         /// The file types
         /// </summary>
-        public static readonly string[] FileTypes = { ".jpg", ".jpeg", ".gif", ".bmp", ".png"};
+        public static readonly string[] FileTypes = { ".jpg", ".bmp", ".png"};
 
         /// <summary>
         /// The file types for saving

@@ -70,7 +70,7 @@ namespace GroupEMosaicMaker.Model
         /// <param name="blockSize"> the block size </param>
         /// <param name="palette"> the palette to use</param>
         public async Task CreatePictureMosaic(int blockSize, ImagePalette palette)
-        {
+        { 
             var colors = palette.AverageColorDictionary;
 
             foreach (var index in this.getBlockStartingPoints(blockSize))

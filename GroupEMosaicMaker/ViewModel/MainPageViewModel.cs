@@ -44,9 +44,34 @@ namespace GroupEMosaicMaker.ViewModel
         private bool zoomImage;
         private bool scaleImage;
 
+        private int countOfImagesInPalette;
+
+        private bool hasInputChanged;
+
         #endregion
 
         #region Properties
+
+        public bool HasInputChanged
+        {
+            get => this.hasInputChanged;
+            set
+            {
+                this.hasInputChanged = value;
+                this.ConvertCommand.OnCanExecuteChanged();
+                this.OnPropertyChanged();
+            }
+        }
+
+        public int CountOfImagesInPalette
+        {
+            get => this.countOfImagesInPalette;
+            set
+            {
+                this.countOfImagesInPalette = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether [zoom image].
@@ -108,7 +133,8 @@ namespace GroupEMosaicMaker.ViewModel
             set
             {
                 this.imagePalette = value;
-                this.PictureMosaicCommand.OnCanExecuteChanged();
+               // this.PictureMosaicCommand.OnCanExecuteChanged();
+                this.ConvertCommand.OnCanExecuteChanged();
                 this.OnPropertyChanged();
             }
         }
@@ -203,6 +229,7 @@ namespace GroupEMosaicMaker.ViewModel
                     this.updateDisplayImage();
                 }
                 this.OnPropertyChanged();
+                this.HasInputChanged = !this.SquareMosaic;
             }
         }
 
@@ -224,6 +251,7 @@ namespace GroupEMosaicMaker.ViewModel
                     this.updateDisplayImage();
                 }
                 this.OnPropertyChanged();
+                this.HasInputChanged = !this.TriangleMosaic;
             }
         }
 
@@ -245,6 +273,7 @@ namespace GroupEMosaicMaker.ViewModel
                     this.updateDisplayImage();
                 }
                 this.OnPropertyChanged();
+                this.HasInputChanged = !this.PictureMosaic;
             }
         }
 
@@ -263,6 +292,8 @@ namespace GroupEMosaicMaker.ViewModel
                 if (this.SourceFile != null)
                 {
                     this.updateGrid();
+                    this.HasInputChanged = true;
+                    this.ConvertCommand.OnCanExecuteChanged();
                     this.updateDisplayImage();
                 }
 
@@ -423,25 +454,44 @@ namespace GroupEMosaicMaker.ViewModel
 
         private async void loadPalette(object obj)
         {
-            this.ImagePalette.Clear();
-            this.palette.ClearPalette();
+            this.resetImagePalette();
             var folder = await MainPage.SelectImagePaletteFolder();
             if (folder != null)
             {
                 this.palette = await this.imageLoader.LoadImages(folder);
+                this.CountOfImagesInPalette = this.palette.FindNumberOfImagesInPalette();
                 this.ImagePalette = this.palette.OriginalImages.ToObservableCollection();
             }
             
         }
 
+        private void resetImagePalette()
+        {
+            this.ImagePalette.Clear();
+            this.palette.ClearPalette();
+            this.palette.AverageColorDictionary.Clear();
+        }
+
         private bool canConvert(object obj)
         {
-            return this.DisplayImage != null;
+            if (this.SquareMosaic)
+            {
+                return this.DisplayImage != null && this.HasInputChanged;
+            } else if (this.PictureMosaic)
+            {
+                return this.DisplayImage != null && this.ImagePalette.Count != 0 && this.HasInputChanged;
+            }
+            else
+            { 
+                return this.DisplayImage != null && this.HasInputChanged;
+            }
         }
 
         private async void convert(object obj)
         {
             await this.handleCreatingMosaic();
+            this.HasInputChanged = false;
+            
         }
 
         private async void loadFile(object obj)
@@ -469,6 +519,7 @@ namespace GroupEMosaicMaker.ViewModel
 
         private async Task handleNewImageFile()
         {
+            this.HasInputChanged = true;
             this.imageWithGrid = await this.imageLoader.LoadImage(this.SourceFile);
 
             var width = (int) this.imageWithGrid.Decoder.PixelWidth;
@@ -481,19 +532,20 @@ namespace GroupEMosaicMaker.ViewModel
                 (uint) height, pixels);
             this.manipulatorForResultImage = new ImageManipulator((uint)width, (uint)height, pixels);
 
+
             this.manipulatorForGridImage.DrawGrid(this.BlockSize, this.TriangleMosaic);
             this.currentImageWithGrid = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.currentImageWithGrid, this.manipulatorForGridImage.RetrieveModifiedPixels());
 
-            if (width > height)
-            {
-                this.SliderMaximum = width;
-            }
-            else
-            {
-                this.SliderMaximum = height;
-            }
-            this.OnPropertyChanged();
+            //if (width > height)
+            //{
+            //    this.SliderMaximum = width;
+            //}
+            //else
+            //{
+            //    this.SliderMaximum = height;
+            //}
+           // this.OnPropertyChanged();
             this.updateDisplayImage();
         }
 

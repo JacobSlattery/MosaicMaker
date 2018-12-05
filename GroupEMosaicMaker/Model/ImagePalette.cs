@@ -48,6 +48,11 @@ namespace GroupEMosaicMaker.Model
             this.FindAverageColorsForImagesInPalette(image);
         }
 
+        public int FindNumberOfImagesInPalette()
+        {
+            return this.OriginalImages.Count;
+        }
+
         /// <summary>
         ///     Clears the palette.
         /// </summary>
