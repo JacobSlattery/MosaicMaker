@@ -20,6 +20,9 @@ namespace GroupEMosaicMaker.ViewModel
     {
         #region Data members
 
+        private const int DefaultGridSetting = 25;
+        private const int DefaultLastUsedBlockSize = 0;
+
         private StorageFile sourceFile;
         private WriteableBitmap displayImage;
         private WriteableBitmap resultImage;
@@ -46,18 +49,42 @@ namespace GroupEMosaicMaker.ViewModel
 
         private int countOfImagesInPalette;
 
-        private bool hasInputChanged;
+        private int lastUsedBlockSizeForSquareMosaic;
+        private int lastUsedBlockSizeForPictureMosaic;
+        private int lastUsedBlockSizeForTriangleMosaic;
 
         #endregion
 
         #region Properties
 
-        public bool HasInputChanged
+        public int LastUsedBlockSizeForSquareMosaic
         {
-            get => this.hasInputChanged;
+            get => this.lastUsedBlockSizeForSquareMosaic;
             set
             {
-                this.hasInputChanged = value;
+                this.lastUsedBlockSizeForSquareMosaic = value;
+                this.ConvertCommand.OnCanExecuteChanged();
+                this.OnPropertyChanged();
+            }
+        }
+
+        public int LastUsedBlockSizeForPictureMosaic
+        {
+            get => this.lastUsedBlockSizeForPictureMosaic;
+            set
+            {
+                this.lastUsedBlockSizeForPictureMosaic = value;
+                this.ConvertCommand.OnCanExecuteChanged();
+                this.OnPropertyChanged();
+            }
+        }
+
+        public int LastUsedBlockSizeForTriangleMosaic
+        {
+            get => this.lastUsedBlockSizeForTriangleMosaic;
+            set
+            {
+                this.lastUsedBlockSizeForTriangleMosaic = value;
                 this.ConvertCommand.OnCanExecuteChanged();
                 this.OnPropertyChanged();
             }
@@ -133,7 +160,6 @@ namespace GroupEMosaicMaker.ViewModel
             set
             {
                 this.imagePalette = value;
-               // this.PictureMosaicCommand.OnCanExecuteChanged();
                 this.ConvertCommand.OnCanExecuteChanged();
                 this.OnPropertyChanged();
             }
@@ -168,7 +194,6 @@ namespace GroupEMosaicMaker.ViewModel
             {
                 this.displayImage = value;
                 this.ConvertCommand.OnCanExecuteChanged();
-                this.PictureMosaicCommand.OnCanExecuteChanged();
                 this.OnPropertyChanged();
             }
         }
@@ -229,7 +254,6 @@ namespace GroupEMosaicMaker.ViewModel
                     this.updateDisplayImage();
                 }
                 this.OnPropertyChanged();
-                this.HasInputChanged = !this.SquareMosaic;
             }
         }
 
@@ -251,7 +275,6 @@ namespace GroupEMosaicMaker.ViewModel
                     this.updateDisplayImage();
                 }
                 this.OnPropertyChanged();
-                this.HasInputChanged = !this.TriangleMosaic;
             }
         }
 
@@ -273,7 +296,6 @@ namespace GroupEMosaicMaker.ViewModel
                     this.updateDisplayImage();
                 }
                 this.OnPropertyChanged();
-                this.HasInputChanged = !this.PictureMosaic;
             }
         }
 
@@ -292,27 +314,10 @@ namespace GroupEMosaicMaker.ViewModel
                 if (this.SourceFile != null)
                 {
                     this.updateGrid();
-                    this.HasInputChanged = true;
                     this.ConvertCommand.OnCanExecuteChanged();
                     this.updateDisplayImage();
                 }
 
-                this.OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the slider maximum.
-        /// </summary>
-        /// <value>
-        /// The slider maximum.
-        /// </value>
-        public int SliderMaximum
-        {
-            get => this.sliderMaximum;
-            set
-            {
-                this.sliderMaximum = value;
                 this.OnPropertyChanged();
             }
         }
@@ -357,14 +362,6 @@ namespace GroupEMosaicMaker.ViewModel
         /// </value>
         public RelayCommand LoadImagePaletteCommand { get; set; }
 
-        /// <summary>
-        /// Gets or sets the picture mosaic command.
-        /// </summary>
-        /// <value>
-        /// The picture mosaic command.
-        /// </value>
-        public RelayCommand PictureMosaicCommand { get; set; }
-
         #endregion
 
         #region Constructors
@@ -407,7 +404,6 @@ namespace GroupEMosaicMaker.ViewModel
             this.SaveToFileCommand = new RelayCommand(this.saveToFile, this.canSaveToFile);
             this.ConvertCommand = new RelayCommand(this.convert, this.canConvert);
             this.LoadImagePaletteCommand = new RelayCommand(this.loadPalette, this.canLoadPalette);
-            this.PictureMosaicCommand = new RelayCommand(this.createPictureMosaic, this.canCreatePictureMosaic);
         }
 
         private void loadProperties()
@@ -417,34 +413,10 @@ namespace GroupEMosaicMaker.ViewModel
             this.currentImage = null;
             this.ResultImage = null;
             this.SourceFile = null;
-            this.BlockSize = 25;
+            this.BlockSize = DefaultGridSetting;
             this.Grid = false;
             this.SquareMosaic = true;
-            this.TriangleMosaic = false;
-            this.SliderMaximum = 100;
-
             this.ScaleImage = true;
-        }
-
-        private bool canCreatePictureMosaic(object obj)
-        {
-            return this.DisplayImage != null && this.ImagePalette.Count != 0;
-        }
-
-        private async void createPictureMosaic(object obj)
-        {
-           
-            this.imageWithMosaic = await this.imageLoader.LoadImage(this.SourceFile);
-
-            var width = (int)this.imageWithMosaic.Decoder.PixelWidth;
-            var height = (int)this.imageWithMosaic.Decoder.PixelHeight;
-            var pixels = this.imageWithMosaic.SourcePixels;
-
-            this.manipulatorForResultImage = new ImageManipulator((uint)width, (uint)height, pixels);
-            
-            await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette);
-            this.ResultImage = new WriteableBitmap(width, height);
-            this.writeStreamOfPixels(this.ResultImage, this.manipulatorForResultImage.RetrieveModifiedPixels());
         }
 
         private bool canLoadPalette(object obj)
@@ -476,22 +448,23 @@ namespace GroupEMosaicMaker.ViewModel
         {
             if (this.SquareMosaic)
             {
-                return this.DisplayImage != null && this.HasInputChanged;
+               
+                return this.DisplayImage != null &&  this.BlockSize != this.LastUsedBlockSizeForSquareMosaic;
+                
             } else if (this.PictureMosaic)
             {
-                return this.DisplayImage != null && this.ImagePalette.Count != 0 && this.HasInputChanged;
+                return this.DisplayImage != null && this.ImagePalette.Count != 0 && this.BlockSize != this.LastUsedBlockSizeForPictureMosaic;
             }
             else
             { 
-                return this.DisplayImage != null && this.HasInputChanged;
+                return this.DisplayImage != null && this.BlockSize != this.LastUsedBlockSizeForTriangleMosaic;
             }
         }
 
         private async void convert(object obj)
         {
             await this.handleCreatingMosaic();
-            this.HasInputChanged = false;
-            
+
         }
 
         private async void loadFile(object obj)
@@ -502,6 +475,7 @@ namespace GroupEMosaicMaker.ViewModel
             {
                 this.SourceFile = file;
                 await this.handleNewImageFile();
+                this.resetLastUsedBlockSizes();
             }
         }
 
@@ -519,7 +493,6 @@ namespace GroupEMosaicMaker.ViewModel
 
         private async Task handleNewImageFile()
         {
-            this.HasInputChanged = true;
             this.imageWithGrid = await this.imageLoader.LoadImage(this.SourceFile);
 
             var width = (int) this.imageWithGrid.Decoder.PixelWidth;
@@ -536,21 +509,12 @@ namespace GroupEMosaicMaker.ViewModel
             this.manipulatorForGridImage.DrawGrid(this.BlockSize, this.TriangleMosaic);
             this.currentImageWithGrid = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.currentImageWithGrid, this.manipulatorForGridImage.RetrieveModifiedPixels());
-
-            //if (width > height)
-            //{
-            //    this.SliderMaximum = width;
-            //}
-            //else
-            //{
-            //    this.SliderMaximum = height;
-            //}
-           // this.OnPropertyChanged();
             this.updateDisplayImage();
         }
 
         private async Task handleCreatingMosaic()
         {
+            this.resetLastUsedBlockSizes();
             this.imageWithMosaic = await this.imageLoader.LoadImage(this.SourceFile);
 
             var width = (int) this.imageWithMosaic.Decoder.PixelWidth;
@@ -561,19 +525,28 @@ namespace GroupEMosaicMaker.ViewModel
             if (this.SquareMosaic)
             {
                 this.manipulatorForResultImage.CreateSquareMosaic(this.BlockSize);
+                this.LastUsedBlockSizeForSquareMosaic = this.BlockSize;
             }
             else if (this.PictureMosaic)
             {
                 await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette);
+                this.LastUsedBlockSizeForPictureMosaic = this.BlockSize;
             }
             else
             {
                 this.manipulatorForResultImage.CreateTriangleMosaic(this.BlockSize);
+                this.LastUsedBlockSizeForTriangleMosaic = this.BlockSize;
             }
-            
 
             this.ResultImage = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.ResultImage, this.manipulatorForResultImage.RetrieveModifiedPixels());
+        }
+
+        private void resetLastUsedBlockSizes()
+        {
+            this.LastUsedBlockSizeForPictureMosaic = DefaultLastUsedBlockSize;
+            this.LastUsedBlockSizeForSquareMosaic = DefaultLastUsedBlockSize;
+            this.LastUsedBlockSizeForTriangleMosaic = DefaultLastUsedBlockSize;
         }
 
         private async void writeStreamOfPixels(WriteableBitmap bitMap, byte[] sourcePixels)
