@@ -424,7 +424,7 @@ namespace GroupEMosaicMaker.ViewModel
 
         private bool canCanConvertToBlackAndWhite(object obj)
         {
-            return this.DisplayImage != null && !this.BlackAndWhiteCreated;
+            return this.ResultImage != null && !this.BlackAndWhiteCreated;
         }
 
         private void convertToBlackAndWhite(object obj)
@@ -507,6 +507,8 @@ namespace GroupEMosaicMaker.ViewModel
                 this.SourceFile = file;
                 await this.handleNewImageFile();
                 this.resetLastUsedBlockSizes();
+
+                this.ResultImage = null;
             }
         }
 
