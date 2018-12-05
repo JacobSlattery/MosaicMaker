@@ -31,7 +31,6 @@ namespace GroupEMosaicMaker.ViewModel
         private bool triangleMosaic;
         private bool pictureMosaic;
         private int blockSize;
-        private int sliderMaximum;
         private ImageManipulator manipulatorForGridImage;
         private ImageManipulator manipulatorForResultImage;
         private readonly ImageLoader imageLoader;
@@ -52,10 +51,23 @@ namespace GroupEMosaicMaker.ViewModel
         private int lastUsedBlockSizeForSquareMosaic;
         private int lastUsedBlockSizeForPictureMosaic;
         private int lastUsedBlockSizeForTriangleMosaic;
+        private bool blackAndWhiteCreated;
 
         #endregion
 
         #region Properties
+
+        public bool BlackAndWhiteCreated
+        {
+            get => this.blackAndWhiteCreated;
+            set
+            {
+                this.blackAndWhiteCreated = value;
+                this.ConvertCommand.OnCanExecuteChanged();
+                this.ConvertToBlackAndWhiteCommand.OnCanExecuteChanged();
+                this.OnPropertyChanged();
+            }
+        }
 
         public int LastUsedBlockSizeForSquareMosaic
         {
@@ -211,6 +223,7 @@ namespace GroupEMosaicMaker.ViewModel
             {
                 this.resultImage = value;
                 this.SaveToFileCommand.OnCanExecuteChanged();
+                this.ConvertToBlackAndWhiteCommand.OnCanExecuteChanged();
                 this.OnPropertyChanged();
             }
         }
@@ -362,6 +375,8 @@ namespace GroupEMosaicMaker.ViewModel
         /// </value>
         public RelayCommand LoadImagePaletteCommand { get; set; }
 
+        public RelayCommand ConvertToBlackAndWhiteCommand { get; set; }
+
         #endregion
 
         #region Constructors
@@ -404,6 +419,20 @@ namespace GroupEMosaicMaker.ViewModel
             this.SaveToFileCommand = new RelayCommand(this.saveToFile, this.canSaveToFile);
             this.ConvertCommand = new RelayCommand(this.convert, this.canConvert);
             this.LoadImagePaletteCommand = new RelayCommand(this.loadPalette, this.canLoadPalette);
+            this.ConvertToBlackAndWhiteCommand = new RelayCommand(this.convertToBlackAndWhite, this.canCanConvertToBlackAndWhite);
+        }
+
+        private bool canCanConvertToBlackAndWhite(object obj)
+        {
+            return this.DisplayImage != null && !this.BlackAndWhiteCreated;
+        }
+
+        private void convertToBlackAndWhite(object obj)
+        {
+            this.manipulatorForResultImage.ConvertImageToBlackAndWhite();
+            this.ResultImage = new WriteableBitmap((int)this.imageWithMosaic.Decoder.PixelWidth, (int)this.imageWithMosaic.Decoder.PixelHeight);
+            this.writeStreamOfPixels(this.ResultImage, this.manipulatorForResultImage.RetrieveModifiedPixels());
+            this.BlackAndWhiteCreated = true;
         }
 
         private void loadProperties()
@@ -449,21 +478,23 @@ namespace GroupEMosaicMaker.ViewModel
             if (this.SquareMosaic)
             {
                
-                return this.DisplayImage != null &&  this.BlockSize != this.LastUsedBlockSizeForSquareMosaic;
+                return (this.DisplayImage != null && this.BlockSize != this.LastUsedBlockSizeForSquareMosaic) || this.BlackAndWhiteCreated;
                 
             } else if (this.PictureMosaic)
             {
-                return this.DisplayImage != null && this.ImagePalette.Count != 0 && this.BlockSize != this.LastUsedBlockSizeForPictureMosaic;
+                return (this.DisplayImage != null && this.ImagePalette.Count != 0 && this.BlockSize != this.LastUsedBlockSizeForPictureMosaic) 
+                       || (this.BlackAndWhiteCreated && this.ImagePalette.Count != 0);
             }
             else
             { 
-                return this.DisplayImage != null && this.BlockSize != this.LastUsedBlockSizeForTriangleMosaic;
+                return (this.DisplayImage != null && this.BlockSize != this.LastUsedBlockSizeForTriangleMosaic) || this.BlackAndWhiteCreated;
             }
         }
 
         private async void convert(object obj)
         {
             await this.handleCreatingMosaic();
+            this.BlackAndWhiteCreated = false;
 
         }
 
