@@ -54,14 +54,6 @@
 
         <TextBlock x:Name="blockSizeTextBlock" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left"
                    Margin="436,680,0,0" Text="Block size:" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.519,0.46" />
-        <!--<TextBox x:Name="blockSizeTextBox" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left"
-                 Margin="131,795,0,0"
-                 Text="{Binding Path=BlockSize, Mode=TwoWay, Converter={StaticResource IntConverter}, UpdateSourceTrigger=LostFocus}"
-                 VerticalAlignment="Top" extensions:TextBoxRegex.Regex="^(\d{0,4})$"
-                 extensions:TextBoxRegex.ValidationMode="Dynamic"/>-->
-        <CheckBox Content="Grid" Grid.ColumnSpan="2" Grid.Column="0"
-                  IsChecked="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  HorizontalAlignment="Left" Margin="383,835,0,0" VerticalAlignment="Top" />
 
         <Slider Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Value="{Binding BlockSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="5" Maximum="50" VerticalAlignment="Top" Width="146" Margin="397,707,0,0"/>
 
