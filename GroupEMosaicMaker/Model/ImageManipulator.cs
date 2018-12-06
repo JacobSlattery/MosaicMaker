@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.UI;
 
@@ -70,6 +71,11 @@ namespace GroupEMosaicMaker.Model
             }
         }
 
+        private Image chooseRandom(Collection<Image> images)
+        {
+            return images[new Random().Next(0, images.Count - 1)];
+        }
+
         /// <summary>
         ///     Creates a picture mosaic with the specified block size and image palette
         /// </summary>
@@ -86,7 +92,9 @@ namespace GroupEMosaicMaker.Model
                     IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
                     var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
 
-                    var imageToUse = findClosestMatch(colors, averageColor);
+                    var images = palette.FindMultipleClosestToColor(averageColor, 50);
+                    //var imageToUse = findClosestMatch(colors, averageColor);
+                    var imageToUse = this.chooseRandom(images);
 
                     //TODO
                     // Alert user about possible null image 

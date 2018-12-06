@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Windows.UI;
 
 namespace GroupEMosaicMaker.Model
@@ -59,27 +60,35 @@ namespace GroupEMosaicMaker.Model
 
 
 
-        //public Image[] FindMultipleImagesFor(Color color, int imageCount)
-        //{
-        //    var colors = new Color[imageCount];
+        public Collection<Image> FindMultipleClosestToColor(Color color, int imageCount)
+        {
+            var images = new Collection<Image>();
+            var orderedAvailableColors = this.MostSimilarColorsInDictionaryTo(color);
+            
+            var currentIndex = 0;
+            while (images.Count < imageCount)
+            {
+                var currentColor = orderedAvailableColors[currentIndex];
+                foreach (var image in this.AverageColorDictionary[currentColor])
+                {
+                    if (images.Count < imageCount && !images.Contains(image))
+                    {
+                        images.Add(image);
+                    }
+                }
 
-        //    foreach (var currentColor in this.AverageColorDictionary.Keys)
-        //    {
-        //        for (var index = 0; index < colors.Length; index++)
-        //        {
-        //            var arrayColor = colors[index];
-        //            if (arrayColor.Equals(null))
-        //            {
-        //                colors[index] = currentColor;
-        //            }
-        //            else if (this.isColorCloser(currentColor, arrayColor, color))
-        //            {
-        //                colors[index] = currentColor;
-        //            }
-        //        }
-        //    }
+                currentIndex++;
+            }
 
-        //}
+            return images;
+        }
+
+        public Color[] MostSimilarColorsInDictionaryTo(Color color)
+        {
+            var colors = new Collection<Color>(this.AverageColorDictionary.Keys.ToArray());
+            var orderedList = colors.OrderBy(key => calculateDifferenceBetweenColors(key, color));
+            return orderedList.ToArray();
+        }
 
 
         private bool isColorCloser(Color primary, Color other, Color baseColor)
