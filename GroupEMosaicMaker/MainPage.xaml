@@ -84,8 +84,8 @@
             </GridView.ItemTemplate>
         </GridView>
         <Button Grid.Column="0" x:Name="loadImagePaletteButton" Command="{Binding LoadImagePaletteCommand}"
-                Content="Load Image Palette" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="685,850,0,0"
-                VerticalAlignment="Top" />
+                Content="Load" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="587,854,0,0"
+                VerticalAlignment="Top" Width="53" />
 
         <Grid Grid.Column="0" BorderBrush="Black" BorderThickness="3" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="135" Margin="220,665,0,0">
             <Grid.RowDefinitions>
@@ -107,6 +107,9 @@
         <TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="587,636,0,0" Text="Images in palette:" TextWrapping="Wrap" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="449"/>
         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="714,636,0,0" Text="{Binding CountOfImagesInPalette, Mode=TwoWay, Converter={StaticResource IntConverter}}" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <Button Command="{Binding ConvertToBlackAndWhiteCommand}" Content="Black and White" Grid.Column="1" HorizontalAlignment="Left" Margin="1435,619,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="addButton" Command="{Binding AddImageToPaletteCommand}" Content="Add" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="665,854,0,0" VerticalAlignment="Top" Width="53"/>
+        <Button x:Name="removeButton" Command="{Binding RemoveImageFromPaletteCommand}" Content="Remove" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="748,855,0,0" VerticalAlignment="Top" Width="77"/>
+        <Button x:Name="clearButton" Command="{Binding ClearImagePaletteCommand}" Content="Clear" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="865,855,0,0" VerticalAlignment="Top"/>
 
 
 

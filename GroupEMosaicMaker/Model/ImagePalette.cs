@@ -51,6 +51,16 @@ namespace GroupEMosaicMaker.Model
         }
 
         /// <summary>
+        /// Removes the image.
+        /// </summary>
+        /// <param name="image">The image.</param>
+        public void RemoveImage(Image image)
+        {
+            this.OriginalImages.Remove(image);
+            this.AverageColorDictionary.Remove(image.AverageColor);
+        }
+
+        /// <summary>
         ///     Clears the palette.
         /// </summary>
         public void ClearPalette()

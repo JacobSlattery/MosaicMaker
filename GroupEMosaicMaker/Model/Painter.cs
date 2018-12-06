@@ -14,12 +14,12 @@ namespace GroupEMosaicMaker.Model
 
         private const int CutOffForBlackOrWhiteColor = 127;
         private const int TotalColors = 3;
-        private const int BlueIndex = 0;
-        private const int GreenIndex = 1;
-        private const int RedIndex = 2;
-        private const int OpacityIndex = 3;
+        private const int BlueOffset = 0;
+        private const int GreenOffset = 1;
+        private const int RedOffset = 2;
+        private const int OpacityOffset = 3;
         private const int StartingByteCounter = 0;
-        private const int IncrementForBytes = 4;
+        private const int ByteOffset = 4;
 
         #endregion
 
@@ -53,19 +53,19 @@ namespace GroupEMosaicMaker.Model
 
         private static Color getPixelBgra8(byte[] pixels, int height, int width, uint imageWidth)
         {
-            var offset = (height * (int)imageWidth + width) * 4;
-            var red = pixels[offset + RedIndex];
-            var green = pixels[offset + GreenIndex];
-            var blue = pixels[offset + BlueIndex];
+            var offset = (height * (int)imageWidth + width) * ByteOffset;
+            var red = pixels[offset + RedOffset];
+            var green = pixels[offset + GreenOffset];
+            var blue = pixels[offset + BlueOffset];
             return Color.FromArgb(0, red, green, blue);
         }
 
         private static void setPixelBgra8(byte[] pixels, int height, int width, Color color, uint imageWidth)
         {
-            var offset = (height * (int)imageWidth + width) * 4;
-            pixels[offset + RedIndex] = color.R;
-            pixels[offset + GreenIndex] = color.G;
-            pixels[offset + BlueIndex] = color.B;
+            var offset = (height * (int)imageWidth + width) * ByteOffset;
+            pixels[offset + RedOffset] = color.R;
+            pixels[offset + GreenOffset] = color.G;
+            pixels[offset + BlueOffset] = color.B;
         }
 
         /// <summary>
@@ -90,11 +90,10 @@ namespace GroupEMosaicMaker.Model
             var byteCounter = StartingByteCounter;
             foreach (var index in indexes)
             {
-                sourceBytes[index + OpacityIndex] = modifiedBytes[byteCounter + OpacityIndex];
-                sourceBytes[index + RedIndex] = modifiedBytes[byteCounter + RedIndex];
-                sourceBytes[index + GreenIndex] = modifiedBytes[byteCounter + GreenIndex];
-                sourceBytes[index + BlueIndex] = modifiedBytes[byteCounter + BlueIndex];
-                byteCounter += IncrementForBytes;
+                sourceBytes[index + RedOffset] = modifiedBytes[byteCounter + RedOffset];
+                sourceBytes[index + GreenOffset] = modifiedBytes[byteCounter + GreenOffset];
+                sourceBytes[index + BlueOffset] = modifiedBytes[byteCounter + BlueOffset];
+                byteCounter += ByteOffset;
             }
         }
 
@@ -108,10 +107,10 @@ namespace GroupEMosaicMaker.Model
         {
             foreach (var index in indexes)
             {
-                sourceBytes[index + OpacityIndex] = color.A;
-                sourceBytes[index + RedIndex] = color.R;
-                sourceBytes[index + GreenIndex] = color.G;
-                sourceBytes[index + BlueIndex] = color.B;
+                sourceBytes[index + OpacityOffset] = color.A;
+                sourceBytes[index + RedOffset] = color.R;
+                sourceBytes[index + GreenOffset] = color.G;
+                sourceBytes[index + BlueOffset] = color.B;
             }
         }
 
@@ -127,7 +126,7 @@ namespace GroupEMosaicMaker.Model
             if (indexes == null)
             {
                 indexCollection = new Collection<int>();
-                for (var index = 0; index < sourceBytes.Length; index += 4)
+                for (var index = 0; index < sourceBytes.Length; index += ByteOffset)
                 {
                     indexCollection.Add(index);
                 }
@@ -145,10 +144,10 @@ namespace GroupEMosaicMaker.Model
             var pixels = new Collection<byte>();
             foreach (var index in indexCollection)
             {
-                pixels.Add(sourceBytes[index + BlueIndex]);
-                pixels.Add(sourceBytes[index + GreenIndex]);
-                pixels.Add(sourceBytes[index + RedIndex]);
-                pixels.Add(sourceBytes[index + OpacityIndex]);
+                pixels.Add(sourceBytes[index + BlueOffset]);
+                pixels.Add(sourceBytes[index + GreenOffset]);
+                pixels.Add(sourceBytes[index + RedOffset]);
+                pixels.Add(sourceBytes[index + OpacityOffset]);
             }
 
             var colorCollection = getColorForEachPixel(pixels);
@@ -170,12 +169,12 @@ namespace GroupEMosaicMaker.Model
         private static Collection<Color> getColorForEachPixel(Collection<byte> pixelBytes)
         {
             var colorCollection = new Collection<Color>();
-            for (var index = 0; index < pixelBytes.Count(); index += IncrementForBytes)
+            for (var index = 0; index < pixelBytes.Count(); index += ByteOffset)
             {
-                var valueA = pixelBytes[index + OpacityIndex];
-                var valueR = pixelBytes[index + RedIndex];
-                var valueG = pixelBytes[index + GreenIndex];
-                var valueB = pixelBytes[index + BlueIndex];
+                var valueA = pixelBytes[index + OpacityOffset];
+                var valueR = pixelBytes[index + RedOffset];
+                var valueG = pixelBytes[index + GreenOffset];
+                var valueB = pixelBytes[index + BlueOffset];
                 colorCollection.Add(Color.FromArgb(valueA, valueR, valueG, valueB));
             }
 

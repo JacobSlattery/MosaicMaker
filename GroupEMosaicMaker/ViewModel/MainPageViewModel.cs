@@ -10,6 +10,7 @@ using GroupEMosaicMaker.Extension;
 using GroupEMosaicMaker.FileIO;
 using GroupEMosaicMaker.Model;
 using GroupEMosaicMaker.Utility;
+using System;
 
 namespace GroupEMosaicMaker.ViewModel
 {
@@ -171,6 +172,7 @@ namespace GroupEMosaicMaker.ViewModel
             set
             {
                 this.selectedImage = value;
+                this.RemoveImageFromPaletteCommand.OnCanExecuteChanged();
                 this.OnPropertyChanged();
             }
         }
@@ -188,6 +190,8 @@ namespace GroupEMosaicMaker.ViewModel
             {
                 this.imagePalette = value;
                 this.ConvertCommand.OnCanExecuteChanged();
+                this.RemoveImageFromPaletteCommand.OnCanExecuteChanged();
+                this.ClearImagePaletteCommand.OnCanExecuteChanged();
                 this.OnPropertyChanged();
             }
         }
@@ -390,7 +394,38 @@ namespace GroupEMosaicMaker.ViewModel
         /// </value>
         public RelayCommand LoadImagePaletteCommand { get; set; }
 
+        /// <summary>
+        /// Gets or sets the convert to black and white command.
+        /// </summary>
+        /// <value>
+        /// The convert to black and white command.
+        /// </value>
         public RelayCommand ConvertToBlackAndWhiteCommand { get; set; }
+
+        /// <summary>
+        /// Gets or sets the add image to palette command.
+        /// </summary>
+        /// <value>
+        /// The add image to palette command.
+        /// </value>
+        public RelayCommand AddImageToPaletteCommand { get; set; }
+
+        /// <summary>
+        /// Gets or sets the remove image from palette command.
+        /// </summary>
+        /// <value>
+        /// The remove image from palette command.
+        /// </value>
+        public RelayCommand RemoveImageFromPaletteCommand { get; set; }
+
+        /// <summary>
+        /// Gets or sets the clear image palette command.
+        /// </summary>
+        /// <value>
+        /// The clear image palette command.
+        /// </value>
+        public RelayCommand ClearImagePaletteCommand { get; set; }
+
 
         #endregion
 
@@ -435,6 +470,46 @@ namespace GroupEMosaicMaker.ViewModel
             this.ConvertCommand = new RelayCommand(this.convert, this.canConvert);
             this.LoadImagePaletteCommand = new RelayCommand(this.loadPalette, this.canLoadPalette);
             this.ConvertToBlackAndWhiteCommand = new RelayCommand(this.convertToBlackAndWhite, this.canCanConvertToBlackAndWhite);
+            this.AddImageToPaletteCommand = new RelayCommand(this.addImageToPalette, this.canAddImageToPalette);
+            this.RemoveImageFromPaletteCommand = new RelayCommand(this.removeImageFromPalette, this.canRemoveImageFromPalette);
+            this.ClearImagePaletteCommand = new RelayCommand(this.clearImagePalette, this.canClearImagePalette);
+        }
+
+        private bool canClearImagePalette(object obj)
+        {
+            return this.ImagePalette.Count != 0;
+        }
+
+        private void clearImagePalette(object obj)
+        {
+            this.resetImagePalette();
+        }
+
+        private bool canRemoveImageFromPalette(object obj)
+        {
+            return this.SelectedImage != null;
+        }
+
+        private void removeImageFromPalette(object obj)
+        {
+            this.palette.RemoveImage(this.SelectedImage);
+            this.CountOfImagesInPalette = this.palette.OriginalImages.Count;
+            this.ImagePalette = this.palette.OriginalImages.ToObservableCollection();
+
+        }
+
+        private bool canAddImageToPalette(object obj)
+        {
+            return true;
+        }
+
+        private async void addImageToPalette(object obj)
+        {
+            var file = await MainPage.SelectImageForPalette();
+            var image = await this.imageLoader.LoadImage(file);
+            this.palette.AddImage(image);
+            this.CountOfImagesInPalette = this.palette.OriginalImages.Count;
+            this.ImagePalette = this.palette.OriginalImages.ToObservableCollection();
         }
 
         private bool canCanConvertToBlackAndWhite(object obj)
@@ -484,9 +559,10 @@ namespace GroupEMosaicMaker.ViewModel
 
         private void resetImagePalette()
         {
-            this.ImagePalette.Clear();
             this.palette.ClearPalette();
             this.palette.AverageColorDictionary.Clear();
+            this.CountOfImagesInPalette = this.palette.OriginalImages.Count;
+            this.ImagePalette = this.palette.OriginalImages.ToObservableCollection();
         }
 
         private bool canConvert(object obj)
