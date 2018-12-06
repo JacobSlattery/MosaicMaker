@@ -100,8 +100,10 @@
         <Grid Grid.Column="0" BorderBrush="Black" BorderThickness="3" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="154" Margin="380,665,0,0" VerticalAlignment="Top" Width="180"/>
         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="427,636,0,0" Text="Grid Settings" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <Grid Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="3" HorizontalAlignment="Left" Height="280" Margin="3,632,0,0" VerticalAlignment="Top" Width="941">
-            <ToggleSwitch x:Name="gridDisplayToggleSwitch" Header="Display Grid:" IsOn="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="417,124,0,0" VerticalAlignment="Top" Width="99" Height="52"/>
+            <ToggleSwitch x:Name="gridDisplayToggleSwitch" Header="Display Grid:" IsOn="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="410,0,0,0" VerticalAlignment="Center" Width="122" Height="52"/>
+            <ToggleSwitch Header="Randomize" IsOn="{Binding Randomize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" Margin="0,188,0,0" VerticalAlignment="Top"/>
         </Grid>
+
         <TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="587,636,0,0" Text="Images in palette:" TextWrapping="Wrap" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="449"/>
         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="714,636,0,0" Text="{Binding CountOfImagesInPalette, Mode=TwoWay, Converter={StaticResource IntConverter}}" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <Button Command="{Binding ConvertToBlackAndWhiteCommand}" Content="Black and White" Grid.Column="1" HorizontalAlignment="Left" Margin="1435,619,0,0" VerticalAlignment="Top"/>

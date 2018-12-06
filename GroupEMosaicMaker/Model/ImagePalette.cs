@@ -60,7 +60,7 @@ namespace GroupEMosaicMaker.Model
 
 
 
-        public Collection<Image> FindMultipleClosestToColor(Color color, int imageCount)
+        public Collection<Image> FindMultipleClosestToColor(Color color, int imageCount, ICollection<Image> disqualified)
         {
             var images = new Collection<Image>();
             var orderedAvailableColors = this.MostSimilarColorsInDictionaryTo(color);
@@ -71,7 +71,7 @@ namespace GroupEMosaicMaker.Model
                 var currentColor = orderedAvailableColors[currentIndex];
                 foreach (var image in this.AverageColorDictionary[currentColor])
                 {
-                    if (images.Count < imageCount && !images.Contains(image))
+                    if (images.Count < imageCount && !images.Contains(image) && !disqualified.Contains(image))
                     {
                         images.Add(image);
                     }

@@ -81,27 +81,44 @@ namespace GroupEMosaicMaker.Model
         /// </summary>
         /// <param name="blockSize"> the block size </param>
         /// <param name="palette"> the palette to use</param>
-        public async Task CreatePictureMosaic(int blockSize, ImagePalette palette)
+        /// <param name="randomize"> whether to randomize the picture to prevent patterns</param>
+        public async Task CreatePictureMosaic(int blockSize, ImagePalette palette, bool randomize)
         {
             var colors = palette.AverageColorDictionary;
-
+            var previous = new List<Image>();
+            var randomSelectionSize = 10;
+            var previousMaxSize = 5;
             foreach (var index in this.getBlockStartingPoints(blockSize))
             {
+                var indexes = IndexMapper.Box(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
+                IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
+                var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
+
+                Image imageToUse;
+                if (randomize)
+                {
+                    var images = palette.FindMultipleClosestToColor(averageColor, randomSelectionSize, previous);
+                    imageToUse = this.chooseRandom(images);
+                    if (previous.Count >= previousMaxSize)
+                    {
+                        previous.RemoveAt(0);
+                    }
+                    previous.Add(imageToUse);
+                }
+                else
+                {
+                    imageToUse = findClosestMatch(colors, averageColor);
+                }
+
+                //TODO
+                // Alert user about possible null image 
+
                 await Task.Factory.StartNew(async () => {
-                    var indexes = IndexMapper.Box(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
-                    IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
-                    var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
-
-                    var images = palette.FindMultipleClosestToColor(averageColor, 50);
-                    //var imageToUse = findClosestMatch(colors, averageColor);
-                    var imageToUse = this.chooseRandom(images);
-
-                    //TODO
-                    // Alert user about possible null image 
-
                     await imageToUse.ResizeImage(blockSize);
                     Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.ModifiedPixels, indexes);
                 });
+
+
 
             }
         }

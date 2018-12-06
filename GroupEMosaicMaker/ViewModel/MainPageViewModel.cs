@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
@@ -53,9 +54,23 @@ namespace GroupEMosaicMaker.ViewModel
         private int lastUsedBlockSizeForTriangleMosaic;
         private bool blackAndWhiteCreated;
 
+        private bool randomize;
+        private bool lastRandomizeSelection;
+
         #endregion
 
         #region Properties
+
+        public bool Randomize
+        {
+            get => this.randomize;
+            set
+            {
+                this.randomize = value;
+                this.ConvertCommand.OnCanExecuteChanged();
+                this.OnPropertyChanged();
+            }
+        }
 
         public bool BlackAndWhiteCreated
         {
@@ -446,6 +461,7 @@ namespace GroupEMosaicMaker.ViewModel
             this.Grid = false;
             this.SquareMosaic = true;
             this.ScaleImage = true;
+            this.randomize = false;
         }
 
         private bool canLoadPalette(object obj)
@@ -483,7 +499,7 @@ namespace GroupEMosaicMaker.ViewModel
             } else if (this.PictureMosaic)
             {
                 return (this.DisplayImage != null && this.ImagePalette.Count != 0 && this.BlockSize != this.LastUsedBlockSizeForPictureMosaic) 
-                       || (this.BlackAndWhiteCreated && this.ImagePalette.Count != 0);
+                       || (this.BlackAndWhiteCreated && this.ImagePalette.Count != 0 || this.Randomize != this.lastRandomizeSelection);
             }
             else
             { 
@@ -562,8 +578,9 @@ namespace GroupEMosaicMaker.ViewModel
             }
             else if (this.PictureMosaic)
             {
-                await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette);
+                await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette, this.Randomize);
                 this.LastUsedBlockSizeForPictureMosaic = this.BlockSize;
+                this.lastRandomizeSelection = this.Randomize;
             }
             else
             {

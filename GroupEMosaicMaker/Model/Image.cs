@@ -45,6 +45,9 @@ namespace GroupEMosaicMaker.Model
         /// </value>
         public byte[] ModifiedPixels { get; set; }
 
+
+        public Color AverageColor { get; set; }
+
         #endregion
 
         #region Constructors
@@ -60,6 +63,8 @@ namespace GroupEMosaicMaker.Model
             this.SourcePixels = pixels;
             this.Decoder = decoder;
             this.Thumbnail = thumbnail;
+
+            this.AverageColor = Painter.GetAverageColor(pixels);
         }
 
 
