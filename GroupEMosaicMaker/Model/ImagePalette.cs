@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Windows.UI;
 
@@ -19,7 +20,7 @@ namespace GroupEMosaicMaker.Model
         /// <summary>
         ///     The average color dictionary
         /// </summary>
-        public IDictionary<Color, Image> AverageColorDictionary;
+        public IDictionary<Color, Collection<Image>> AverageColorDictionary;
 
         #endregion
 
@@ -31,7 +32,7 @@ namespace GroupEMosaicMaker.Model
         public ImagePalette()
         {
             this.OriginalImages = new Collection<Image>();
-            this.AverageColorDictionary = new Dictionary<Color, Image>();
+            this.AverageColorDictionary = new Dictionary<Color, Collection<Image>>();
         }
 
         #endregion
@@ -45,12 +46,7 @@ namespace GroupEMosaicMaker.Model
         public void AddImage(Image image)
         {
             this.OriginalImages.Add(image);
-            this.FindAverageColorsForImagesInPalette(image);
-        }
-
-        public int FindNumberOfImagesInPalette()
-        {
-            return this.OriginalImages.Count;
+            this.addImageToAverageColorDictionary(image);
         }
 
         /// <summary>
@@ -61,18 +57,54 @@ namespace GroupEMosaicMaker.Model
             this.OriginalImages.Clear();
         }
 
-        /// <summary>
-        ///     Finds the average colors for images in palette.
-        /// </summary>
-        /// <param name="image">The image.</param>
-        public void FindAverageColorsForImagesInPalette(Image image)
-        {
-            var indexes = IndexMapper.Box(0, 50, 50, 50);
-            IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
-            var color = Painter.GetAverageColor(image.SourcePixels, indexes);
 
-            this.AverageColorDictionary.Add(color, image);
-            
+
+        //public Image[] FindMultipleImagesFor(Color color, int imageCount)
+        //{
+        //    var colors = new Color[imageCount];
+
+        //    foreach (var currentColor in this.AverageColorDictionary.Keys)
+        //    {
+        //        for (var index = 0; index < colors.Length; index++)
+        //        {
+        //            var arrayColor = colors[index];
+        //            if (arrayColor.Equals(null))
+        //            {
+        //                colors[index] = currentColor;
+        //            }
+        //            else if (this.isColorCloser(currentColor, arrayColor, color))
+        //            {
+        //                colors[index] = currentColor;
+        //            }
+        //        }
+        //    }
+
+        //}
+
+
+        private bool isColorCloser(Color primary, Color other, Color baseColor)
+        {
+            return (calculateDifferenceBetweenColors(primary, baseColor) <
+                    calculateDifferenceBetweenColors(other, baseColor));
+        }
+
+        private static double calculateDifferenceBetweenColors(Color averageColor, Color color)
+        {
+            return Math.Pow((color.R - averageColor.R) * .3, 2) +
+                   Math.Pow((color.G - averageColor.G) * .59, 2) +
+                   Math.Pow((color.B - averageColor.B) * .11, 2);
+        }
+
+        private void addImageToAverageColorDictionary(Image image)
+        {
+            var color = Painter.GetAverageColor(image.SourcePixels);
+
+            if (!this.AverageColorDictionary.ContainsKey(color))
+            {
+                this.AverageColorDictionary.Add(color, new Collection<Image>());
+            }
+            this.AverageColorDictionary[color].Add(image);
+
         }
 
         #endregion

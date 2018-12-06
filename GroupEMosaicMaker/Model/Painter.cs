@@ -121,15 +121,29 @@ namespace GroupEMosaicMaker.Model
         /// <param name="sourceBytes">The source bytes.</param>
         /// <param name="indexes">The indexes.</param>
         /// <returns></returns>
-        public static Color GetAverageColor(byte[] sourceBytes, IEnumerable<int> indexes)
-
+        public static Color GetAverageColor(byte[] sourceBytes, IEnumerable<int> indexes=null)
         {
+            Collection<int> indexCollection;
+            if (indexes == null)
+            {
+                indexCollection = new Collection<int>();
+                for (var index = 0; index < sourceBytes.Length; index += 4)
+                {
+                    indexCollection.Add(index);
+                }
+            }
+            else
+            {
+                indexCollection = new Collection<int>(indexes.ToList());
+            }
+
+
             var totalA = 0;
             var totalR = 0;
             var totalG = 0;
             var totalB = 0;
             var pixels = new Collection<byte>();
-            foreach (var index in indexes)
+            foreach (var index in indexCollection)
             {
                 pixels.Add(sourceBytes[index + BlueIndex]);
                 pixels.Add(sourceBytes[index + GreenIndex]);

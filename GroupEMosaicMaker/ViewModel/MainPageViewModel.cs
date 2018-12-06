@@ -460,7 +460,7 @@ namespace GroupEMosaicMaker.ViewModel
             if (folder != null)
             {
                 this.palette = await this.imageLoader.LoadImages(folder);
-                this.CountOfImagesInPalette = this.palette.FindNumberOfImagesInPalette();
+                this.CountOfImagesInPalette = this.palette.OriginalImages.Count;
                 this.ImagePalette = this.palette.OriginalImages.ToObservableCollection();
             }
             

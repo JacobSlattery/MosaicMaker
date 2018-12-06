@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
+using Windows.UI;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace GroupEMosaicMaker.Model
@@ -86,5 +87,6 @@ namespace GroupEMosaicMaker.Model
             this.ModifiedPixels = pixelData.DetachPixelData();
 
         }
+
     }
 }

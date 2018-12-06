@@ -81,21 +81,24 @@ namespace GroupEMosaicMaker.Model
 
             foreach (var index in this.getBlockStartingPoints(blockSize))
             {
-                var indexes = IndexMapper.Box(index, blockSize, (int) this.ImageWidth, (int) this.ImageHeight);
-                IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
-                var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
+                await Task.Factory.StartNew(async () => {
+                    var indexes = IndexMapper.Box(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
+                    IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
+                    var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
 
-                var imageToUse = findClosestMatch(colors, averageColor);
+                    var imageToUse = findClosestMatch(colors, averageColor);
 
-                //TODO
-                // Alert user about possible null image 
+                    //TODO
+                    // Alert user about possible null image 
 
-                await imageToUse.ResizeImage(blockSize);
-                Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.ModifiedPixels, indexes);
+                    await imageToUse.ResizeImage(blockSize);
+                    Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.ModifiedPixels, indexes);
+                });
+
             }
         }
 
-        private static Image findClosestMatch(IDictionary<Color, Image> colors, Color averageColor)
+        private static Image findClosestMatch(IDictionary<Color, Collection<Image>> colors, Color averageColor)
         {
             Image imageToUse = null;
             var difference = StartingDifferenceBetweenColors;
@@ -105,7 +108,7 @@ namespace GroupEMosaicMaker.Model
                 if (currentDifference <= difference)
                 {
                     difference = currentDifference;
-                    imageToUse = colors[color];
+                    imageToUse = colors[color][0];
                 }
             }
 
