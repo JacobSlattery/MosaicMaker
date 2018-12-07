@@ -86,14 +86,15 @@ namespace GroupEMosaicMaker.Model
         public async Task CreatePictureMosaic(int blockSize, ImagePalette palette, bool randomize)
         {
             var colors = palette.AverageColorDictionary;
-            var disqualified = new List<Image>();
-            var previous = new List<Image>();
-            var randomSelectionSize = 5;
-            var disqualifiedSize = 5;
-            var aboveImageIndex = 0;
-            var imageByteWidth = this.ImageWidth * 4;
+            var disqualified = new Collection<Image>();
+            var previous = new Collection<Image>();
+            var tasks = new Collection<Task>();
+            const int randomSelectionSize = 8;
+            const int disqualifiedSize = 6;
+            var imageByteWidth = (int)this.ImageWidth * 4;
 
-            Collection<Task> tasks = new Collection<Task>();
+            var aboveImageIndex = 0;
+
             foreach (var index in this.getBlockStartingPoints(blockSize))
             {
                 var indexes = IndexMapper.Box(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
@@ -104,13 +105,14 @@ namespace GroupEMosaicMaker.Model
                 if (randomize)
                 {
                     Image aboveImage = null;
+                    Collection<Image> images;
+
                     if (index > imageByteWidth)
                     {
                         aboveImage = previous[aboveImageIndex];
                         aboveImageIndex++;
                     }
 
-                    Collection<Image> images;
                     if (aboveImage != null)
                     {
                         disqualified.Add(aboveImage);
@@ -122,12 +124,12 @@ namespace GroupEMosaicMaker.Model
                         images = palette.FindMultipleClosestToColor(averageColor, randomSelectionSize, disqualified);
                     }
 
-                    imageToUse = this.chooseRandom(images);
-
                     if (disqualified.Count >= disqualifiedSize)
                     {
                         disqualified.RemoveAt(0);
                     }
+
+                    imageToUse = this.chooseRandom(images);
                     disqualified.Add(imageToUse);
                     previous.Add(imageToUse);
                 }
