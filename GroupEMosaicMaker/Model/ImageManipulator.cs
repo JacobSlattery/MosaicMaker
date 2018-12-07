@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI;
 
@@ -85,9 +86,14 @@ namespace GroupEMosaicMaker.Model
         public async Task CreatePictureMosaic(int blockSize, ImagePalette palette, bool randomize)
         {
             var colors = palette.AverageColorDictionary;
+            var disqualified = new List<Image>();
             var previous = new List<Image>();
-            var randomSelectionSize = 10;
-            var previousMaxSize = 5;
+            var randomSelectionSize = 5;
+            var disqualifiedSize = 5;
+            var aboveImageIndex = 0;
+            var imageByteWidth = this.ImageWidth * 4;
+
+            Collection<Task> tasks = new Collection<Task>();
             foreach (var index in this.getBlockStartingPoints(blockSize))
             {
                 var indexes = IndexMapper.Box(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
@@ -97,12 +103,32 @@ namespace GroupEMosaicMaker.Model
                 Image imageToUse;
                 if (randomize)
                 {
-                    var images = palette.FindMultipleClosestToColor(averageColor, randomSelectionSize, previous);
-                    imageToUse = this.chooseRandom(images);
-                    if (previous.Count >= previousMaxSize)
+                    Image aboveImage = null;
+                    if (index > imageByteWidth)
                     {
-                        previous.RemoveAt(0);
+                        aboveImage = previous[aboveImageIndex];
+                        aboveImageIndex++;
                     }
+
+                    Collection<Image> images;
+                    if (aboveImage != null)
+                    {
+                        disqualified.Add(aboveImage);
+                        images = palette.FindMultipleClosestToColor(averageColor, randomSelectionSize, disqualified);
+                        disqualified.RemoveAt(disqualified.Count - 1);
+                    }
+                    else
+                    {
+                        images = palette.FindMultipleClosestToColor(averageColor, randomSelectionSize, disqualified);
+                    }
+
+                    imageToUse = this.chooseRandom(images);
+
+                    if (disqualified.Count >= disqualifiedSize)
+                    {
+                        disqualified.RemoveAt(0);
+                    }
+                    disqualified.Add(imageToUse);
                     previous.Add(imageToUse);
                 }
                 else
@@ -110,16 +136,23 @@ namespace GroupEMosaicMaker.Model
                     imageToUse = findClosestMatch(colors, averageColor);
                 }
 
-                //TODO
-                // Alert user about possible null image 
-
-                await Task.Factory.StartNew(async () => {
+                var task = await Task.Factory.StartNew(async () =>
+                {
                     await imageToUse.ResizeImage(blockSize);
                     Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.ModifiedPixels, indexes);
                 });
 
+                tasks.Add(task);
 
 
+                //TODO
+                //Alert user about possible null image
+
+            }
+
+            foreach (var task in tasks)
+            {
+                await task;
             }
         }
 
