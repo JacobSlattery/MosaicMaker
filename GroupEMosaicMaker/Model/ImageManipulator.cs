@@ -77,6 +77,48 @@ namespace GroupEMosaicMaker.Model
             return images[new Random().Next(0, images.Count - 1)];
         }
 
+        public async Task CreatePictureMosaicUsingEachImageAtleastOnce(int blockSize, ImagePalette palette)
+        {
+           
+            var colors = palette.AverageColorDictionary;
+            var temporaryColors = new Dictionary<Color, Collection<Image>>();
+            this.addImagesToTemporayDictionary(colors, temporaryColors);
+            var tasks = new Collection<Task>();
+            foreach (var index in this.getBlockStartingPoints(blockSize))
+            {
+                if (temporaryColors.Count == 0)
+                {
+                    this.addImagesToTemporayDictionary(colors,temporaryColors);
+                }
+                var indexes = IndexMapper.Box(index, blockSize, (int) this.ImageWidth, (int) this.ImageHeight);
+                IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
+                var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
+                var imageToUse = findClosestMatch(temporaryColors, averageColor);
+                var task = await Task.Factory.StartNew(async () =>
+                {
+                    await imageToUse.ResizeImage(blockSize);
+                    Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.ModifiedPixels, indexes);
+                });
+
+                tasks.Add(task);
+                temporaryColors.Remove(imageToUse.AverageColor);
+
+            }
+
+            foreach (var task in tasks)
+            {
+                await task;
+            }
+        }
+
+        private void addImagesToTemporayDictionary(IDictionary<Color, Collection<Image>> colors, Dictionary<Color, Collection<Image>> temp)
+        {
+            foreach (var current in colors.Keys)
+            {
+                temp.Add(current, colors[current]);
+            }
+        }
+
         /// <summary>
         ///     Creates a picture mosaic with the specified block size and image palette
         /// </summary>

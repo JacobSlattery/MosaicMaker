@@ -59,9 +59,23 @@ namespace GroupEMosaicMaker.ViewModel
 
         private bool useSelectedImages;
 
+        private bool useEachImageOnce;
+        private bool lastUseEachImageOnceSelection;
+
         #endregion
 
         #region Properties
+
+        public bool UseEachImageOnce
+        {
+            get => this.useEachImageOnce;
+            set
+            {
+                this.useEachImageOnce = value;
+                this.ConvertCommand.OnCanExecuteChanged();
+                this.OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets and sets whether or not the use selected images was selected  
@@ -268,6 +282,7 @@ namespace GroupEMosaicMaker.ViewModel
                 {
                     this.updateGrid();
                     this.updateDisplayImage();
+
                 }
                 this.OnPropertyChanged();
             }
@@ -591,7 +606,7 @@ namespace GroupEMosaicMaker.ViewModel
             } else if (this.PictureMosaic)
             {
                 return (this.DisplayImage != null && this.ImagePalette.Count != 0 && this.BlockSize != this.lastUsedBlockSizeForPictureMosaic) 
-                       || (this.BlackAndWhiteCreated && this.ImagePalette.Count != 0 || this.Randomize != this.lastRandomizeSelection);
+                       || (this.BlackAndWhiteCreated && this.ImagePalette.Count != 0 || this.Randomize != this.lastRandomizeSelection || this.UseEachImageOnce != this.lastUseEachImageOnceSelection);
             }
             else
             { 
@@ -672,9 +687,27 @@ namespace GroupEMosaicMaker.ViewModel
             }
             else if (this.PictureMosaic)
             {
-                await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette, this.Randomize);
-                this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
-                this.lastRandomizeSelection = this.Randomize;
+                if (this.Randomize)
+                {
+                    await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette, this.Randomize);
+                    this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
+                    this.lastRandomizeSelection = this.Randomize;
+                }
+                else if (this.UseEachImageOnce)
+                {
+                    await this.manipulatorForResultImage.CreatePictureMosaicUsingEachImageAtleastOnce(this.BlockSize,
+                        this.palette);
+                    this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
+                    this.lastUseEachImageOnceSelection = this.UseEachImageOnce;
+                }
+                else
+                {
+                    await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette, false);
+                    this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
+                    this.lastRandomizeSelection = this.Randomize;
+                    this.lastUseEachImageOnceSelection = this.UseEachImageOnce;
+                }
+                
             }
             else
             {
