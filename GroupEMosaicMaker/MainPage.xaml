@@ -7,7 +7,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:converter="using:GroupEMosaicMaker.Converter"
-    xmlns:view="using:GroupEMosaicMaker.View"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="1980" Height="1080">
 
@@ -23,30 +22,30 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <CommandBar VerticalAlignment="Top" Grid.ColumnSpan="2" Height="48" Margin="0,0,1,0">
+        <CommandBar VerticalAlignment="Top" Grid.ColumnSpan="2" Height="48" Margin="0,0,706,0" HorizontalAlignment="Stretch">
             <AppBarButton Icon="Save" Label="Save File"
-                          Command="{Binding SaveToFileCommand, UpdateSourceTrigger=PropertyChanged}" />
+                          Command="{Binding SaveToFileCommand, UpdateSourceTrigger=PropertyChanged}" RenderTransformOrigin="0.449,0.583" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="Auto" Margin="0,0,0,0" />
             <AppBarButton Icon="OpenFile" Label="Load File" Command="{Binding LoadFileCommand}" />
         </CommandBar>
 
-        <Grid Grid.Column="0" BorderBrush="Black" BorderThickness="3" Grid.ColumnSpan="2" Margin="1026,0,10,463" Height="540" Width="940" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+        <Grid Grid.Column="0" BorderBrush="Black" BorderThickness="3" Grid.ColumnSpan="2" Margin="686,0,706,463" Height="540" VerticalAlignment="Bottom">
             <ScrollViewer x:Name="resultScrollView" IsEnabled="{Binding ZoomImage}" ZoomMode="{Binding ZoomImage}" Height="540" 
                           VerticalAlignment="Center" HorizontalScrollBarVisibility="Visible"  VerticalScrollBarVisibility="Visible" 
-                          HorizontalScrollMode="Enabled" VerticalScrollMode="Enabled" HorizontalAlignment="Center" Width="940">
+                          HorizontalScrollMode="Enabled" VerticalScrollMode="Enabled" HorizontalAlignment="Center" Width="587" Margin="0,0,0,0">
 
                 <Image x:Name="resultImage" Source="{Binding ResultImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-               HorizontalAlignment="Center" Height="540" VerticalAlignment="Center" Width="940" Stretch="Fill" Margin="0,0,0,0"/>
+               HorizontalAlignment="Center" Height="540" VerticalAlignment="Center" Width="587" Stretch="Fill" Margin="0,0,0,0"/>
 
             </ScrollViewer>
         </Grid>
 
-        <Grid Grid.Column="0" BorderBrush="Black" BorderThickness="3" Grid.ColumnSpan="2" Margin="0,0,1033,463" Height="540" Width="940" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+        <Grid Grid.Column="0" BorderBrush="Black" BorderThickness="3" Grid.ColumnSpan="2" Margin="4,0,1398,463" Height="540" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
             <ScrollViewer x:Name="displayScrollView" IsEnabled="{Binding ZoomImage}" ZoomMode="{Binding ZoomImage}" Height="540" 
                           VerticalAlignment="Center" HorizontalScrollBarVisibility="Visible"  VerticalScrollBarVisibility="Visible" 
-                          HorizontalScrollMode="Enabled" VerticalScrollMode="Enabled" HorizontalAlignment="Center" Width="940">
+                          HorizontalScrollMode="Enabled" VerticalScrollMode="Enabled" HorizontalAlignment="Center" Width="578">
 
                 <Image x:Name="displayImage" Source="{Binding DisplayImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                       HorizontalAlignment="Center" Height="540" VerticalAlignment="Center" Width="940" Stretch="Fill" />
+                       HorizontalAlignment="Center" Height="540" VerticalAlignment="Center" Width="578" Stretch="Fill" Margin="0,0,0,0" />
 
             </ScrollViewer>
         </Grid>
@@ -54,11 +53,11 @@
 
 
         <TextBlock x:Name="blockSizeTextBlock" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Left"
-                   Margin="436,680,0,0" Text="Block size:" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.519,0.46" />
+                   Margin="571,683,0,0" Text="Block size:" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.519,0.46" />
 
-        <Slider Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Value="{Binding BlockSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="5" Maximum="50" VerticalAlignment="Top" Width="146" Margin="397,707,0,0"/>
+        <Slider Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Value="{Binding BlockSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="5" Maximum="50" VerticalAlignment="Top" Width="146" Margin="532,710,0,0"/>
 
-        <Grid Grid.Column="0" BorderBrush="Black" BorderThickness="3" Grid.ColumnSpan="2" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="138" Margin="60,665,0,0">
+        <Grid Grid.Column="0" BorderBrush="Black" BorderThickness="3" Grid.ColumnSpan="2" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="138" Margin="195,668,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -69,10 +68,10 @@
             <RadioButton Content="Triangle Mosaic" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding TriangleMosaic, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" GroupName="mosaicType"/>
         </Grid>
         <Button Content="Convert" Command="{Binding ConvertCommand, UpdateSourceTrigger=PropertyChanged}"
-                Grid.Column="1" HorizontalAlignment="Left" Margin="948,333,0,0" VerticalAlignment="Top" Width="75" />
+                Grid.Column="1" HorizontalAlignment="Left" Margin="594,79,0,0" VerticalAlignment="Top" Width="75" />
         <GridView x:Name="imagePaletteGridView" BorderBrush="Black" BorderThickness="3"
                   ItemsSource="{Binding ImagePalette, Mode=TwoWay}" SelectedItem="{Binding SelectedImage, Mode=TwoWay}" SelectionMode="Multiple"
-                  HorizontalAlignment="Left" Margin="587,665,0,0" VerticalAlignment="Top" Width="344" Height="173" Grid.Column="1">
+                  HorizontalAlignment="Left" Margin="722,668,0,0" VerticalAlignment="Top" Width="344" Height="173" Grid.Column="1">
             <GridView.ItemTemplate>
                 <DataTemplate>
                     <Border BorderBrush="Black" BorderThickness="1">
@@ -85,10 +84,10 @@
             </GridView.ItemTemplate>
         </GridView>
         <Button Grid.Column="0" x:Name="loadImagePaletteButton" Command="{Binding LoadImagePaletteCommand}"
-                Content="Load" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="587,854,0,0"
+                Content="Load" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="722,857,0,0"
                 VerticalAlignment="Top" Width="53" />
 
-        <Grid Grid.Column="0" BorderBrush="Black" BorderThickness="3" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="135" Margin="220,665,0,0">
+        <Grid Grid.Column="0" BorderBrush="Black" BorderThickness="3" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="135" Margin="355,668,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -96,22 +95,22 @@
             <RadioButton x:Name="scaleToFitRadioButton" Grid.Row="0"  Content="Scale to fit" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="0,0,0,0" Checked="scaleToFitRadioButton_Checked" GroupName="imageProperties" IsChecked="True"/>
             <RadioButton x:Name="zoomRadioButton" Grid.Row="1" IsChecked="{Binding ZoomImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="Zoom image" HorizontalAlignment="Left" VerticalAlignment="Top" GroupName="imageProperties"/>
         </Grid>
-        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="88,636,0,0" Text="Mosaic Type" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="231,636,0,0" Text="Image properties" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <Grid Grid.Column="0" BorderBrush="Black" BorderThickness="3" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="154" Margin="380,665,0,0" VerticalAlignment="Top" Width="180"/>
-        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="427,636,0,0" Text="Grid Settings" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <Grid Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="3" HorizontalAlignment="Left" Height="280" Margin="3,632,0,0" VerticalAlignment="Top" Width="941">
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="223,639,0,0" Text="Mosaic Type" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="366,639,0,0" Text="Image properties" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <Grid Grid.Column="0" BorderBrush="Black" BorderThickness="3" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="154" Margin="515,668,0,0" VerticalAlignment="Top" Width="180"/>
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="562,639,0,0" Text="Grid Settings" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <Grid Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="3" HorizontalAlignment="Left" Height="280" Margin="138,635,0,0" VerticalAlignment="Top" Width="987">
             <ToggleSwitch x:Name="gridDisplayToggleSwitch" Header="Display Grid:" IsOn="{Binding Grid, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="410,0,0,0" VerticalAlignment="Center" Width="122" Height="52"/>
             <ToggleSwitch Header="Randomize" IsOn="{Binding Randomize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" Margin="0,188,0,0" VerticalAlignment="Top"/>
         </Grid>
 
-        <TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="587,636,0,0" Text="Images in palette:" TextWrapping="Wrap" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="449"/>
-        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="714,636,0,0" Text="{Binding CountOfImagesInPalette, Mode=TwoWay, Converter={StaticResource IntConverter}}" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <Button Command="{Binding ConvertToBlackAndWhiteCommand}" Content="Black and White" Grid.Column="1" HorizontalAlignment="Left" Margin="1435,619,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="addButton" Command="{Binding AddImageToPaletteCommand}" Content="Add" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="665,854,0,0" VerticalAlignment="Top" Width="53"/>
-        <Button x:Name="removeButton" Command="{Binding RemoveImageFromPaletteCommand}" Content="Remove" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="748,855,0,0" VerticalAlignment="Top" Width="77"/>
-        <Button x:Name="clearButton" Command="{Binding ClearImagePaletteCommand}" Content="Clear" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="865,855,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="useSelectedItemsCheckBox" Unchecked="UseSelectedItemsCheckBox_OnUnchecked" Checked="UseSelectedItemsCheckBox_OnChecked" IsChecked="{Binding UseSelectedImages, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="Use Selected Images" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="766,635,0,0" VerticalAlignment="Top"/>
+        <TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="722,639,0,0" Text="Images in palette:" TextWrapping="Wrap" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="449"/>
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="849,639,0,0" Text="{Binding CountOfImagesInPalette, Mode=TwoWay, Converter={StaticResource IntConverter}}" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <Button Command="{Binding ConvertToBlackAndWhiteCommand}" Content="Black and White" Grid.Column="1" HorizontalAlignment="Left" Margin="563,16,0,0" VerticalAlignment="Top" Width="138"/>
+        <Button x:Name="addButton" Command="{Binding AddImageToPaletteCommand}" Content="Add" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="800,857,0,0" VerticalAlignment="Top" Width="53"/>
+        <Button x:Name="removeButton" Command="{Binding RemoveImageFromPaletteCommand}" Content="Remove" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="883,858,0,0" VerticalAlignment="Top" Width="77"/>
+        <Button x:Name="clearButton" Command="{Binding ClearImagePaletteCommand}" Content="Clear" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="1000,858,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="useSelectedItemsCheckBox" Unchecked="UseSelectedItemsCheckBox_OnUnchecked" Checked="UseSelectedItemsCheckBox_OnChecked" IsChecked="{Binding UseSelectedImages, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="Use Selected Images" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="901,638,0,0" VerticalAlignment="Top"/>
 
 
 

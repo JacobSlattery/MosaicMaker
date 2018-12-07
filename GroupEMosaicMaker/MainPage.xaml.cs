@@ -53,7 +53,8 @@ namespace GroupEMosaicMaker
 
             var bounds = ApplicationView.GetForCurrentView().VisibleBounds;
 
-            ApplicationView.PreferredLaunchViewSize = new Size(bounds.Width, bounds.Height);
+            //ApplicationView.PreferredLaunchViewSize = new Size(bounds.Width, bounds.Height);
+            ApplicationView.PreferredLaunchViewSize = new Size(1300, 1000);
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 
             sourceFile = null;
@@ -221,16 +222,6 @@ namespace GroupEMosaicMaker
         {
             var images = this.imagePaletteGridView.SelectedItems;
             this.ViewModel.AddSelectedImages(images);
-            //var selected = new List<Model.Image>();
-            //foreach (Model.Image current in test)
-            //{
-            //    selected.Add(current);
-            //}
-            //var palette = new ImagePalette();
-            //foreach (var current in selected)
-            //{
-            //    palette.AddImage(current);
-            //}
         }
 
         private void UseSelectedItemsCheckBox_OnUnchecked(object sender, RoutedEventArgs e)

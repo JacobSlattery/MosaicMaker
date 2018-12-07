@@ -37,8 +37,8 @@ namespace GroupEMosaicMaker.ViewModel
         private ImageManipulator manipulatorForGridImage;
         private ImageManipulator manipulatorForResultImage;
         private readonly ImageLoader imageLoader;
-        private Image imageWithGrid;
-        private Image imageWithMosaic;
+        private Image propertiesOfImageWithGrid;
+        private Image propertiesOfImageWithMosaic;
 
         private WriteableBitmap currentImage;
         private WriteableBitmap currentImageWithGrid;
@@ -64,6 +64,12 @@ namespace GroupEMosaicMaker.ViewModel
 
         #region Properties
 
+        /// <summary>
+        /// Gets and sets whether or not the use selected images was selected  
+        /// </summary>
+        /// <value>
+        /// <c> true</c> if [use selected images]; otherwise, <c>false</c>
+        /// </value>
         public bool UseSelectedImages
         {
             get => this.useSelectedImages;
@@ -74,6 +80,12 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Gets and sets whether or not the randomize was selected  
+        /// </summary>
+        /// <value>
+        /// <c> true</c> if [randomize]; otherwise, <c>false</c>
+        /// </value>
         public bool Randomize
         {
             get => this.randomize;
@@ -85,6 +97,12 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Gets and sets whether or not the black and white image was created 
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [black and white created]; otherwise, <c>false</c>.
+        /// </value>
         public bool BlackAndWhiteCreated
         {
             get => this.blackAndWhiteCreated;
@@ -97,6 +115,10 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Gets or sets the number of images in the image palette 
+        /// </summary>
+        /// <value> the count of images in the palette</value>
         public int CountOfImagesInPalette
         {
             get => this.countOfImagesInPalette;
@@ -322,11 +344,11 @@ namespace GroupEMosaicMaker.ViewModel
         /// </summary>
         private void updateGrid()
         {
-            this.manipulatorForGridImage = new ImageManipulator(this.imageWithGrid.Decoder.PixelWidth,
-                this.imageWithGrid.Decoder.PixelHeight, this.imageWithGrid.SourcePixels);
+            this.manipulatorForGridImage = new ImageManipulator(this.propertiesOfImageWithGrid.Decoder.PixelWidth,
+                this.propertiesOfImageWithGrid.Decoder.PixelHeight, this.propertiesOfImageWithGrid.SourcePixels);
             this.manipulatorForGridImage.DrawGrid(this.BlockSize, this.TriangleMosaic);
-            this.currentImageWithGrid = new WriteableBitmap((int) this.imageWithGrid.Decoder.PixelWidth,
-                (int) this.imageWithGrid.Decoder.PixelHeight);
+            this.currentImageWithGrid = new WriteableBitmap((int)this.propertiesOfImageWithGrid.Decoder.PixelWidth,
+                (int)this.propertiesOfImageWithGrid.Decoder.PixelHeight);
             this.writeStreamOfPixels(this.currentImageWithGrid,
                 this.manipulatorForGridImage.RetrieveModifiedPixels());
         }
@@ -402,8 +424,8 @@ namespace GroupEMosaicMaker.ViewModel
             this.loadCommands();
             this.loadProperties();
             this.imageLoader = new ImageLoader();
-            this.imageWithGrid = null;
-            this.imageWithMosaic = null;
+            this.propertiesOfImageWithGrid = null;
+            this.propertiesOfImageWithMosaic = null;
             this.imagePalette = new ObservableCollection<Image>();
             this.palette = new ImagePalette();
         }
@@ -412,6 +434,10 @@ namespace GroupEMosaicMaker.ViewModel
 
         #region Methods     
 
+        /// <summary>
+        /// Adds the selected images to the image palette
+        /// </summary>
+        /// <param name="images"> the images to be added to the palette</param>
         public void AddSelectedImages(IList<object> images)
         {
             this.palette.ClearPalette();
@@ -426,6 +452,9 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        /// Adds all the images in the image palette to the palette 
+        /// </summary>
         public void AddAllImages()
         {
             foreach (var image in this.ImagePalette)
@@ -509,7 +538,7 @@ namespace GroupEMosaicMaker.ViewModel
         private void convertToBlackAndWhite(object obj)
         {
             this.manipulatorForResultImage.ConvertImageToBlackAndWhite();
-            this.ResultImage = new WriteableBitmap((int)this.imageWithMosaic.Decoder.PixelWidth, (int)this.imageWithMosaic.Decoder.PixelHeight);
+            this.ResultImage = new WriteableBitmap((int)this.propertiesOfImageWithMosaic.Decoder.PixelWidth, (int)this.propertiesOfImageWithMosaic.Decoder.PixelHeight);
             this.writeStreamOfPixels(this.ResultImage, this.manipulatorForResultImage.RetrieveModifiedPixels());
             this.BlackAndWhiteCreated = true;
         }
@@ -607,16 +636,17 @@ namespace GroupEMosaicMaker.ViewModel
 
         private async Task handleNewImageFile()
         {
-            this.imageWithGrid = await this.imageLoader.LoadImage(this.SourceFile);
+            this.propertiesOfImageWithGrid = await this.imageLoader.LoadImage(this.SourceFile);
 
-            var width = (int) this.imageWithGrid.Decoder.PixelWidth;
-            var height = (int) this.imageWithGrid.Decoder.PixelHeight;
-            var pixels = this.imageWithGrid.SourcePixels;
+
+            var width = (int)this.propertiesOfImageWithGrid.Decoder.PixelWidth;
+            var height = (int)this.propertiesOfImageWithGrid.Decoder.PixelHeight;
+            var pixels = this.propertiesOfImageWithGrid.SourcePixels;
             this.currentImage = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.currentImage, pixels);
 
-            this.manipulatorForGridImage = new ImageManipulator((uint) width,
-                (uint) height, pixels);
+            this.manipulatorForGridImage = new ImageManipulator((uint)width,
+                (uint)height, pixels);
             this.manipulatorForResultImage = new ImageManipulator((uint)width, (uint)height, pixels);
 
 
@@ -629,13 +659,13 @@ namespace GroupEMosaicMaker.ViewModel
         private async Task handleCreatingMosaic()
         {
             this.resetLastUsedBlockSizes();
-            this.imageWithMosaic = await this.imageLoader.LoadImage(this.SourceFile);
+            this.propertiesOfImageWithMosaic = await this.imageLoader.LoadImage(this.SourceFile);
 
-            var width = (int) this.imageWithMosaic.Decoder.PixelWidth;
-            var height = (int) this.imageWithMosaic.Decoder.PixelHeight;
-            var pixels = this.imageWithMosaic.SourcePixels;
+            var width = (int)this.propertiesOfImageWithMosaic.Decoder.PixelWidth;
+            var height = (int)this.propertiesOfImageWithMosaic.Decoder.PixelHeight;
+            var pixels = this.propertiesOfImageWithMosaic.SourcePixels;
 
-            this.manipulatorForResultImage = new ImageManipulator((uint) width, (uint) height, pixels);
+            this.manipulatorForResultImage = new ImageManipulator((uint)width, (uint)height, pixels);
             if (this.SquareMosaic)
             {
                 this.manipulatorForResultImage.CreateSquareMosaic(this.BlockSize);
@@ -655,6 +685,7 @@ namespace GroupEMosaicMaker.ViewModel
 
             this.ResultImage = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.ResultImage, this.manipulatorForResultImage.RetrieveModifiedPixels());
+
         }
 
         private void resetLastUsedBlockSizes()
@@ -677,7 +708,7 @@ namespace GroupEMosaicMaker.ViewModel
             var saveFile = await MainPage.SelectSaveImageFile();
             if (saveFile != null)
             {
-                await ImageSaver.SaveImage(saveFile, this.ResultImage, this.imageWithMosaic);
+                await ImageSaver.SaveImage(saveFile, this.ResultImage, this.propertiesOfImageWithMosaic);
             }
         }
 
