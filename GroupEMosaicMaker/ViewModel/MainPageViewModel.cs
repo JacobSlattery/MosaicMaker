@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
@@ -10,8 +9,8 @@ using GroupEMosaicMaker.Extension;
 using GroupEMosaicMaker.FileIO;
 using GroupEMosaicMaker.Model;
 using GroupEMosaicMaker.Utility;
-using System;
 using System.Collections.Generic;
+using GroupEMosaicMaker.View;
 
 namespace GroupEMosaicMaker.ViewModel
 {

@@ -4,22 +4,18 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Pickers;
-using Windows.UI.Notifications;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using GroupEMosaicMaker.Model;
 using GroupEMosaicMaker.ViewModel;
-using Image = Windows.UI.Xaml.Controls.Image;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
-namespace GroupEMosaicMaker
+namespace GroupEMosaicMaker.View
 {
     /// <summary>
     ///     An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage
     {
         #region Data members
 
@@ -50,10 +46,6 @@ namespace GroupEMosaicMaker
         public MainPage()
         {
             this.InitializeComponent();
-
-            var bounds = ApplicationView.GetForCurrentView().VisibleBounds;
-
-            //ApplicationView.PreferredLaunchViewSize = new Size(bounds.Width, bounds.Height);
             ApplicationView.PreferredLaunchViewSize = new Size(1300, 1000);
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 
@@ -212,7 +204,7 @@ namespace GroupEMosaicMaker
 
         #endregion
 
-        private void scaleToFitRadioButton_Checked(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private void scaleToFitRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             this.displayScrollView.ChangeView(0, this.displayScrollView.VerticalOffset, 1.0f);
             this.resultScrollView.ChangeView(0, this.resultScrollView.VerticalOffset, 1.0f);
