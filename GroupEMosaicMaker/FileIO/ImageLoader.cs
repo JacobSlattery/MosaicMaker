@@ -20,22 +20,10 @@ namespace GroupEMosaicMaker.FileIO
         private const string BmpFileType = ".bmp";
         private const string PngFileType = ".png";
 
-        /// <summary>
-        /// The palette
-        /// </summary>
-        public ImagePalette Palette;
-
         #endregion
 
         #region Constructors  
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ImageLoader"/> class.
-        /// </summary>
-        public ImageLoader()
-        {
-            this.Palette = new ImagePalette();
-        }
+       
 
         #endregion
 
@@ -57,18 +45,19 @@ namespace GroupEMosaicMaker.FileIO
         /// <returns> the palette created from the folder</returns>
         public async Task<ImagePalette> LoadImages(StorageFolder folder)
         {
+            var palette = new ImagePalette();
             var images = await folder.GetFilesAsync();
             foreach (var image in images)
             {
                 if (this.determineIfFileIsValid(image))
                 {
                     var myImage = await this.createWorkableImage(image);
-                    this.Palette.AddImage(myImage);
+                    palette.AddImage(myImage);
                 }
                 
             }
 
-            return this.Palette;
+            return palette;
         }
 
         private async Task<Image> createWorkableImage(StorageFile image)

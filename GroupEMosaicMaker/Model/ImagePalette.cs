@@ -66,6 +66,7 @@ namespace GroupEMosaicMaker.Model
         public void ClearPalette()
         {
             this.OriginalImages.Clear();
+            this.AverageColorDictionary.Clear();
         }
 
 

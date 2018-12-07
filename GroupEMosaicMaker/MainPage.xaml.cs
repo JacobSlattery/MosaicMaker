@@ -6,8 +6,11 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI.Notifications;
 using Windows.UI.ViewManagement;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using GroupEMosaicMaker.Model;
 using GroupEMosaicMaker.ViewModel;
+using Image = Windows.UI.Xaml.Controls.Image;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -101,6 +104,10 @@ namespace GroupEMosaicMaker
             return sourceFile;
         }
 
+        /// <summary>
+        /// Picks a file to open and select for the image palette 
+        /// </summary>
+        /// <returns> the file</returns>
         public static async Task<StorageFile> SelectImageForPalette()
         {
             var openPicker = new FileOpenPicker
@@ -210,5 +217,25 @@ namespace GroupEMosaicMaker
             this.resultScrollView.ChangeView(0, this.resultScrollView.VerticalOffset, 1.0f);
         }
 
+        private void UseSelectedItemsCheckBox_OnChecked(object sender, RoutedEventArgs e)
+        {
+            var images = this.imagePaletteGridView.SelectedItems;
+            this.ViewModel.AddSelectedImages(images);
+            //var selected = new List<Model.Image>();
+            //foreach (Model.Image current in test)
+            //{
+            //    selected.Add(current);
+            //}
+            //var palette = new ImagePalette();
+            //foreach (var current in selected)
+            //{
+            //    palette.AddImage(current);
+            //}
+        }
+
+        private void UseSelectedItemsCheckBox_OnUnchecked(object sender, RoutedEventArgs e)
+        {
+            this.ViewModel.AddAllImages();
+        }
     }
 }

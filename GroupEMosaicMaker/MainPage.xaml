@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:converter="using:GroupEMosaicMaker.Converter"
+    xmlns:view="using:GroupEMosaicMaker.View"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="1980" Height="1080">
 
@@ -42,7 +43,7 @@
         <Grid Grid.Column="0" BorderBrush="Black" BorderThickness="3" Grid.ColumnSpan="2" Margin="0,0,1033,463" Height="540" Width="940" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
             <ScrollViewer x:Name="displayScrollView" IsEnabled="{Binding ZoomImage}" ZoomMode="{Binding ZoomImage}" Height="540" 
                           VerticalAlignment="Center" HorizontalScrollBarVisibility="Visible"  VerticalScrollBarVisibility="Visible" 
-                          HorizontalScrollMode="Enabled" VerticalScrollMode="Enabled" HorizontalAlignment="Left" Width="940">
+                          HorizontalScrollMode="Enabled" VerticalScrollMode="Enabled" HorizontalAlignment="Center" Width="940">
 
                 <Image x:Name="displayImage" Source="{Binding DisplayImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                        HorizontalAlignment="Center" Height="540" VerticalAlignment="Center" Width="940" Stretch="Fill" />
@@ -69,8 +70,8 @@
         </Grid>
         <Button Content="Convert" Command="{Binding ConvertCommand, UpdateSourceTrigger=PropertyChanged}"
                 Grid.Column="1" HorizontalAlignment="Left" Margin="948,333,0,0" VerticalAlignment="Top" Width="75" />
-        <GridView BorderBrush="Black" BorderThickness="3"
-                  ItemsSource="{Binding ImagePalette, Mode=TwoWay}" SelectedItem="{Binding SelectedImage, Mode=TwoWay}"
+        <GridView x:Name="imagePaletteGridView" BorderBrush="Black" BorderThickness="3"
+                  ItemsSource="{Binding ImagePalette, Mode=TwoWay}" SelectedItem="{Binding SelectedImage, Mode=TwoWay}" SelectionMode="Multiple"
                   HorizontalAlignment="Left" Margin="587,665,0,0" VerticalAlignment="Top" Width="344" Height="173" Grid.Column="1">
             <GridView.ItemTemplate>
                 <DataTemplate>
@@ -92,7 +93,7 @@
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <RadioButton x:Name="scaleToFitRadioButton" Grid.Row="0" IsChecked="{Binding ScaleImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Content="Scale to fit" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="0,0,0,0" Checked="scaleToFitRadioButton_Checked" GroupName="imageProperties"/>
+            <RadioButton x:Name="scaleToFitRadioButton" Grid.Row="0"  Content="Scale to fit" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="0,0,0,0" Checked="scaleToFitRadioButton_Checked" GroupName="imageProperties" IsChecked="True"/>
             <RadioButton x:Name="zoomRadioButton" Grid.Row="1" IsChecked="{Binding ZoomImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="Zoom image" HorizontalAlignment="Left" VerticalAlignment="Top" GroupName="imageProperties"/>
         </Grid>
         <TextBlock Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="88,636,0,0" Text="Mosaic Type" TextWrapping="Wrap" VerticalAlignment="Top"/>
@@ -110,6 +111,7 @@
         <Button x:Name="addButton" Command="{Binding AddImageToPaletteCommand}" Content="Add" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="665,854,0,0" VerticalAlignment="Top" Width="53"/>
         <Button x:Name="removeButton" Command="{Binding RemoveImageFromPaletteCommand}" Content="Remove" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="748,855,0,0" VerticalAlignment="Top" Width="77"/>
         <Button x:Name="clearButton" Command="{Binding ClearImagePaletteCommand}" Content="Clear" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="865,855,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="useSelectedItemsCheckBox" Unchecked="UseSelectedItemsCheckBox_OnUnchecked" Checked="UseSelectedItemsCheckBox_OnChecked" IsChecked="{Binding UseSelectedImages, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="Use Selected Images" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="766,635,0,0" VerticalAlignment="Top"/>
 
 
 
