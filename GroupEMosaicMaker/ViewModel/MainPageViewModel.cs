@@ -695,7 +695,7 @@ namespace GroupEMosaicMaker.ViewModel
                 }
                 else if (this.UseEachImageOnce)
                 {
-                    await this.manipulatorForResultImage.CreatePictureMosaicUsingEachImageAtleastOnce(this.BlockSize,
+                    await this.manipulatorForResultImage.CreatePictureMosaicByCyclingThroughAvailableImages(this.BlockSize,
                         this.palette);
                     this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
                     this.lastUseEachImageOnceSelection = this.UseEachImageOnce;

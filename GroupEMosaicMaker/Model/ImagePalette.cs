@@ -73,14 +73,7 @@ namespace GroupEMosaicMaker.Model
 
         public Collection<Image> FindMultipleClosestToColor(Color color, int imageCount, IList<Image> disqualified)
         {
-            var disqualifiedImages = disqualified.ToList();
-            if (disqualifiedImages.Count > this.AverageColorDictionary.Count)
-            {
-                for (var i = this.AverageColorDictionary.Count - 1; i < disqualifiedImages.Count; i++)
-                {
-                    disqualifiedImages.RemoveAt(i);
-                }
-            }
+            var disqualifiedImages = this.ensureDisqualifiedIsNotTooRestrictive(disqualified);
 
             var images = new Collection<Image>();
             var orderedAvailableColors = this.MostSimilarColorsInDictionaryTo(color);
@@ -89,13 +82,7 @@ namespace GroupEMosaicMaker.Model
             while (images.Count < imageCount)
             {
                 var currentColor = orderedAvailableColors[currentIndex];
-                foreach (var image in this.AverageColorDictionary[currentColor])
-                {
-                    if (images.Count < imageCount && !images.Contains(image) && !disqualifiedImages.Contains(image))
-                    {
-                        images.Add(image);
-                    }
-                }
+                this.addImagesCloseToColor(imageCount, currentColor, images, disqualifiedImages);
 
                 if (currentIndex < orderedAvailableColors.Length - 1)
                 {
@@ -123,18 +110,36 @@ namespace GroupEMosaicMaker.Model
             return orderedList.ToArray();
         }
 
-
-        private bool isColorCloser(Color primary, Color other, Color baseColor)
-        {
-            return (calculateDifferenceBetweenColors(primary, baseColor) <
-                    calculateDifferenceBetweenColors(other, baseColor));
-        }
-
         private static double calculateDifferenceBetweenColors(Color averageColor, Color color)
         {
             return Math.Pow((color.R - averageColor.R) * .3, 2) +
                    Math.Pow((color.G - averageColor.G) * .59, 2) +
                    Math.Pow((color.B - averageColor.B) * .11, 2);
+        }
+
+        private List<Image> ensureDisqualifiedIsNotTooRestrictive(IEnumerable<Image> disqualified)
+        {
+            var disqualifiedImages = disqualified.ToList();
+            if (disqualifiedImages.Count > this.AverageColorDictionary.Count)
+            {
+                for (var i = this.AverageColorDictionary.Count - 1; i < disqualifiedImages.Count; i++)
+                {
+                    disqualifiedImages.RemoveAt(i);
+                }
+            }
+
+            return disqualifiedImages;
+        }
+
+        private void addImagesCloseToColor(int imageCount, Color currentColor, ICollection<Image> images, ICollection<Image> disqualifiedImages)
+        {
+            foreach (var image in this.AverageColorDictionary[currentColor])
+            {
+                if (images.Count < imageCount && !images.Contains(image) && !disqualifiedImages.Contains(image))
+                {
+                    images.Add(image);
+                }
+            }
         }
 
         private void addImageToAverageColorDictionary(Image image)
