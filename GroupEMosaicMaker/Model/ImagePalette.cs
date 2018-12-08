@@ -71,7 +71,7 @@ namespace GroupEMosaicMaker.Model
 
 
 
-        public Collection<Image> FindMultipleClosestToColor(Color color, int imageCount, IList<Image> disqualified)
+        public Collection<Image> FindMultipleImagesClosestToColor(Color color, int imageCount, ICollection<Image> disqualified)
         {
             var disqualifiedImages = this.ensureDisqualifiedIsNotTooRestrictive(disqualified);
 
@@ -120,7 +120,7 @@ namespace GroupEMosaicMaker.Model
         private List<Image> ensureDisqualifiedIsNotTooRestrictive(IEnumerable<Image> disqualified)
         {
             var disqualifiedImages = disqualified.ToList();
-            if (disqualifiedImages.Count > this.AverageColorDictionary.Count)
+            if (disqualifiedImages.Count > this.AverageColorDictionary.Count && this.AverageColorDictionary.Count != 0)
             {
                 for (var i = this.AverageColorDictionary.Count - 1; i < disqualifiedImages.Count; i++)
                 {

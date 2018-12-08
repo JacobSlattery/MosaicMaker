@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.UI;
@@ -94,39 +93,39 @@ namespace GroupEMosaicMaker.Model
             return chosenImage;
         }
 
-        public async Task CreatePictureMosaicByCyclingThroughAvailableImages(int blockSize, ImagePalette palette)
-        {
+        //public async Task CreatePictureMosaicByCyclingThroughAvailableImages(int blockSize, ImagePalette palette)
+        //{
            
-            var colors = palette.AverageColorDictionary;
-            var temporaryColors = new Dictionary<Color, Collection<Image>>();
-            this.addImagesToTemporayDictionary(colors, temporaryColors);
-            var tasks = new Collection<Task>();
-            foreach (var index in this.getBlockStartingPoints(blockSize))
-            {
-                if (temporaryColors.Count == 0)
-                {
-                    this.addImagesToTemporayDictionary(colors,temporaryColors);
-                }
-                var indexes = IndexMapper.Box(index, blockSize, (int) this.ImageWidth, (int) this.ImageHeight);
-                IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
-                var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
-                var imageToUse = findClosestMatch(temporaryColors, averageColor);
-                var task = await Task.Factory.StartNew(async () =>
-                {
-                    await imageToUse.ResizeImage(blockSize);
-                    Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.ModifiedPixels, indexes);
-                });
+        //    var colors = palette.AverageColorDictionary;
+        //    var temporaryColors = new Dictionary<Color, Collection<Image>>();
+        //    this.addImagesToTemporayDictionary(colors, temporaryColors);
+        //    var tasks = new Collection<Task>();
+        //    foreach (var index in this.getBlockStartingPoints(blockSize))
+        //    {
+        //        if (temporaryColors.Count == 0)
+        //        {
+        //            this.addImagesToTemporayDictionary(colors,temporaryColors);
+        //        }
+        //        var indexes = IndexMapper.Box(index, blockSize, (int) this.ImageWidth, (int) this.ImageHeight);
+        //        IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
+        //        var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
+        //        var imageToUse = findClosestMatch(temporaryColors, averageColor);
+        //        var task = await Task.Factory.StartNew(async () =>
+        //        {
+        //            await imageToUse.ResizeImage(blockSize);
+        //            Painter.FillBlockWithPicture(this.SourcePixels, imageToUse.ModifiedPixels, indexes);
+        //        });
 
-                tasks.Add(task);
-                temporaryColors.Remove(imageToUse.AverageColor);
+        //        tasks.Add(task);
+        //        temporaryColors.Remove(imageToUse.AverageColor);
 
-            }
+        //    }
 
-            foreach (var task in tasks)
-            {
-                await task;
-            }
-        }
+        //    foreach (var task in tasks)
+        //    {
+        //        await task;
+        //    }
+        //}
 
         private void addImagesToTemporayDictionary(IDictionary<Color, Collection<Image>> colors, Dictionary<Color, Collection<Image>> temp)
         {
@@ -141,10 +140,22 @@ namespace GroupEMosaicMaker.Model
         /// </summary>
         /// <param name="blockSize"> the block size </param>
         /// <param name="palette"> the palette to use</param>
-        /// <param name="randomize"> whether to randomize the picture to prevent patterns</param>
-        public async Task CreatePictureMosaic(int blockSize, ImagePalette palette, bool randomize)
+        /// <param name="juxtaposition"> whether to juxtaposition the picture to prevent patterns</param>
+        /// /// <param name="cycle"> whether to cycle through available photos to ensure no photo used used more that once more than any other</param>
+        public async Task CreatePictureMosaic(int blockSize, ImagePalette palette, bool juxtaposition, bool cycle)
         {
+            if (palette.AverageColorDictionary.Count == 0)
+            {
+                throw new ArgumentException("There must be a minimum of one picture in the palette.", nameof(palette));
+            }
+
+            if (juxtaposition && cycle && palette.AverageColorDictionary.Count < 1)
+            {
+                throw new ArgumentException("There must be at least two pictures in the palette to both cycle thorough images and prevent juxtaposition", nameof(palette));
+            }
+
             var colors = palette.AverageColorDictionary;
+            var cycleRemoved = new Collection<Image>();
             var disqualified = new Collection<Image>();
             var previous = new Collection<Image>();
             var tasks = new Collection<Task>();
@@ -158,19 +169,36 @@ namespace GroupEMosaicMaker.Model
                 IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
                 var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
 
-                Image imageToUse;
-                if (randomize)
+                Image imageToUse = null;
+
+                if (juxtaposition)
                 {
                     if (index > imageByteWidth)
                     {
                         aboveImage = previous[aboveImageIndex];
                         aboveImageIndex++;
                     }
-                    imageToUse = this.getRandomImage(indexes, palette, aboveImage, previous, disqualified);
+
+                    imageToUse = this.getRandomImage(indexes, palette, aboveImage, previous, disqualified, cycleRemoved);
                 }
-                else
+
+                if (cycle)
                 {
-                    imageToUse = findClosestMatch(colors, averageColor);
+                    if (imageToUse == null)
+                    {
+                        imageToUse = findClosestMatch(colors, averageColor, cycleRemoved);
+                    }
+                    cycleRemoved.Add(imageToUse);
+                    if (cycleRemoved.Count == colors.Count)
+                    {
+                        cycleRemoved.Clear();
+                    }
+                }
+                
+
+                if (imageToUse == null)
+                {
+                    imageToUse = findClosestMatch(colors, averageColor, cycleRemoved);
                 }
 
                 var task = await Task.Factory.StartNew(async () =>
@@ -193,25 +221,39 @@ namespace GroupEMosaicMaker.Model
             }
         }
 
-        private Image getRandomImage(int[] indexes, ImagePalette palette, Image aboveImage, Collection<Image> previous, Collection<Image> disqualified)
+        private Image getRandomImage(int[] indexes, ImagePalette palette, Image aboveImage, Collection<Image> previous, Collection<Image> disqualified, ICollection<Image> cycleRemoved)
         {
             Collection<Image> images;
             var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
-            const int randomSelectionSize = 8;
-            const int disqualifiedSize = 6;
+            var randomSelectionSize = 8;
+            while (randomSelectionSize > palette.AverageColorDictionary.Keys.Count)
+            {
+                randomSelectionSize--;
+            }
+            var disqualifiedSize = 6;
+            if (disqualified.Count == 0 || disqualified.Count == 1)
+            {
+                disqualifiedSize = 0;
+            }
+            else if (disqualifiedSize > disqualified.Count)
+            {
+                disqualifiedSize = disqualified.Count - 2;
+            }
+
+            var imagesToAvoid = disqualified.Concat(cycleRemoved).ToList();
 
             if (aboveImage != null)
             {
-                disqualified.Add(aboveImage);
-                images = palette.FindMultipleClosestToColor(averageColor, randomSelectionSize, disqualified);
-                disqualified.RemoveAt(disqualified.Count - 1);
+                imagesToAvoid.Add(aboveImage);
+                images = palette.FindMultipleImagesClosestToColor(averageColor, randomSelectionSize, imagesToAvoid);
+                imagesToAvoid.RemoveAt(disqualified.Count - 1);
             }
             else
             {
-                images = palette.FindMultipleClosestToColor(averageColor, randomSelectionSize, disqualified);
+                images = palette.FindMultipleImagesClosestToColor(averageColor, randomSelectionSize, imagesToAvoid);
             }
 
-            if (disqualified.Count >= disqualifiedSize)
+            if (disqualified.Count > disqualifiedSize)
             {
                 disqualified.RemoveAt(0);
             }
@@ -222,7 +264,7 @@ namespace GroupEMosaicMaker.Model
             return imageToUse;
         }
 
-        private static Image findClosestMatch(IDictionary<Color, Collection<Image>> colors, Color averageColor)
+        private static Image findClosestMatch(IDictionary<Color, Collection<Image>> colors, Color averageColor, Collection<Image> disqualified)
         {
             Image imageToUse = null;
             var difference = StartingDifferenceBetweenColors;
@@ -231,8 +273,13 @@ namespace GroupEMosaicMaker.Model
                 var currentDifference = calculateDifferenceBetweenColors(averageColor, color);
                 if (currentDifference <= difference)
                 {
-                    difference = currentDifference;
-                    imageToUse = colors[color][0];
+                    var image = colors[color][0];
+                    if (!disqualified.Contains(image))
+                    {
+                        difference = currentDifference;
+                        imageToUse = image;
+                    }
+
                 }
             }
 

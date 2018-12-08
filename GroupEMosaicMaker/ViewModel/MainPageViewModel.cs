@@ -687,22 +687,16 @@ namespace GroupEMosaicMaker.ViewModel
             }
             else if (this.PictureMosaic)
             {
-                if (this.Randomize)
+                if (this.Randomize || this.UseEachImageOnce)
                 {
-                    await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette, this.Randomize);
+                    await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette, this.Randomize, this.UseEachImageOnce);
                     this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
                     this.lastRandomizeSelection = this.Randomize;
-                }
-                else if (this.UseEachImageOnce)
-                {
-                    await this.manipulatorForResultImage.CreatePictureMosaicByCyclingThroughAvailableImages(this.BlockSize,
-                        this.palette);
-                    this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
                     this.lastUseEachImageOnceSelection = this.UseEachImageOnce;
                 }
                 else
                 {
-                    await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette, false);
+                    await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette, this.Randomize, this.useEachImageOnce);
                     this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
                     this.lastRandomizeSelection = this.Randomize;
                     this.lastUseEachImageOnceSelection = this.UseEachImageOnce;
