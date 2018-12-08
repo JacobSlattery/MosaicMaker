@@ -66,6 +66,12 @@ namespace GroupEMosaicMaker.ViewModel
 
         #region Properties
 
+        /// <summary>
+        /// Gets or sets whether or not use each image once was selected
+        /// </summary>
+        /// <value>
+        /// <c> true</c> if [use each image once]; otherwise, <c>false</c>
+        /// </value>
         public bool UseEachImageOnce
         {
             get => this.useEachImageOnce;
@@ -105,6 +111,52 @@ namespace GroupEMosaicMaker.ViewModel
             set
             {
                 this.randomize = value;
+                this.ConvertCommand.OnCanExecuteChanged();
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets and sets the last used block size for the square mosaic
+        /// </summary>
+        /// <value> the last used block size for the square mosaic</value>
+        public int LastUsedBlockSizeForSquareMosaic
+        {
+            get => this.lastUsedBlockSizeForSquareMosaic;
+            set
+            {
+                this.lastUsedBlockSizeForSquareMosaic = value;
+                this.ConvertCommand.OnCanExecuteChanged();
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets and sets the last used block size for the picture mosaic
+        /// </summary>
+        /// <value> the last used block size for the picture mosaic</value>
+        public int LastUsedBlockSizeForPictureMosaic
+        {
+            get => this.lastUsedBlockSizeForPictureMosaic;
+            set
+            {
+                this.lastUsedBlockSizeForPictureMosaic = value;
+                this.ConvertCommand.OnCanExecuteChanged();
+                this.OnPropertyChanged();
+            }
+        }
+
+
+        /// <summary>
+        /// Gets and sets the last used block size for the triangle mosaic
+        /// </summary>
+        /// <value> the last used block size for the triangle mosaic</value>
+        public int LastUsedBlockSizeForTriangleMosaic
+        {
+            get => this.lastUsedBlockSizeForTriangleMosaic;
+            set
+            {
+                this.lastUsedBlockSizeForTriangleMosaic = value;
                 this.ConvertCommand.OnCanExecuteChanged();
                 this.OnPropertyChanged();
             }
@@ -601,16 +653,16 @@ namespace GroupEMosaicMaker.ViewModel
             if (this.SquareMosaic)
             {
                
-                return (this.DisplayImage != null && this.BlockSize != this.lastUsedBlockSizeForSquareMosaic) || this.BlackAndWhiteCreated;
+                return (this.DisplayImage != null && this.BlockSize != this.LastUsedBlockSizeForSquareMosaic) || this.BlackAndWhiteCreated;
                 
             } else if (this.PictureMosaic)
             {
-                return (this.DisplayImage != null && this.ImagePalette.Count != 0 && this.BlockSize != this.lastUsedBlockSizeForPictureMosaic) 
+                return (this.DisplayImage != null && this.ImagePalette.Count != 0 && this.BlockSize != this.LastUsedBlockSizeForPictureMosaic) 
                        || (this.BlackAndWhiteCreated && this.ImagePalette.Count != 0 || this.Randomize != this.lastRandomizeSelection || this.UseEachImageOnce != this.lastUseEachImageOnceSelection);
             }
             else
             { 
-                return (this.DisplayImage != null && this.BlockSize != this.lastUsedBlockSizeForTriangleMosaic) || this.BlackAndWhiteCreated;
+                return (this.DisplayImage != null && this.BlockSize != this.LastUsedBlockSizeForTriangleMosaic) || this.BlackAndWhiteCreated;
             }
         }
 
@@ -683,27 +735,27 @@ namespace GroupEMosaicMaker.ViewModel
             if (this.SquareMosaic)
             {
                 this.manipulatorForResultImage.CreateSquareMosaic(this.BlockSize);
-                this.lastUsedBlockSizeForSquareMosaic = this.BlockSize;
+                this.LastUsedBlockSizeForSquareMosaic = this.BlockSize;
             }
             else if (this.PictureMosaic)
             {
                 if (this.Randomize)
                 {
                     await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette, this.Randomize);
-                    this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
+                    this.LastUsedBlockSizeForPictureMosaic = this.BlockSize;
                     this.lastRandomizeSelection = this.Randomize;
                 }
                 else if (this.UseEachImageOnce)
                 {
                     await this.manipulatorForResultImage.CreatePictureMosaicByCyclingThroughAvailableImages(this.BlockSize,
                         this.palette);
-                    this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
+                    this.LastUsedBlockSizeForPictureMosaic = this.BlockSize;
                     this.lastUseEachImageOnceSelection = this.UseEachImageOnce;
                 }
                 else
                 {
                     await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette, false);
-                    this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
+                    this.LastUsedBlockSizeForPictureMosaic = this.BlockSize;
                     this.lastRandomizeSelection = this.Randomize;
                     this.lastUseEachImageOnceSelection = this.UseEachImageOnce;
                 }
@@ -712,7 +764,7 @@ namespace GroupEMosaicMaker.ViewModel
             else
             {
                 this.manipulatorForResultImage.CreateTriangleMosaic(this.BlockSize);
-                this.lastUsedBlockSizeForTriangleMosaic = this.BlockSize;
+                this.LastUsedBlockSizeForTriangleMosaic = this.BlockSize;
             }
 
             this.ResultImage = new WriteableBitmap(width, height);
@@ -722,9 +774,9 @@ namespace GroupEMosaicMaker.ViewModel
 
         private void resetLastUsedBlockSizes()
         {
-            this.lastUsedBlockSizeForPictureMosaic = DefaultLastUsedBlockSize;
-            this.lastUsedBlockSizeForSquareMosaic = DefaultLastUsedBlockSize;
-            this.lastUsedBlockSizeForTriangleMosaic = DefaultLastUsedBlockSize;
+            this.LastUsedBlockSizeForPictureMosaic = DefaultLastUsedBlockSize;
+            this.LastUsedBlockSizeForSquareMosaic = DefaultLastUsedBlockSize;
+            this.LastUsedBlockSizeForTriangleMosaic = DefaultLastUsedBlockSize;
         }
 
         private async void writeStreamOfPixels(WriteableBitmap bitMap, byte[] sourcePixels)
