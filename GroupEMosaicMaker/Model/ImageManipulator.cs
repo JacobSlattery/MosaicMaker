@@ -74,7 +74,24 @@ namespace GroupEMosaicMaker.Model
 
         private Image chooseRandom(Collection<Image> images)
         {
-            return images[new Random().Next(0, images.Count - 1)];
+            if (images.Count == 0)
+            {
+                throw new ArgumentException(nameof(images));
+            }
+
+            var min = 0;
+            var max = images.Count - 1;
+            Image chosenImage;
+            if (images.Count == 1)
+            {
+                chosenImage = images[0];
+            }
+            else
+            {
+                chosenImage = images[new Random().Next(min, max)];
+            }
+
+            return chosenImage;
         }
 
         public async Task CreatePictureMosaicUsingEachImageAtleastOnce(int blockSize, ImagePalette palette)
