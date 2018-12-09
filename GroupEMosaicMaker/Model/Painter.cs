@@ -51,23 +51,6 @@ namespace GroupEMosaicMaker.Model
             }
         }
 
-        private static Color getPixelBgra8(byte[] pixels, int height, int width, uint imageWidth)
-        {
-            var offset = (height * (int) imageWidth + width) * ByteOffset;
-            var red = pixels[offset + RedOffset];
-            var green = pixels[offset + GreenOffset];
-            var blue = pixels[offset + BlueOffset];
-            return Color.FromArgb(0, red, green, blue);
-        }
-
-        private static void setPixelBgra8(byte[] pixels, int height, int width, Color color, uint imageWidth)
-        {
-            var offset = (height * (int) imageWidth + width) * ByteOffset;
-            pixels[offset + RedOffset] = color.R;
-            pixels[offset + GreenOffset] = color.G;
-            pixels[offset + BlueOffset] = color.B;
-        }
-
         /// <summary>
         ///     Fills the indexes that map to the specified source bytes with the average color.
         /// </summary>
@@ -163,6 +146,23 @@ namespace GroupEMosaicMaker.Model
             var newG = (byte) (totalG / colorCollection.Count);
             var newB = (byte) (totalB / colorCollection.Count);
             return Color.FromArgb(newA, newR, newG, newB);
+        }
+
+        private static Color getPixelBgra8(byte[] pixels, int height, int width, uint imageWidth)
+        {
+            var offset = (height * (int)imageWidth + width) * ByteOffset;
+            var red = pixels[offset + RedOffset];
+            var green = pixels[offset + GreenOffset];
+            var blue = pixels[offset + BlueOffset];
+            return Color.FromArgb(0, red, green, blue);
+        }
+
+        private static void setPixelBgra8(byte[] pixels, int height, int width, Color color, uint imageWidth)
+        {
+            var offset = (height * (int)imageWidth + width) * ByteOffset;
+            pixels[offset + RedOffset] = color.R;
+            pixels[offset + GreenOffset] = color.G;
+            pixels[offset + BlueOffset] = color.B;
         }
 
         private static Collection<Color> getColorForEachPixel(Collection<byte> pixelBytes)

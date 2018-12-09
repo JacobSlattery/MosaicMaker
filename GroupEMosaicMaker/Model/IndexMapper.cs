@@ -99,24 +99,6 @@ namespace GroupEMosaicMaker.Model
             }
         }
 
-        private static bool isValidGridIndex(int boxSize, int row, int relativeRowIndex,
-            bool includeDiagonalLine = false)
-        {
-            var topWall = row == 0;
-            var leftWall = relativeRowIndex % boxSize == 0;
-            var bottomWall = row == boxSize - 1;
-            var rightWall = (relativeRowIndex + 1) % boxSize == 0;
-
-            var isValid = topWall || leftWall || bottomWall || rightWall;
-
-            if (includeDiagonalLine)
-            {
-                isValid = isValid || relativeRowIndex - row == 0;
-            }
-
-            return isValid;
-        }
-
         /// <summary>
         ///     Finds the indexes for a box within a larger box. Uses bounds to ensure that indexes do not go outside the bounds of
         ///     the larger box.
@@ -168,6 +150,24 @@ namespace GroupEMosaicMaker.Model
             {
                 indexes[i] = indexes[i] * offset;
             }
+        }
+
+        private static bool isValidGridIndex(int boxSize, int row, int relativeRowIndex,
+            bool includeDiagonalLine = false)
+        {
+            var topWall = row == 0;
+            var leftWall = relativeRowIndex % boxSize == 0;
+            var bottomWall = row == boxSize - 1;
+            var rightWall = (relativeRowIndex + 1) % boxSize == 0;
+
+            var isValid = topWall || leftWall || bottomWall || rightWall;
+
+            if (includeDiagonalLine)
+            {
+                isValid = isValid || relativeRowIndex - row == 0;
+            }
+
+            return isValid;
         }
 
         #endregion

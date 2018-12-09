@@ -65,7 +65,12 @@ namespace GroupEMosaicMaker.ViewModel
         #endregion
 
         #region Properties
-
+        /// <summary>
+        ///     Gets and sets whether to use the selected images
+        /// </summary>
+        /// <value>
+        ///     <c> true</c> if [use the selected images]; otherwise, <c>false</c>
+        /// </value>
         public bool UseSelectedImages
         {
             get => this.useSelectedImages;
@@ -77,6 +82,12 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
+        /// <summary>
+        ///     Gets and sets whether to cycle through images
+        /// </summary>
+        /// <value>
+        ///     <c> true</c> if [cycle]; otherwise, <c>false</c>
+        /// </value>
         public bool UseEachImageOnce
         {
             get => this.useEachImageOnce;

@@ -20,9 +20,19 @@ namespace GroupEMosaicMaker.Model
 
         #region Properties
 
+        /// <summary>
+        ///     The image width
+        /// </summary>
         private uint ImageWidth { get; }
+
+        /// <summary>
+        ///     The image Height
+        /// </summary>
         private uint ImageHeight { get; }
 
+        /// <summary>
+        ///     The image pixels
+        /// </summary>
         private byte[] SourcePixels { get; }
 
         #endregion
@@ -71,28 +81,6 @@ namespace GroupEMosaicMaker.Model
             }
         }
 
-        private Image chooseRandom(Collection<Image> images)
-        {
-            if (images.Count == 0)
-            {
-                throw new ArgumentException(nameof(images));
-            }
-
-            var min = 0;
-            var max = images.Count - 1;
-            Image chosenImage;
-            if (images.Count == 1)
-            {
-                chosenImage = images[0];
-            }
-            else
-            {
-                chosenImage = images[new Random().Next(min, max)];
-            }
-
-            return chosenImage;
-        }
-
         /// <summary>
         ///     Creates a picture mosaic with the specified block size and image palette
         /// </summary>
@@ -124,13 +112,12 @@ namespace GroupEMosaicMaker.Model
             var previous = new Collection<Image>();
             var tasks = new Collection<Task>();
             var aboveImageIndex = 0;
-            //var rowIndexOffset = 0;
-            var imageByteWidth = (int) this.ImageWidth * 4;
+            var imageByteWidth = (int)this.ImageWidth * 4;
             Image aboveImage = null;
 
             foreach (var index in this.getBlockStartingPoints(blockSize))
             {
-                var indexes = IndexMapper.Box(index, blockSize, (int) this.ImageWidth, (int) this.ImageHeight);
+                var indexes = IndexMapper.Box(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
                 IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
                 var averageColor = Painter.GetAverageColor(this.SourcePixels, indexes);
 
@@ -146,12 +133,6 @@ namespace GroupEMosaicMaker.Model
 
                     imageToUse = this.getRandomImage(indexes, palette, aboveImage, previous, disqualified,
                         cycleRemoved);
-
-                    //if (index % imageByteWidth == 0)
-                    //{
-                    //    disqualified.Clear();
-                    //    aboveImageIndex = 0;
-                    //}
                 }
 
                 if (cycle)
@@ -182,14 +163,86 @@ namespace GroupEMosaicMaker.Model
 
                 tasks.Add(task);
 
-                //TODO
-                //Alert user about possible null image
             }
 
             foreach (var task in tasks)
             {
                 await task;
             }
+        }
+
+        /// <summary>
+        ///     Creates the triangle mosaic.
+        /// </summary>
+        /// <param name="blockSize">Size of the block.</param>
+        public void CreateTriangleMosaic(int blockSize)
+        {
+            foreach (var index in this.getBlockStartingPoints(blockSize))
+            {
+                var indexMapperData =
+                    IndexMapper.Triangle(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
+                for (var collectionIndex = 0; collectionIndex < indexMapperData.Count; collectionIndex++)
+                {
+                    IndexMapper.ConvertEachIndexToMatchOffset(indexMapperData[collectionIndex], 4);
+                }
+
+                var left = indexMapperData[0];
+                var right = indexMapperData[1];
+
+                if (left.Length > 0)
+                {
+                    Painter.FillWithAverageColor(this.SourcePixels, left);
+                }
+
+                if (right.Length > 0)
+                {
+                    Painter.FillWithAverageColor(this.SourcePixels, right);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Creates the solid block mosaic with the specified block sizes
+        /// </summary>
+        /// <param name="blockSize"> the block size to use</param>
+        public void CreateSquareMosaic(int blockSize)
+        {
+            foreach (var index in this.getBlockStartingPoints(blockSize))
+            {
+                var indexes = IndexMapper.Box(index, blockSize, (int)this.ImageWidth, (int)this.ImageHeight);
+                IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
+                Painter.FillWithAverageColor(this.SourcePixels, indexes);
+            }
+        }
+
+        /// <summary>
+        ///     Converts the image to black and white
+        /// </summary>
+        public void ConvertImageToBlackAndWhite()
+        {
+            Painter.ConvertToBlackAndWhite(this.SourcePixels, (int)this.ImageWidth, (int)this.ImageHeight);
+        }
+
+        private Image chooseRandom(Collection<Image> images)
+        {
+            if (images.Count == 0)
+            {
+                throw new ArgumentException(nameof(images));
+            }
+
+            var min = 0;
+            var max = images.Count - 1;
+            Image chosenImage;
+            if (images.Count == 1)
+            {
+                chosenImage = images[0];
+            }
+            else
+            {
+                chosenImage = images[new Random().Next(min, max)];
+            }
+
+            return chosenImage;
         }
 
         private Image getRandomImage(int[] indexes, ImagePalette palette, Image aboveImage, Collection<Image> previous,
@@ -200,20 +253,8 @@ namespace GroupEMosaicMaker.Model
             var imagesToAvoid = disqualified.Concat(cycleRemoved).ToList();
 
             var randomSelectionSize = 8;
-            //if (randomSelectionSize > palette.OriginalImages.Count)
-            //{
-            //    randomSelectionSize = palette.OriginalImages.Count;
-            //}
 
             var disqualifiedSize = 6;
-            //if (palette.OriginalImages.Count == 0 || palette.OriginalImages.Count == 1)
-            //{
-            //    disqualifiedSize = 0;
-            //}
-            //else if (disqualifiedSize > palette.OriginalImages.Count)
-            //{
-            //    disqualifiedSize = palette.OriginalImages.Count - 1;
-            //}
 
             if (aboveImage != null)
             {
@@ -264,58 +305,6 @@ namespace GroupEMosaicMaker.Model
             return Math.Pow((color.R - averageColor.R) * .3, 2) +
                    Math.Pow((color.G - averageColor.G) * .59, 2) +
                    Math.Pow((color.B - averageColor.B) * .11, 2);
-        }
-
-        /// <summary>
-        ///     Creates the triangle mosaic.
-        /// </summary>
-        /// <param name="blockSize">Size of the block.</param>
-        public void CreateTriangleMosaic(int blockSize)
-        {
-            foreach (var index in this.getBlockStartingPoints(blockSize))
-            {
-                var indexMapperData =
-                    IndexMapper.Triangle(index, blockSize, (int) this.ImageWidth, (int) this.ImageHeight);
-                for (var collectionIndex = 0; collectionIndex < indexMapperData.Count; collectionIndex++)
-                {
-                    IndexMapper.ConvertEachIndexToMatchOffset(indexMapperData[collectionIndex], 4);
-                }
-
-                var left = indexMapperData[0];
-                var right = indexMapperData[1];
-
-                if (left.Length > 0)
-                {
-                    Painter.FillWithAverageColor(this.SourcePixels, left);
-                }
-
-                if (right.Length > 0)
-                {
-                    Painter.FillWithAverageColor(this.SourcePixels, right);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Creates the solid block mosaic with the specified block sizes
-        /// </summary>
-        /// <param name="blockSize"> the block size to use</param>
-        public void CreateSquareMosaic(int blockSize)
-        {
-            foreach (var index in this.getBlockStartingPoints(blockSize))
-            {
-                var indexes = IndexMapper.Box(index, blockSize, (int) this.ImageWidth, (int) this.ImageHeight);
-                IndexMapper.ConvertEachIndexToMatchOffset(indexes, 4);
-                Painter.FillWithAverageColor(this.SourcePixels, indexes);
-            }
-        }
-
-        /// <summary>
-        ///     Converts the image to black and white
-        /// </summary>
-        public void ConvertImageToBlackAndWhite()
-        {
-            Painter.ConvertToBlackAndWhite(this.SourcePixels, (int) this.ImageWidth, (int) this.ImageHeight);
         }
 
         private IEnumerable<int> getBlockStartingPoints(int blockSize)

@@ -69,6 +69,9 @@ namespace GroupEMosaicMaker.Model
             this.AverageColorDictionary.Clear();
         }
 
+        /// <summary>
+        ///     Changes the palette to use a new collection of images.
+        /// </summary>
         public void ChangeToNewCollection(ICollection<Image> images)
         {
             this.AverageColorDictionary.Clear();
@@ -79,6 +82,12 @@ namespace GroupEMosaicMaker.Model
             }
         }
 
+        /// <summary>
+        ///     Finds multiple images close to the color
+        /// </summary>
+        /// <returns>
+        ///     A collection of images
+        /// </returns>
         public Collection<Image> FindMultipleImagesClosestToColor(Color color, int imageCount,
             ICollection<Image> disqualified)
         {
@@ -111,6 +120,12 @@ namespace GroupEMosaicMaker.Model
             return images;
         }
 
+        /// <summary>
+        ///     Finds the most similar colors in the dictionary in order
+        /// </summary>
+        /// <returns>
+        ///     Am array of colors
+        /// </returns>
         public Color[] MostSimilarColorsInDictionaryTo(Color color)
         {
             var colors = new Collection<Color>(this.AverageColorDictionary.Keys.ToArray());
