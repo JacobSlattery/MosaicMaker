@@ -3,8 +3,10 @@ using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 using GroupEMosaicMaker.Model;
+using Image = GroupEMosaicMaker.Model.Image;
 
 namespace GroupEMosaicMaker.FileIO
 {

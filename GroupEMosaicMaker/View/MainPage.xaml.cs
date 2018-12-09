@@ -6,6 +6,7 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using GroupEMosaicMaker.ViewModel;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -91,6 +92,18 @@ namespace GroupEMosaicMaker.View
             catch (NullReferenceException)
             {
                 sourceFile = null;
+            }
+            catch (Exception)
+            {
+                var dialog = new ContentDialog()
+                {
+                    Title = "Invalid File",
+                    IsPrimaryButtonEnabled = true,
+                    DefaultButton = ContentDialogButton.Primary,
+                    PrimaryButtonText = "Ok"
+                    
+                };
+                await dialog.ShowAsync();
             }
 
             return sourceFile;
