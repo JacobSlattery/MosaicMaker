@@ -7,7 +7,7 @@ using Windows.UI;
 namespace GroupEMosaicMaker.Model
 {
     /// <summary>
-    /// Keeps track of a list of images and performs actions on them
+    ///     Keeps track of a list of images and performs actions on them
     /// </summary>
     public class ImagePalette
     {
@@ -51,7 +51,7 @@ namespace GroupEMosaicMaker.Model
         }
 
         /// <summary>
-        /// Removes the image.
+        ///     Removes the image.
         /// </summary>
         /// <param name="image">The image.</param>
         public void RemoveImage(Image image)
@@ -69,15 +69,24 @@ namespace GroupEMosaicMaker.Model
             this.AverageColorDictionary.Clear();
         }
 
+        public void ChangeToNewCollection(ICollection<Image> images)
+        {
+            this.AverageColorDictionary.Clear();
+            this.OriginalImages.Clear();
+            foreach (var image in images)
+            {
+                this.AddImage(image);
+            }
+        }
 
-
-        public Collection<Image> FindMultipleImagesClosestToColor(Color color, int imageCount, ICollection<Image> disqualified)
+        public Collection<Image> FindMultipleImagesClosestToColor(Color color, int imageCount,
+            ICollection<Image> disqualified)
         {
             var disqualifiedImages = this.ensureDisqualifiedIsNotTooRestrictive(disqualified);
 
             var images = new Collection<Image>();
             var orderedAvailableColors = this.MostSimilarColorsInDictionaryTo(color);
-            
+
             var currentIndex = 0;
             while (images.Count < imageCount)
             {
@@ -88,16 +97,15 @@ namespace GroupEMosaicMaker.Model
                 {
                     currentIndex++;
                 }
-                else if (images.Count == 0)
+                else if (images.Count == 0 && disqualifiedImages.Count > 0)
                 {
                     currentIndex = 0;
-                    disqualifiedImages.Clear();
+                    disqualifiedImages.RemoveAt(0);
                 }
                 else
                 {
                     break;
                 }
-                
             }
 
             return images;
@@ -131,7 +139,8 @@ namespace GroupEMosaicMaker.Model
             return disqualifiedImages;
         }
 
-        private void addImagesCloseToColor(int imageCount, Color currentColor, ICollection<Image> images, ICollection<Image> disqualifiedImages)
+        private void addImagesCloseToColor(int imageCount, Color currentColor, ICollection<Image> images,
+            ICollection<Image> disqualifiedImages)
         {
             foreach (var image in this.AverageColorDictionary[currentColor])
             {
@@ -150,8 +159,8 @@ namespace GroupEMosaicMaker.Model
             {
                 this.AverageColorDictionary.Add(color, new Collection<Image>());
             }
-            this.AverageColorDictionary[color].Add(image);
 
+            this.AverageColorDictionary[color].Add(image);
         }
 
         #endregion

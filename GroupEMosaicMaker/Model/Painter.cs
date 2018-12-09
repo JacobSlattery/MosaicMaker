@@ -53,7 +53,7 @@ namespace GroupEMosaicMaker.Model
 
         private static Color getPixelBgra8(byte[] pixels, int height, int width, uint imageWidth)
         {
-            var offset = (height * (int)imageWidth + width) * ByteOffset;
+            var offset = (height * (int) imageWidth + width) * ByteOffset;
             var red = pixels[offset + RedOffset];
             var green = pixels[offset + GreenOffset];
             var blue = pixels[offset + BlueOffset];
@@ -62,7 +62,7 @@ namespace GroupEMosaicMaker.Model
 
         private static void setPixelBgra8(byte[] pixels, int height, int width, Color color, uint imageWidth)
         {
-            var offset = (height * (int)imageWidth + width) * ByteOffset;
+            var offset = (height * (int) imageWidth + width) * ByteOffset;
             pixels[offset + RedOffset] = color.R;
             pixels[offset + GreenOffset] = color.G;
             pixels[offset + BlueOffset] = color.B;
@@ -120,7 +120,7 @@ namespace GroupEMosaicMaker.Model
         /// <param name="sourceBytes">The source bytes.</param>
         /// <param name="indexes">The indexes.</param>
         /// <returns></returns>
-        public static Color GetAverageColor(byte[] sourceBytes, IEnumerable<int> indexes=null)
+        public static Color GetAverageColor(byte[] sourceBytes, IEnumerable<int> indexes = null)
         {
             Collection<int> indexCollection;
             if (indexes == null)
@@ -135,7 +135,6 @@ namespace GroupEMosaicMaker.Model
             {
                 indexCollection = new Collection<int>(indexes.ToList());
             }
-
 
             var totalA = 0;
             var totalR = 0;

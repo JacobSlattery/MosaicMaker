@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
@@ -10,7 +9,7 @@ using GroupEMosaicMaker.Model;
 namespace GroupEMosaicMaker.FileIO
 {
     /// <summary>
-    /// The class that handles loading images
+    ///     The class that handles loading images
     /// </summary>
     public class ImageLoader
     {
@@ -22,14 +21,10 @@ namespace GroupEMosaicMaker.FileIO
 
         #endregion
 
-        #region Constructors  
-       
+        #region Methods
 
-        #endregion
-
-        #region Methods        
         /// <summary>
-        /// Loads a single image.
+        ///     Loads a single image.
         /// </summary>
         /// <param name="image">The image.</param>
         /// <returns> the workable image</returns>
@@ -39,7 +34,7 @@ namespace GroupEMosaicMaker.FileIO
         }
 
         /// <summary>
-        /// Loads a folder of images.
+        ///     Loads a folder of images.
         /// </summary>
         /// <param name="folder">The folder.</param>
         /// <returns> the palette created from the folder</returns>
@@ -54,7 +49,6 @@ namespace GroupEMosaicMaker.FileIO
                     var myImage = await this.createWorkableImage(image);
                     palette.AddImage(myImage);
                 }
-                
             }
 
             return palette;
@@ -96,7 +90,8 @@ namespace GroupEMosaicMaker.FileIO
 
         private bool determineIfFileIsValid(StorageFile file)
         {
-            return file.FileType.Equals(BmpFileType) || file.FileType.Equals(JpgFileType) || file.FileType.Equals(PngFileType);
+            return file.FileType.Equals(BmpFileType) || file.FileType.Equals(JpgFileType) ||
+                   file.FileType.Equals(PngFileType);
         }
 
         #endregion

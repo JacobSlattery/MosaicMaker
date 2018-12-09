@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace GroupEMosaicMaker.Model
 {
     /// <summary>
-    /// The index mapper class used to determine the indexes
+    ///     The index mapper class used to determine the indexes
     /// </summary>
     internal class IndexMapper
     {
-
+        #region Methods
 
         /// <summary>
-        /// Gets the indexes for the triangle at the specified start index.
+        ///     Gets the indexes for the triangle at the specified start index.
         /// </summary>
         /// <param name="startIndex">The start index.</param>
         /// <param name="boxSize">Size of the box.</param>
@@ -35,7 +32,7 @@ namespace GroupEMosaicMaker.Model
                 {
                     for (var j = 0; j < boxSize; j++)
                     {
-                        var relativeRowIndex = currentIndex - startIndex - (row*maxWidth);
+                        var relativeRowIndex = currentIndex - startIndex - row * maxWidth;
                         if (currentIndex - rowOffset < maxWidth)
                         {
                             if (relativeRowIndex - row <= 0)
@@ -47,16 +44,19 @@ namespace GroupEMosaicMaker.Model
                                 rightTriangle.Add(currentIndex);
                             }
                         }
+
                         currentIndex++;
                     }
                 }
+
                 currentIndex = currentIndex - boxSize + maxWidth;
             }
-            return new Collection<int[]>() {leftTriangle.ToArray(), rightTriangle.ToArray()};
+
+            return new Collection<int[]> {leftTriangle.ToArray(), rightTriangle.ToArray()};
         }
 
         /// <summary>
-        /// Gets the indexes for the grid at the specified start index.
+        ///     Gets the indexes for the grid at the specified start index.
         /// </summary>
         /// <param name="startIndex">The start index.</param>
         /// <param name="boxSize">Size of the box.</param>
@@ -64,7 +64,8 @@ namespace GroupEMosaicMaker.Model
         /// <param name="maxHeight">The maximum height.</param>
         /// <param name="includeDiagonalLine">if set to <c>true</c> [include diagonal line].</param>
         /// <returns> the indexes for the grid</returns>
-        public static int[] Grid(int startIndex, int boxSize, int maxWidth, int maxHeight, bool includeDiagonalLine=false)
+        public static int[] Grid(int startIndex, int boxSize, int maxWidth, int maxHeight,
+            bool includeDiagonalLine = false)
         {
             {
                 var indexes = new Collection<int>();
@@ -79,8 +80,8 @@ namespace GroupEMosaicMaker.Model
                     {
                         for (var j = 0; j < boxSize; j++)
                         {
-                            var relativeRowIndex = currentIndex - startIndex - (row * maxWidth);
-                            var isInBoxRange = (currentIndex - rowOffset < maxWidth);
+                            var relativeRowIndex = currentIndex - startIndex - row * maxWidth;
+                            var isInBoxRange = currentIndex - rowOffset < maxWidth;
 
                             if (isInBoxRange && isValidGridIndex(boxSize, row, relativeRowIndex, includeDiagonalLine))
                             {
@@ -94,17 +95,17 @@ namespace GroupEMosaicMaker.Model
                     currentIndex = currentIndex - boxSize + maxWidth;
                 }
 
-
                 return indexes.Distinct().ToArray();
             }
         }
 
-        private static bool isValidGridIndex(int boxSize, int row, int relativeRowIndex, bool includeDiagonalLine=false)
+        private static bool isValidGridIndex(int boxSize, int row, int relativeRowIndex,
+            bool includeDiagonalLine = false)
         {
-            var topWall = (row == 0);
-            var leftWall = (relativeRowIndex % boxSize == 0);
-            var bottomWall = (row == boxSize - 1);
-            var rightWall = ((relativeRowIndex + 1) % boxSize == 0);
+            var topWall = row == 0;
+            var leftWall = relativeRowIndex % boxSize == 0;
+            var bottomWall = row == boxSize - 1;
+            var rightWall = (relativeRowIndex + 1) % boxSize == 0;
 
             var isValid = topWall || leftWall || bottomWall || rightWall;
 
@@ -115,8 +116,6 @@ namespace GroupEMosaicMaker.Model
 
             return isValid;
         }
-
-        #region Methods
 
         /// <summary>
         ///     Finds the indexes for a box within a larger box. Uses bounds to ensure that indexes do not go outside the bounds of
@@ -156,13 +155,10 @@ namespace GroupEMosaicMaker.Model
             }
 
             return indexCollection.ToArray();
-
-
-
         }
 
         /// <summary>
-        /// Converts each index to match offset.
+        ///     Converts each index to match offset.
         /// </summary>
         /// <param name="indexes">The indexes.</param>
         /// <param name="offset">The offset.</param>

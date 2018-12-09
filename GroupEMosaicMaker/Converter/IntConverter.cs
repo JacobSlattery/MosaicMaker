@@ -4,7 +4,7 @@ using Windows.UI.Xaml.Data;
 namespace GroupEMosaicMaker.Converter
 {
     /// <summary>
-    /// converts strings to integers and integers to strings
+    ///     converts strings to integers and integers to strings
     /// </summary>
     /// <seealso cref="Windows.UI.Xaml.Data.IValueConverter" />
     public class IntConverter : IValueConverter

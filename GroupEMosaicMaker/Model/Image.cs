@@ -7,44 +7,43 @@ using Windows.UI.Xaml.Media.Imaging;
 namespace GroupEMosaicMaker.Model
 {
     /// <summary>
-    /// The class that keeps track of the properties for a image object and performs actions on the image
+    ///     The class that keeps track of the properties for a image object and performs actions on the image
     /// </summary>
     public class Image
     {
         #region Properties
 
         /// <summary>
-        /// Gets or sets the source pixels.
+        ///     Gets or sets the source pixels.
         /// </summary>
         /// <value>
-        /// The source pixels.
+        ///     The source pixels.
         /// </value>
         public byte[] SourcePixels { get; set; }
 
         /// <summary>
-        /// Gets or sets the decoder.
+        ///     Gets or sets the decoder.
         /// </summary>
         /// <value>
-        /// The decoder.
+        ///     The decoder.
         /// </value>
         public BitmapDecoder Decoder { get; set; }
 
         /// <summary>
-        /// Gets or sets the thumbnail.
+        ///     Gets or sets the thumbnail.
         /// </summary>
         /// <value>
-        /// The thumbnail.
+        ///     The thumbnail.
         /// </value>
         public BitmapImage Thumbnail { get; set; }
 
         /// <summary>
-        /// Gets or sets the modified pixels.
+        ///     Gets or sets the modified pixels.
         /// </summary>
         /// <value>
-        /// The modified pixels.
+        ///     The modified pixels.
         /// </value>
         public byte[] ModifiedPixels { get; set; }
-
 
         public Color AverageColor { get; set; }
 
@@ -53,7 +52,7 @@ namespace GroupEMosaicMaker.Model
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Image"/> class.
+        ///     Initializes a new instance of the <see cref="Image" /> class.
         /// </summary>
         /// <param name="pixels">The pixels.</param>
         /// <param name="decoder">The decoder.</param>
@@ -67,18 +66,19 @@ namespace GroupEMosaicMaker.Model
             this.AverageColor = Painter.GetAverageColor(pixels);
         }
 
-
         #endregion
 
+        #region Methods
+
         /// <summary>
-        /// Resizes the image.
+        ///     Resizes the image.
         /// </summary>
         /// <param name="size">The size.</param>
         public async Task ResizeImage(int size)
         {
             var transform = new BitmapTransform {
                 ScaledWidth = Convert.ToUInt32(size),
-                ScaledHeight = Convert.ToUInt32(size) 
+                ScaledHeight = Convert.ToUInt32(size)
             };
 
             var pixelData = await this.Decoder.GetPixelDataAsync(
@@ -90,8 +90,8 @@ namespace GroupEMosaicMaker.Model
             );
 
             this.ModifiedPixels = pixelData.DetachPixelData();
-
         }
 
+        #endregion
     }
 }

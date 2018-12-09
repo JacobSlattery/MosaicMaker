@@ -1,21 +1,23 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 using GroupEMosaicMaker.Extension;
 using GroupEMosaicMaker.FileIO;
 using GroupEMosaicMaker.Model;
 using GroupEMosaicMaker.Utility;
-using System.Collections.Generic;
 using GroupEMosaicMaker.View;
+using Image = GroupEMosaicMaker.Model.Image;
 
 namespace GroupEMosaicMaker.ViewModel
 {
     /// <summary>
-    /// The main paige view model
+    ///     The main paige view model
     /// </summary>
     /// <seealso cref="System.ComponentModel.INotifyPropertyChanged" />
     public class MainPageViewModel : INotifyPropertyChanged
@@ -25,46 +27,56 @@ namespace GroupEMosaicMaker.ViewModel
         private const int DefaultGridSetting = 25;
         private const int DefaultLastUsedBlockSize = 0;
 
+        private readonly GridView gridView;
         private StorageFile sourceFile;
+        private readonly ImageLoader imageLoader;
         private WriteableBitmap displayImage;
         private WriteableBitmap resultImage;
+        private WriteableBitmap currentImage;
+        private WriteableBitmap currentImageWithGrid;
+        private ImageManipulator manipulatorForGridImage;
+        private ImageManipulator manipulatorForResultImage;
+        private Image propertiesOfImageWithGrid;
+        private Image propertiesOfImageWithMosaic;
+        private Image selectedImage;
+        private ObservableCollection<Image> imageCollection;
+        private ImagePalette imagePalette;
+
+        private int countOfImagesInPalette;
+
         private bool grid;
         private bool squareMosaic;
         private bool triangleMosaic;
         private bool pictureMosaic;
-        private int blockSize;
-        private ImageManipulator manipulatorForGridImage;
-        private ImageManipulator manipulatorForResultImage;
-        private readonly ImageLoader imageLoader;
-        private Image propertiesOfImageWithGrid;
-        private Image propertiesOfImageWithMosaic;
-
-        private WriteableBitmap currentImage;
-        private WriteableBitmap currentImageWithGrid;
-        private ObservableCollection<Image> imagePalette;
-        private Image selectedImage;
-        private ImagePalette palette;
-
         private bool zoomImage;
+        private bool blackAndWhiteCreated;
+        private bool juxtaposition;
+        private bool selectMultipleImages;
+        private bool useEachImageOnce;
+        private bool useSelectedImages;
 
-        private int countOfImagesInPalette;
-
+        private bool lastJuxtaposition;
+        private bool lastUseEachImageOnceSelection;
         private int lastUsedBlockSizeForSquareMosaic;
         private int lastUsedBlockSizeForPictureMosaic;
         private int lastUsedBlockSizeForTriangleMosaic;
-        private bool blackAndWhiteCreated;
-
-        private bool randomize;
-        private bool lastRandomizeSelection;
-
-        private bool useSelectedImages;
-
-        private bool useEachImageOnce;
-        private bool lastUseEachImageOnceSelection;
+        private bool lastUseSelectedImages;
+        private int blockSize;
 
         #endregion
 
         #region Properties
+
+        public bool UseSelectedImages
+        {
+            get => this.useSelectedImages;
+            set
+            {
+                this.useSelectedImages = value;
+                this.ConvertCommand.OnCanExecuteChanged();
+                this.OnPropertyChanged();
+            }
+        }
 
         public bool UseEachImageOnce
         {
@@ -78,43 +90,43 @@ namespace GroupEMosaicMaker.ViewModel
         }
 
         /// <summary>
-        /// Gets and sets whether or not the use selected images was selected  
+        ///     Gets and sets whether the user can select multiple images
         /// </summary>
         /// <value>
-        /// <c> true</c> if [use selected images]; otherwise, <c>false</c>
+        ///     <c> true</c> if [select multiple images]; otherwise, <c>false</c>
         /// </value>
-        public bool UseSelectedImages
+        public bool SelectMultipleImages
         {
-            get => this.useSelectedImages;
+            get => this.selectMultipleImages;
             set
             {
-                this.useSelectedImages = value;
+                this.selectMultipleImages = value;
                 this.OnPropertyChanged();
             }
         }
 
         /// <summary>
-        /// Gets and sets whether or not the randomize was selected  
+        ///     Gets and sets whether or not the juxtaposition was selected
         /// </summary>
         /// <value>
-        /// <c> true</c> if [randomize]; otherwise, <c>false</c>
+        ///     <c> true</c> if [juxtaposition]; otherwise, <c>false</c>
         /// </value>
-        public bool Randomize
+        public bool Juxtaposition
         {
-            get => this.randomize;
+            get => this.juxtaposition;
             set
             {
-                this.randomize = value;
+                this.juxtaposition = value;
                 this.ConvertCommand.OnCanExecuteChanged();
                 this.OnPropertyChanged();
             }
         }
 
         /// <summary>
-        /// Gets and sets whether or not the black and white image was created 
+        ///     Gets and sets whether or not the black and white image was created
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [black and white created]; otherwise, <c>false</c>.
+        ///     <c>true</c> if [black and white created]; otherwise, <c>false</c>.
         /// </value>
         public bool BlackAndWhiteCreated
         {
@@ -129,9 +141,9 @@ namespace GroupEMosaicMaker.ViewModel
         }
 
         /// <summary>
-        /// Gets or sets the number of images in the image palette 
+        ///     Gets or sets the number of images in the image imagePalette
         /// </summary>
-        /// <value> the count of images in the palette</value>
+        /// <value> the count of images in the imagePalette</value>
         public int CountOfImagesInPalette
         {
             get => this.countOfImagesInPalette;
@@ -143,10 +155,10 @@ namespace GroupEMosaicMaker.ViewModel
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [zoom image].
+        ///     Gets or sets a value indicating whether [zoom image].
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [zoom image]; otherwise, <c>false</c>.
+        ///     <c>true</c> if [zoom image]; otherwise, <c>false</c>.
         /// </value>
         public bool ZoomImage
         {
@@ -159,10 +171,10 @@ namespace GroupEMosaicMaker.ViewModel
         }
 
         /// <summary>
-        /// Gets or sets the selected image.
+        ///     Gets or sets the selected image.
         /// </summary>
         /// <value>
-        /// The selected image.
+        ///     The selected image.
         /// </value>
         public Image SelectedImage
         {
@@ -176,29 +188,30 @@ namespace GroupEMosaicMaker.ViewModel
         }
 
         /// <summary>
-        /// Gets or sets the image palette.
+        ///     Gets or sets the image collection.
         /// </summary>
         /// <value>
-        /// The image palette.
+        ///     The image collection.
         /// </value>
-        public ObservableCollection<Image> ImagePalette
+        public ObservableCollection<Image> ImageCollection
         {
-            get => this.imagePalette;
+            get => this.imageCollection;
             set
             {
-                this.imagePalette = value;
+                this.imageCollection = value;
                 this.ConvertCommand.OnCanExecuteChanged();
                 this.RemoveImageFromPaletteCommand.OnCanExecuteChanged();
                 this.ClearImagePaletteCommand.OnCanExecuteChanged();
+                this.SelectMultipleCommand.OnCanExecuteChanged();
                 this.OnPropertyChanged();
             }
         }
 
         /// <summary>
-        /// Gets or sets the source file.
+        ///     Gets or sets the source file.
         /// </summary>
         /// <value>
-        /// The source file.
+        ///     The source file.
         /// </value>
         public StorageFile SourceFile
         {
@@ -211,10 +224,10 @@ namespace GroupEMosaicMaker.ViewModel
         }
 
         /// <summary>
-        /// Gets or sets the display image.
+        ///     Gets or sets the display image.
         /// </summary>
         /// <value>
-        /// The display image.
+        ///     The display image.
         /// </value>
         public WriteableBitmap DisplayImage
         {
@@ -228,10 +241,10 @@ namespace GroupEMosaicMaker.ViewModel
         }
 
         /// <summary>
-        /// Gets or sets the result image.
+        ///     Gets or sets the result image.
         /// </summary>
         /// <value>
-        /// The result image.
+        ///     The result image.
         /// </value>
         public WriteableBitmap ResultImage
         {
@@ -246,10 +259,10 @@ namespace GroupEMosaicMaker.ViewModel
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="MainPageViewModel"/> is grid.
+        ///     Gets or sets a value indicating whether this <see cref="MainPageViewModel" /> is grid.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if grid; otherwise, <c>false</c>.
+        ///     <c>true</c> if grid; otherwise, <c>false</c>.
         /// </value>
         public bool Grid
         {
@@ -262,15 +275,16 @@ namespace GroupEMosaicMaker.ViewModel
                     this.updateGrid();
                     this.updateDisplayImage();
                 }
+
                 this.OnPropertyChanged();
             }
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [square mosaic].
+        ///     Gets or sets a value indicating whether [square mosaic].
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [square mosaic]; otherwise, <c>false</c>.
+        ///     <c>true</c> if [square mosaic]; otherwise, <c>false</c>.
         /// </value>
         public bool SquareMosaic
         {
@@ -282,17 +296,17 @@ namespace GroupEMosaicMaker.ViewModel
                 {
                     this.updateGrid();
                     this.updateDisplayImage();
-
                 }
+
                 this.OnPropertyChanged();
             }
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [triangle mosaic].
+        ///     Gets or sets a value indicating whether [triangle mosaic].
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [triangle mosaic]; otherwise, <c>false</c>.
+        ///     <c>true</c> if [triangle mosaic]; otherwise, <c>false</c>.
         /// </value>
         public bool TriangleMosaic
         {
@@ -305,15 +319,16 @@ namespace GroupEMosaicMaker.ViewModel
                     this.updateGrid();
                     this.updateDisplayImage();
                 }
+
                 this.OnPropertyChanged();
             }
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [picture mosaic].
+        ///     Gets or sets a value indicating whether [picture mosaic].
         /// </summary>
         /// <value>
-        ///   <c>true</c> if [picture mosaic]; otherwise, <c>false</c>.
+        ///     <c>true</c> if [picture mosaic]; otherwise, <c>false</c>.
         /// </value>
         public bool PictureMosaic
         {
@@ -326,15 +341,16 @@ namespace GroupEMosaicMaker.ViewModel
                     this.updateGrid();
                     this.updateDisplayImage();
                 }
+
                 this.OnPropertyChanged();
             }
         }
 
         /// <summary>
-        /// Gets or sets the size of the block.
+        ///     Gets or sets the size of the block.
         /// </summary>
         /// <value>
-        /// The size of the block.
+        ///     The size of the block.
         /// </value>
         public int BlockSize
         {
@@ -353,19 +369,7 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
-        /// <summary>
-        /// Updates the grid.
-        /// </summary>
-        private void updateGrid()
-        {
-            this.manipulatorForGridImage = new ImageManipulator(this.propertiesOfImageWithGrid.Decoder.PixelWidth,
-                this.propertiesOfImageWithGrid.Decoder.PixelHeight, this.propertiesOfImageWithGrid.SourcePixels);
-            this.manipulatorForGridImage.DrawGrid(this.BlockSize, this.TriangleMosaic);
-            this.currentImageWithGrid = new WriteableBitmap((int)this.propertiesOfImageWithGrid.Decoder.PixelWidth,
-                (int)this.propertiesOfImageWithGrid.Decoder.PixelHeight);
-            this.writeStreamOfPixels(this.currentImageWithGrid,
-                this.manipulatorForGridImage.RetrieveModifiedPixels());
-        }
+        public RelayCommand SelectMultipleCommand { get; set; }
 
         /// <summary>
         ///     Gets or sets the save to file command.
@@ -378,53 +382,52 @@ namespace GroupEMosaicMaker.ViewModel
         public RelayCommand LoadFileCommand { get; set; }
 
         /// <summary>
-        /// Gets or sets the convert command.
+        ///     Gets or sets the convert command.
         /// </summary>
         /// <value>
-        /// The convert command.
+        ///     The convert command.
         /// </value>
         public RelayCommand ConvertCommand { get; set; }
 
         /// <summary>
-        /// Gets or sets the load image palette command.
+        ///     Gets or sets the load image imagePalette command.
         /// </summary>
         /// <value>
-        /// The load image palette command.
+        ///     The load image imagePalette command.
         /// </value>
         public RelayCommand LoadImagePaletteCommand { get; set; }
 
         /// <summary>
-        /// Gets or sets the convert to black and white command.
+        ///     Gets or sets the convert to black and white command.
         /// </summary>
         /// <value>
-        /// The convert to black and white command.
+        ///     The convert to black and white command.
         /// </value>
         public RelayCommand ConvertToBlackAndWhiteCommand { get; set; }
 
         /// <summary>
-        /// Gets or sets the add image to palette command.
+        ///     Gets or sets the add image to imagePalette command.
         /// </summary>
         /// <value>
-        /// The add image to palette command.
+        ///     The add image to imagePalette command.
         /// </value>
         public RelayCommand AddImageToPaletteCommand { get; set; }
 
         /// <summary>
-        /// Gets or sets the remove image from palette command.
+        ///     Gets or sets the remove image from imagePalette command.
         /// </summary>
         /// <value>
-        /// The remove image from palette command.
+        ///     The remove image from imagePalette command.
         /// </value>
         public RelayCommand RemoveImageFromPaletteCommand { get; set; }
 
         /// <summary>
-        /// Gets or sets the clear image palette command.
+        ///     Gets or sets the clear image imagePalette command.
         /// </summary>
         /// <value>
-        /// The clear image palette command.
+        ///     The clear image imagePalette command.
         /// </value>
         public RelayCommand ClearImagePaletteCommand { get; set; }
-
 
         #endregion
 
@@ -433,58 +436,43 @@ namespace GroupEMosaicMaker.ViewModel
         /// <summary>
         ///     Initializes a new instance of the <see cref="MainPageViewModel" /> class.
         /// </summary>
-        public MainPageViewModel()
+        public MainPageViewModel(GridView gridView)
         {
             this.loadCommands();
             this.loadProperties();
             this.imageLoader = new ImageLoader();
             this.propertiesOfImageWithGrid = null;
             this.propertiesOfImageWithMosaic = null;
-            this.imagePalette = new ObservableCollection<Image>();
-            this.palette = new ImagePalette();
+            this.imageCollection = new ObservableCollection<Image>();
+            this.imagePalette = new ImagePalette();
+            this.gridView = gridView;
         }
 
         #endregion
 
-        #region Methods     
+        #region Methods
 
         /// <summary>
-        /// Adds the selected images to the image palette
-        /// </summary>
-        /// <param name="images"> the images to be added to the palette</param>
-        public void AddSelectedImages(IList<object> images)
-        {
-            this.palette.ClearPalette();
-            var selectedImages = new List<Image>();
-            foreach (Image current in images)
-            {
-                selectedImages.Add(current);
-            }
-            foreach (var current in selectedImages)
-            {
-                this.palette.AddImage(current);
-            }
-        }
-
-        /// <summary>
-        /// Adds all the images in the image palette to the palette 
-        /// </summary>
-        public void AddAllImages()
-        {
-            foreach (var image in this.ImagePalette)
-            {
-                this.palette.AddImage(image);
-            }
-
-        }
-
-        /// <summary>
-        /// Occurs when a property value changes.
+        ///     Occurs when a property value changes.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
-        /// Called when [property changed].
+        ///     Updates the grid.
+        /// </summary>
+        private void updateGrid()
+        {
+            this.manipulatorForGridImage = new ImageManipulator(this.propertiesOfImageWithGrid.Decoder.PixelWidth,
+                this.propertiesOfImageWithGrid.Decoder.PixelHeight, this.propertiesOfImageWithGrid.SourcePixels);
+            this.manipulatorForGridImage.DrawGrid(this.BlockSize, this.TriangleMosaic);
+            this.currentImageWithGrid = new WriteableBitmap((int) this.propertiesOfImageWithGrid.Decoder.PixelWidth,
+                (int) this.propertiesOfImageWithGrid.Decoder.PixelHeight);
+            this.writeStreamOfPixels(this.currentImageWithGrid,
+                this.manipulatorForGridImage.RetrieveModifiedPixels());
+        }
+
+        /// <summary>
+        ///     Called when [property changed].
         /// </summary>
         /// <param name="propertyName">Name of the property.</param>
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -498,15 +486,37 @@ namespace GroupEMosaicMaker.ViewModel
             this.SaveToFileCommand = new RelayCommand(this.saveToFile, this.canSaveToFile);
             this.ConvertCommand = new RelayCommand(this.convert, this.canConvert);
             this.LoadImagePaletteCommand = new RelayCommand(this.loadPalette, this.canLoadPalette);
-            this.ConvertToBlackAndWhiteCommand = new RelayCommand(this.convertToBlackAndWhite, this.canCanConvertToBlackAndWhite);
+            this.ConvertToBlackAndWhiteCommand =
+                new RelayCommand(this.convertToBlackAndWhite, this.canCanConvertToBlackAndWhite);
             this.AddImageToPaletteCommand = new RelayCommand(this.addImageToPalette, this.canAddImageToPalette);
-            this.RemoveImageFromPaletteCommand = new RelayCommand(this.removeImageFromPalette, this.canRemoveImageFromPalette);
+            this.RemoveImageFromPaletteCommand =
+                new RelayCommand(this.removeImageFromPalette, this.canRemoveImageFromPalette);
             this.ClearImagePaletteCommand = new RelayCommand(this.clearImagePalette, this.canClearImagePalette);
+            this.SelectMultipleCommand = new RelayCommand(this.selectMultiple, this.canSelectMultiple);
+        }
+
+        private bool canSelectMultiple(object obj)
+        {
+            return this.ImageCollection.Count > 1;
+        }
+
+        private void selectMultiple(object obj)
+        {
+            if (this.SelectMultipleImages)
+            {
+                this.gridView.SelectionMode = ListViewSelectionMode.Multiple;
+            }
+            else
+            {
+                this.gridView.SelectionMode = ListViewSelectionMode.Single;
+            }
+
+            this.OnPropertyChanged();
         }
 
         private bool canClearImagePalette(object obj)
         {
-            return this.ImagePalette.Count != 0;
+            return this.ImageCollection.Count > 0;
         }
 
         private void clearImagePalette(object obj)
@@ -521,10 +531,9 @@ namespace GroupEMosaicMaker.ViewModel
 
         private void removeImageFromPalette(object obj)
         {
-            this.palette.RemoveImage(this.SelectedImage);
-            this.CountOfImagesInPalette = this.palette.OriginalImages.Count;
-            this.ImagePalette = this.palette.OriginalImages.ToObservableCollection();
-
+            this.imagePalette.RemoveImage(this.SelectedImage);
+            this.CountOfImagesInPalette = this.imagePalette.OriginalImages.Count;
+            this.ImageCollection = this.imagePalette.OriginalImages.ToObservableCollection();
         }
 
         private bool canAddImageToPalette(object obj)
@@ -538,9 +547,9 @@ namespace GroupEMosaicMaker.ViewModel
             if (file != null)
             {
                 var image = await this.imageLoader.LoadImage(file);
-                this.palette.AddImage(image);
-                this.CountOfImagesInPalette = this.palette.OriginalImages.Count;
-                this.ImagePalette = this.palette.OriginalImages.ToObservableCollection();
+                this.imagePalette.AddImage(image);
+                this.CountOfImagesInPalette = this.imagePalette.OriginalImages.Count;
+                this.ImageCollection = this.imagePalette.OriginalImages.ToObservableCollection();
             }
         }
 
@@ -552,74 +561,93 @@ namespace GroupEMosaicMaker.ViewModel
         private void convertToBlackAndWhite(object obj)
         {
             this.manipulatorForResultImage.ConvertImageToBlackAndWhite();
-            this.ResultImage = new WriteableBitmap((int)this.propertiesOfImageWithMosaic.Decoder.PixelWidth, (int)this.propertiesOfImageWithMosaic.Decoder.PixelHeight);
+            this.ResultImage = new WriteableBitmap((int) this.propertiesOfImageWithMosaic.Decoder.PixelWidth,
+                (int) this.propertiesOfImageWithMosaic.Decoder.PixelHeight);
             this.writeStreamOfPixels(this.ResultImage, this.manipulatorForResultImage.RetrieveModifiedPixels());
             this.BlackAndWhiteCreated = true;
         }
 
         private void loadProperties()
         {
-            this.DisplayImage = null;
+            this.displayImage = null;
             this.currentImageWithGrid = null;
             this.currentImage = null;
-            this.ResultImage = null;
-            this.SourceFile = null;
-            this.BlockSize = DefaultGridSetting;
-            this.Grid = false;
+            this.resultImage = null;
+            this.sourceFile = null;
+            this.blockSize = DefaultGridSetting;
+            this.grid = false;
             this.SquareMosaic = true;
-            this.randomize = false;
+            this.juxtaposition = false;
         }
 
         private bool canLoadPalette(object obj)
         {
-            return this.imagePalette != null;
+            return this.ImageCollection != null;
         }
 
         private async void loadPalette(object obj)
         {
-            this.resetImagePalette();
             var folder = await MainPage.SelectImagePaletteFolder();
             if (folder != null)
             {
-                this.palette = await this.imageLoader.LoadImages(folder);
-                this.CountOfImagesInPalette = this.palette.OriginalImages.Count;
-                this.ImagePalette = this.palette.OriginalImages.ToObservableCollection();
+                this.resetImagePalette();
+                this.imagePalette = await this.imageLoader.LoadImages(folder);
+                this.CountOfImagesInPalette = this.imagePalette.OriginalImages.Count;
+                this.ImageCollection = this.imagePalette.OriginalImages.ToObservableCollection();
             }
-            
         }
 
         private void resetImagePalette()
         {
-            this.palette.ClearPalette();
-            this.palette.AverageColorDictionary.Clear();
-            this.CountOfImagesInPalette = this.palette.OriginalImages.Count;
-            this.ImagePalette = this.palette.OriginalImages.ToObservableCollection();
+            this.imagePalette.ClearPalette();
+            this.imagePalette.AverageColorDictionary.Clear();
+            this.CountOfImagesInPalette = this.imagePalette.OriginalImages.Count;
+            this.ImageCollection = this.imagePalette.OriginalImages.ToObservableCollection();
         }
 
         private bool canConvert(object obj)
         {
+            bool value;
             if (this.SquareMosaic)
             {
-               
-                return (this.DisplayImage != null && this.BlockSize != this.lastUsedBlockSizeForSquareMosaic) || this.BlackAndWhiteCreated;
-                
-            } else if (this.PictureMosaic)
+                value = this.DisplayImage != null && this.BlockSize != this.lastUsedBlockSizeForSquareMosaic ||
+                        this.BlackAndWhiteCreated;
+            }
+            else if (this.PictureMosaic)
             {
-                return (this.DisplayImage != null && this.ImagePalette.Count != 0 && this.BlockSize != this.lastUsedBlockSizeForPictureMosaic) 
-                       || (this.BlackAndWhiteCreated && this.ImagePalette.Count != 0 || this.Randomize != this.lastRandomizeSelection || this.UseEachImageOnce != this.lastUseEachImageOnceSelection);
+                value = this.UseEachImageOnce != this.lastUseEachImageOnceSelection;
+                if (this.UseSelectedImages)
+                {
+                    var selectedImages = this.gridView.SelectedItems.Cast<Image>().ToList();
+                    value = value ||
+                            this.DisplayImage != null && selectedImages.Count != 0 &&
+                            (this.BlockSize != this.lastUsedBlockSizeForPictureMosaic || this.Juxtaposition || this.lastJuxtaposition != this.Juxtaposition || this.UseSelectedImages != this.lastUseSelectedImages) ||
+                            this.BlackAndWhiteCreated && selectedImages.Count != 0;
+
+                }
+                else
+                {
+                    value = value ||
+                            this.DisplayImage != null && this.ImageCollection.Count != 0 &&
+                            (this.BlockSize != this.lastUsedBlockSizeForPictureMosaic || this.Juxtaposition || this.lastJuxtaposition != this.Juxtaposition || this.UseSelectedImages != this.lastUseSelectedImages) ||
+                            this.BlackAndWhiteCreated && this.ImageCollection.Count != 0;
+
+
+                }
             }
             else
-            { 
-                return (this.DisplayImage != null && this.BlockSize != this.lastUsedBlockSizeForTriangleMosaic) || this.BlackAndWhiteCreated;
+            {
+                value = this.DisplayImage != null && this.BlockSize != this.lastUsedBlockSizeForTriangleMosaic ||
+                        this.BlackAndWhiteCreated;
             }
+
+            return value;
         }
 
         private async void convert(object obj)
         {
             await this.handleCreatingMosaic();
             this.BlackAndWhiteCreated = false;
-            this.UseSelectedImages = false;
-
         }
 
         private async void loadFile(object obj)
@@ -629,9 +657,8 @@ namespace GroupEMosaicMaker.ViewModel
             if (file != null)
             {
                 this.SourceFile = file;
-                await this.handleNewImageFile();
+                await this.updatePropertiesWithNewImageFile();
                 this.resetLastUsedBlockSizes();
-
                 this.ResultImage = null;
             }
         }
@@ -648,21 +675,19 @@ namespace GroupEMosaicMaker.ViewModel
             }
         }
 
-        private async Task handleNewImageFile()
+        private async Task updatePropertiesWithNewImageFile()
         {
             this.propertiesOfImageWithGrid = await this.imageLoader.LoadImage(this.SourceFile);
 
-
-            var width = (int)this.propertiesOfImageWithGrid.Decoder.PixelWidth;
-            var height = (int)this.propertiesOfImageWithGrid.Decoder.PixelHeight;
+            var width = (int) this.propertiesOfImageWithGrid.Decoder.PixelWidth;
+            var height = (int) this.propertiesOfImageWithGrid.Decoder.PixelHeight;
             var pixels = this.propertiesOfImageWithGrid.SourcePixels;
             this.currentImage = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.currentImage, pixels);
 
-            this.manipulatorForGridImage = new ImageManipulator((uint)width,
-                (uint)height, pixels);
-            this.manipulatorForResultImage = new ImageManipulator((uint)width, (uint)height, pixels);
-
+            this.manipulatorForGridImage = new ImageManipulator((uint) width,
+                (uint) height, pixels);
+            this.manipulatorForResultImage = new ImageManipulator((uint) width, (uint) height, pixels);
 
             this.manipulatorForGridImage.DrawGrid(this.BlockSize, this.TriangleMosaic);
             this.currentImageWithGrid = new WriteableBitmap(width, height);
@@ -675,11 +700,11 @@ namespace GroupEMosaicMaker.ViewModel
             this.resetLastUsedBlockSizes();
             this.propertiesOfImageWithMosaic = await this.imageLoader.LoadImage(this.SourceFile);
 
-            var width = (int)this.propertiesOfImageWithMosaic.Decoder.PixelWidth;
-            var height = (int)this.propertiesOfImageWithMosaic.Decoder.PixelHeight;
+            var width = (int) this.propertiesOfImageWithMosaic.Decoder.PixelWidth;
+            var height = (int) this.propertiesOfImageWithMosaic.Decoder.PixelHeight;
             var pixels = this.propertiesOfImageWithMosaic.SourcePixels;
 
-            this.manipulatorForResultImage = new ImageManipulator((uint)width, (uint)height, pixels);
+            this.manipulatorForResultImage = new ImageManipulator((uint) width, (uint) height, pixels);
             if (this.SquareMosaic)
             {
                 this.manipulatorForResultImage.CreateSquareMosaic(this.BlockSize);
@@ -687,21 +712,22 @@ namespace GroupEMosaicMaker.ViewModel
             }
             else if (this.PictureMosaic)
             {
-                if (this.Randomize || this.UseEachImageOnce)
+                if (this.UseSelectedImages)
                 {
-                    await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette, this.Randomize, this.UseEachImageOnce);
-                    this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
-                    this.lastRandomizeSelection = this.Randomize;
-                    this.lastUseEachImageOnceSelection = this.UseEachImageOnce;
+                    var selectedImages = this.gridView.SelectedItems.Cast<Image>().ToList();
+                    this.imagePalette.ChangeToNewCollection(selectedImages);
                 }
                 else
                 {
-                    await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.palette, this.Randomize, this.useEachImageOnce);
-                    this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
-                    this.lastRandomizeSelection = this.Randomize;
-                    this.lastUseEachImageOnceSelection = this.UseEachImageOnce;
+                    this.imagePalette.ChangeToNewCollection(this.ImageCollection);
                 }
-                
+
+                await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.imagePalette,
+                    this.Juxtaposition, this.UseEachImageOnce);
+                this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
+                this.lastUseEachImageOnceSelection = this.UseEachImageOnce;
+                this.lastUseSelectedImages = this.UseSelectedImages;
+                this.lastJuxtaposition = this.Juxtaposition;
             }
             else
             {
@@ -711,7 +737,6 @@ namespace GroupEMosaicMaker.ViewModel
 
             this.ResultImage = new WriteableBitmap(width, height);
             this.writeStreamOfPixels(this.ResultImage, this.manipulatorForResultImage.RetrieveModifiedPixels());
-
         }
 
         private void resetLastUsedBlockSizes()

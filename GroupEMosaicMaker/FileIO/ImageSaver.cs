@@ -9,14 +9,14 @@ using GroupEMosaicMaker.Model;
 namespace GroupEMosaicMaker.FileIO
 {
     /// <summary>
-    /// the class that handles saving images
+    ///     the class that handles saving images
     /// </summary>
     public class ImageSaver
     {
         #region Methods
 
         /// <summary>
-        /// Saves the image.
+        ///     Saves the image.
         /// </summary>
         /// <param name="saveFile">The save file.</param>
         /// <param name="bitMapToSave">The bit map to save.</param>
