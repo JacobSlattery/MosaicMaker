@@ -65,6 +65,51 @@ namespace GroupEMosaicMaker.ViewModel
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// gets or sets the last used block size for the square mosaic 
+        /// </summary>
+        /// <value> the last used block size for the square mosaic</value>
+        public int LastUsedBlockSizeForSquareMosaic
+        {
+            get => this.lastUsedBlockSizeForSquareMosaic;
+            set
+            {
+                this.lastUsedBlockSizeForSquareMosaic = value;
+                this.ConvertCommand.OnCanExecuteChanged();
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// gets or sets the last used block size for the picture mosaic 
+        /// </summary>
+        /// <value> the last used block size for the picture mosaic</value>
+        public int LastUsedBlockSizeForPictureMosaic
+        {
+            get => this.lastUsedBlockSizeForPictureMosaic;
+            set
+            {
+                this.lastUsedBlockSizeForPictureMosaic = value;
+                this.ConvertCommand.OnCanExecuteChanged();
+                this.OnPropertyChanged();
+            }
+        }
+        /// <summary>
+        /// gets or sets the last used block size for the triangle mosaic 
+        /// </summary>
+        /// <value> the last used block size for the triangle mosaic</value>
+        public int LastUsedBlockSizeForTriangleMosaic
+        {
+            get => this.lastUsedBlockSizeForTriangleMosaic;
+            set
+            {
+                this.lastUsedBlockSizeForTriangleMosaic = value;
+                this.ConvertCommand.OnCanExecuteChanged();
+                this.OnPropertyChanged();
+            }
+        }
+
         /// <summary>
         ///     Gets and sets whether to use the selected images
         /// </summary>
@@ -604,7 +649,7 @@ namespace GroupEMosaicMaker.ViewModel
             bool value;
             if (this.SquareMosaic)
             {
-                value = this.DisplayImage != null && this.BlockSize != this.lastUsedBlockSizeForSquareMosaic ||
+                value = this.DisplayImage != null && this.BlockSize != this.LastUsedBlockSizeForSquareMosaic ||
                         this.BlackAndWhiteCreated;
             }
             else if (this.PictureMosaic)
@@ -615,7 +660,7 @@ namespace GroupEMosaicMaker.ViewModel
                     var selectedImages = this.gridView.SelectedItems.Cast<Image>().ToList();
                     value = value ||
                             this.DisplayImage != null && selectedImages.Count != 0 &&
-                            (this.BlockSize != this.lastUsedBlockSizeForPictureMosaic || this.Juxtaposition ||
+                            (this.BlockSize != this.LastUsedBlockSizeForPictureMosaic || this.Juxtaposition ||
                              this.lastJuxtaposition != this.Juxtaposition ||
                              this.UseSelectedImages != this.lastUseSelectedImages) ||
                             this.BlackAndWhiteCreated && selectedImages.Count != 0;
@@ -624,7 +669,7 @@ namespace GroupEMosaicMaker.ViewModel
                 {
                     value = value ||
                             this.DisplayImage != null && this.ImageCollection.Count != 0 &&
-                            (this.BlockSize != this.lastUsedBlockSizeForPictureMosaic || this.Juxtaposition ||
+                            (this.BlockSize != this.LastUsedBlockSizeForPictureMosaic || this.Juxtaposition ||
                              this.lastJuxtaposition != this.Juxtaposition ||
                              this.UseSelectedImages != this.lastUseSelectedImages) ||
                             this.BlackAndWhiteCreated && this.ImageCollection.Count != 0;
@@ -632,7 +677,7 @@ namespace GroupEMosaicMaker.ViewModel
             }
             else
             {
-                value = this.DisplayImage != null && this.BlockSize != this.lastUsedBlockSizeForTriangleMosaic ||
+                value = this.DisplayImage != null && this.BlockSize != this.LastUsedBlockSizeForTriangleMosaic ||
                         this.BlackAndWhiteCreated;
             }
 
@@ -703,7 +748,7 @@ namespace GroupEMosaicMaker.ViewModel
             if (this.SquareMosaic)
             {
                 this.manipulatorForResultImage.CreateSquareMosaic(this.BlockSize);
-                this.lastUsedBlockSizeForSquareMosaic = this.BlockSize;
+                this.LastUsedBlockSizeForSquareMosaic = this.BlockSize;
             }
             else if (this.PictureMosaic)
             {
@@ -719,7 +764,7 @@ namespace GroupEMosaicMaker.ViewModel
 
                 await this.manipulatorForResultImage.CreatePictureMosaic(this.BlockSize, this.imagePalette,
                     this.Juxtaposition, this.UseEachImageOnce);
-                this.lastUsedBlockSizeForPictureMosaic = this.BlockSize;
+                this.LastUsedBlockSizeForPictureMosaic = this.BlockSize;
                 this.lastUseEachImageOnceSelection = this.UseEachImageOnce;
                 this.lastUseSelectedImages = this.UseSelectedImages;
                 this.lastJuxtaposition = this.Juxtaposition;
@@ -727,7 +772,7 @@ namespace GroupEMosaicMaker.ViewModel
             else
             {
                 this.manipulatorForResultImage.CreateTriangleMosaic(this.BlockSize);
-                this.lastUsedBlockSizeForTriangleMosaic = this.BlockSize;
+                this.LastUsedBlockSizeForTriangleMosaic = this.BlockSize;
             }
 
             this.ResultImage = new WriteableBitmap(width, height);
@@ -736,9 +781,9 @@ namespace GroupEMosaicMaker.ViewModel
 
         private void resetLastUsedBlockSizes()
         {
-            this.lastUsedBlockSizeForPictureMosaic = DefaultLastUsedBlockSize;
-            this.lastUsedBlockSizeForSquareMosaic = DefaultLastUsedBlockSize;
-            this.lastUsedBlockSizeForTriangleMosaic = DefaultLastUsedBlockSize;
+            this.LastUsedBlockSizeForPictureMosaic = DefaultLastUsedBlockSize;
+            this.LastUsedBlockSizeForSquareMosaic = DefaultLastUsedBlockSize;
+            this.LastUsedBlockSizeForTriangleMosaic = DefaultLastUsedBlockSize;
         }
 
         private async void writeStreamOfPixels(WriteableBitmap bitMap, byte[] sourcePixels)
