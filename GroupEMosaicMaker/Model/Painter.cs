@@ -168,7 +168,7 @@ namespace GroupEMosaicMaker.Model
         private static Collection<Color> getColorForEachPixel(Collection<byte> pixelBytes)
         {
             var colorCollection = new Collection<Color>();
-            for (var index = 0; index < pixelBytes.Count(); index += ByteOffset)
+            for (var index = 0; index < pixelBytes.Count; index += ByteOffset)
             {
                 var valueA = pixelBytes[index + OpacityOffset];
                 var valueR = pixelBytes[index + RedOffset];

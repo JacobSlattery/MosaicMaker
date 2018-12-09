@@ -2,7 +2,6 @@
     x:Class="GroupEMosaicMaker.View.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:vm="using:GroupEMosaicMaker.ViewModel"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:converter="using:GroupEMosaicMaker.Converter"
@@ -89,7 +88,6 @@
                   VerticalAlignment="Top" Width="135" Margin="10,175,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="13*" />
-                    <ColumnDefinition Width="2*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition />
@@ -98,11 +96,11 @@
                 <RadioButton x:Name="scaleToFitRadioButton" Grid.Row="0" Content="Scale Image"
                              HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="3,3,0,29"
                              Checked="scaleToFitRadioButton_Checked" GroupName="imageProperties" IsChecked="True"
-                             Grid.ColumnSpan="2" Grid.RowSpan="2" />
+                             Grid.RowSpan="2" />
                 <RadioButton x:Name="zoomRadioButton" Grid.Row="1"
                              IsChecked="{Binding ZoomImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              Content="Control Zoom" HorizontalAlignment="Left" VerticalAlignment="Top"
-                             GroupName="imageProperties" Grid.ColumnSpan="2" Margin="3,3,0,0" />
+                             GroupName="imageProperties" Margin="3,3,0,0" />
             </Grid>
 
             <TextBlock Grid.Column="0" HorizontalAlignment="Left" Margin="313,0,0,0" Text="Grid Settings"

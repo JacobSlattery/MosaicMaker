@@ -48,7 +48,6 @@ namespace GroupEMosaicMaker.ViewModel
         private bool squareMosaic;
         private bool triangleMosaic;
         private bool pictureMosaic;
-        private bool zoomImage;
         private bool blackAndWhiteCreated;
         private bool juxtaposition;
         private bool selectMultipleImages;
@@ -150,22 +149,6 @@ namespace GroupEMosaicMaker.ViewModel
             set
             {
                 this.countOfImagesInPalette = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        ///     Gets or sets a value indicating whether [zoom image].
-        /// </summary>
-        /// <value>
-        ///     <c>true</c> if [zoom image]; otherwise, <c>false</c>.
-        /// </value>
-        public bool ZoomImage
-        {
-            get => this.zoomImage;
-            set
-            {
-                this.zoomImage = value;
                 this.OnPropertyChanged();
             }
         }
@@ -621,18 +604,19 @@ namespace GroupEMosaicMaker.ViewModel
                     var selectedImages = this.gridView.SelectedItems.Cast<Image>().ToList();
                     value = value ||
                             this.DisplayImage != null && selectedImages.Count != 0 &&
-                            (this.BlockSize != this.lastUsedBlockSizeForPictureMosaic || this.Juxtaposition || this.lastJuxtaposition != this.Juxtaposition || this.UseSelectedImages != this.lastUseSelectedImages) ||
+                            (this.BlockSize != this.lastUsedBlockSizeForPictureMosaic || this.Juxtaposition ||
+                             this.lastJuxtaposition != this.Juxtaposition ||
+                             this.UseSelectedImages != this.lastUseSelectedImages) ||
                             this.BlackAndWhiteCreated && selectedImages.Count != 0;
-
                 }
                 else
                 {
                     value = value ||
                             this.DisplayImage != null && this.ImageCollection.Count != 0 &&
-                            (this.BlockSize != this.lastUsedBlockSizeForPictureMosaic || this.Juxtaposition || this.lastJuxtaposition != this.Juxtaposition || this.UseSelectedImages != this.lastUseSelectedImages) ||
+                            (this.BlockSize != this.lastUsedBlockSizeForPictureMosaic || this.Juxtaposition ||
+                             this.lastJuxtaposition != this.Juxtaposition ||
+                             this.UseSelectedImages != this.lastUseSelectedImages) ||
                             this.BlackAndWhiteCreated && this.ImageCollection.Count != 0;
-
-
                 }
             }
             else

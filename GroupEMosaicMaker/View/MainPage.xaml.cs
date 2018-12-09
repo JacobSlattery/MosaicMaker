@@ -95,13 +95,11 @@ namespace GroupEMosaicMaker.View
             }
             catch (Exception)
             {
-                var dialog = new ContentDialog()
-                {
+                var dialog = new ContentDialog {
                     Title = "Invalid File",
                     IsPrimaryButtonEnabled = true,
                     DefaultButton = ContentDialogButton.Primary,
                     PrimaryButtonText = "Ok"
-                    
                 };
                 await dialog.ShowAsync();
             }
